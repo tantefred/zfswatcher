@@ -1,67 +1,64 @@
-	<dl class="dl-horizontal">
-		<dt>name:</dt><dd>{{ .Name }}</dd>
-		<dt>state:</dt><dd class="{{ .StateClass }}">{{ .State }}</dd>
+	<dl class="row">
+		<dt class="col-sm-2">name</dt><dd class="col-sm-10">{{ .Name }}</dd>
+		<dt class="col-sm-2">state</dt><dd class="col-sm-10 {{ .StateClass }}">{{ .State }}</dd>
 		{{ if .Status }}
-		<dt>status:</dt><dd>{{ .Status }}</dd>
+		<dt class="col-sm-2">status</dt><dd class="col-sm-10">{{ .Status }}</dd>
 		{{ end }}
 		{{ if .Action }}
-		<dt>action:</dt><dd>{{ .Action }}</dd>
+		<dt class="col-sm-2">action</dt><dd class="col-sm-10">{{ .Action }}</dd>
 		{{ end }}
 		{{ if .See }}
-		<dt>see:</dt><dd><a href="{{ .See }}" target="_blank">{{ .See }}</a></dd>
+		<dt class="col-sm-2">see</dt><dd class="col-sm-10"><a href="{{ .See }}" target="_blank" rel="noopener noreferrer">{{ .See }}</a></dd>
 		{{ end }}
 		{{ if .Scan }}
-		<dt>scan:</dt><dd>{{ .Scan }}</dd>
+		<dt class="col-sm-2">scan</dt><dd class="col-sm-10">{{ .Scan }}</dd>
 		{{ end }}
 	</dl>
-	<table class="table table-condensed table-hover">
-		<thead>
-			<tr>
-				<th style="width: 30%">Name</th>
-				<th style="width: 4%">Loc</th>
-				<th style="width: 15%">State</th>
-				<th style="text-align: right; width: 8%">Read</th>
-				<th style="text-align: right; width: 8%">Write</th>
-				<th style="text-align: right; width: 8%">Cksum</th>
-				<th style="width: 31%"></th>
-			</tr>
-		</thead>
-		<tbody>
-			{{ range .Devs }}
-			<tr>
-				<td style="padding-left: {{ .Indent }}em">{{ .Name }}</td>
-				<td>
-				{{ if .EnableLed }}
-				<form action="{{ .Root }}/locate/" method="post" style="margin-bottom: -1px; margin-top: -1px">
-					<input type="hidden" name="return" value="{{ .Return }}">
-					{{ if .Locate }}
-					<input type="hidden" name="dev" value="{{ .Name }}">
-					<input type="hidden" name="state" value="off">
-					<button type="submit" class="btn btn-sm btn-warning">
-					☼
-					</button>
-					{{ else }}
-					<input type="hidden" name="dev" value="{{ .Name }}">
-					<input type="hidden" name="state" value="on">
-					<button type="submit" class="btn btn-sm">
-					☀
-					</button>
-					{{ end }}
+	<div class="table-responsive card-table">
+		<table class="table table-sm table-hover">
+			<thead>
+				<tr>
+					<th scope="col">Name</th>
+					<th scope="col">Loc</th>
+					<th scope="col">State</th>
+					<th scope="col" class="num">Read</th>
+					<th scope="col" class="num">Write</th>
+					<th scope="col" class="num">Cksum</th>
+					<th scope="col"><span class="visually-hidden">Additional information</span></th>
+				</tr>
+			</thead>
+			<tbody>
+				{{ range .Devs }}
+				<tr>
+					<td class="dev-name {{ .IndentClass }}">{{ .Name }}</td>
+					<td>
+					{{ if .EnableLed }}
+					<form action="{{ .Root }}/locate/" method="post" class="locate-form">
+						<input type="hidden" name="return" value="{{ .Return }}">
+						<input type="hidden" name="dev" value="{{ .Name }}">
+						{{ if .Locate }}
+						<input type="hidden" name="state" value="off">
+						<button type="submit" class="btn btn-sm btn-warning py-0" title="Switch the locate LED off" aria-label="Switch the locate LED of {{ .Name }} off">☼</button>
+						{{ else }}
+						<input type="hidden" name="state" value="on">
+						<button type="submit" class="btn btn-sm btn-outline-secondary py-0" title="Switch the locate LED on" aria-label="Switch the locate LED of {{ .Name }} on">☀</button>
+						{{ end }}
 					</form>
+					{{ end }}
+					</td>
+					<td class="{{ .StateClass }}">{{ .State }}</td>
+					<td class="num">{{ nicenumber .Read }}</td>
+					<td class="num">{{ nicenumber .Write }}</td>
+					<td class="num">{{ nicenumber .Cksum }}</td>
+					<td>{{ .Rest }}</td>
+				</tr>
 				{{ end }}
-				</td>
-				<td class="{{ .StateClass }}">{{ .State }}</td>
-				<td style="text-align: right">{{ nicenumber .Read }}</td>
-				<td style="text-align: right">{{ nicenumber .Write }}</td>
-				<td style="text-align: right">{{ nicenumber .Cksum }}</td>
-				<td style="">{{ .Rest }}</td>
-			</tr>
-			{{ end }}
-		</tbody>
-	</table>
+			</tbody>
+		</table>
+	</div>
 
-	<dl class="dl-horizontal">
-		{{ if .Errors }}
-		<dt>errors:</dt><dd>{{ .Errors }}</dd>
-		{{ end }}
+	{{ if .Errors }}
+	<dl class="row mt-3">
+		<dt class="col-sm-2">errors</dt><dd class="col-sm-10">{{ .Errors }}</dd>
 	</dl>
+	{{ end }}

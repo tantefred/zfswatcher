@@ -58,12 +58,13 @@ func goldenSetup(t *testing.T) {
 	t.Cleanup(func() { cfg = oldCfg })
 	cfg.Www.Rootdir = "/zw"
 	cfg.Www.Logbuffer = 5
+	cfg.Www.Refresh = 10
 	cfg.Www.Severitycssclassmap = severityToWwwClassMap{
-		notifier.CRIT: "danger", notifier.ERR: "danger", notifier.WARNING: "warning", notifier.INFO: "info",
+		notifier.CRIT: "table-danger", notifier.ERR: "table-danger", notifier.WARNING: "table-warning", notifier.INFO: "table-info",
 	}
-	cfg.Www.Poolstatecssclassmap = stringToStringMap{"ONLINE": "success", "DEGRADED": "warning", "FAULTED": "danger"}
-	cfg.Www.Devstatecssclassmap = stringToStringMap{"ONLINE": "success", "DEGRADED": "warning", "FAULTED": "danger", "AVAIL": "info"}
-	cfg.Www.Usedstatecssclassmap = severityToWwwClassMap{notifier.INFO: "progress-bar-info", notifier.WARNING: "progress-bar-warning", notifier.CRIT: "progress-bar-danger"}
+	cfg.Www.Poolstatecssclassmap = stringToStringMap{"ONLINE": "text-success", "DEGRADED": "text-warning", "FAULTED": "text-danger"}
+	cfg.Www.Devstatecssclassmap = stringToStringMap{"ONLINE": "text-success", "DEGRADED": "text-warning", "FAULTED": "text-danger", "AVAIL": "text-info"}
+	cfg.Www.Usedstatecssclassmap = severityToWwwClassMap{notifier.INFO: "bg-info", notifier.WARNING: "bg-warning", notifier.CRIT: "bg-danger"}
 	cfg.Severity.Usedspace = percentageToSeverityMap{0: notifier.INFO, 70: notifier.WARNING, 90: notifier.CRIT}
 
 	oldTemplates := templates
@@ -243,7 +244,7 @@ func TestGoldenViewer(t *testing.T) {
 		t.Error("viewer page contains locate or logs")
 	}
 	_, body = renderAs(RoleViewer, dashboardHandler, "/zw/")
-	checkGolden(t, "dashboard-viewer.html", volatileRE.ReplaceAllString(body, "$1:</dt><dd>VOLATILE"))
+	checkGolden(t, "dashboard-viewer.html", volatileRE.ReplaceAllString(body, "${1}</dt>${2}VOLATILE"))
 	if strings.Contains(body, "/zw/logs/") {
 		t.Error("viewer dashboard links the logs")
 	}
@@ -256,7 +257,7 @@ func TestGoldenViewer(t *testing.T) {
 }
 
 // volatileRE matches the values of the dashboard which change on every run.
-var volatileRE = regexp.MustCompile(`(load averages|system uptime|zfswatcher uptime):</dt><dd>[^<\n]*`)
+var volatileRE = regexp.MustCompile(`(load averages|system uptime|zfswatcher uptime)</dt>(\s*<dd class="[^"]*">)[^<\n]*`)
 
 func TestGoldenDashboard(t *testing.T) {
 	goldenSetup(t)
@@ -266,11 +267,11 @@ func TestGoldenDashboard(t *testing.T) {
 	if code != 200 {
 		t.Fatalf("status %d", code)
 	}
-	checkGolden(t, "dashboard.html", volatileRE.ReplaceAllString(body, "$1:</dt><dd>VOLATILE"))
+	checkGolden(t, "dashboard.html", volatileRE.ReplaceAllString(body, "${1}</dt>${2}VOLATILE"))
 
 	goldenSetState(t, nil, nil)
 	_, body = render(dashboardHandler, "/zw/")
-	checkGolden(t, "dashboard-none.html", volatileRE.ReplaceAllString(body, "$1:</dt><dd>VOLATILE"))
+	checkGolden(t, "dashboard-none.html", volatileRE.ReplaceAllString(body, "${1}</dt>${2}VOLATILE"))
 }
 
 func TestGoldenUsage(t *testing.T) {
@@ -375,4 +376,20 @@ func TestGoldenEnclosure(t *testing.T) {
 	cfg.Chassis.Enable = false
 	_, body = render(enclosureHandler, "/zw/enclosure/")
 	checkGolden(t, "enclosure-disabled.html", body)
+}
+
+// The fragments of the automatic refresh are the content of the live part of
+// the pages; with refresh = 0 the pages have no htmx attributes.
+func TestGoldenFragmentsAndNoRefresh(t *testing.T) {
+	goldenLedSetup(t)
+	_, body := render(dashboardHandler, "/zw/?fragment=1")
+	checkGolden(t, "dashboard-fragment.html", volatileRE.ReplaceAllString(body, "${1}</dt>${2}VOLATILE"))
+	_, body = render(statusHandler, "/zw/status/zfsw_mix?fragment=1")
+	checkGolden(t, "status-fragment.html", body)
+
+	cfg.Www.Refresh = 0
+	_, body = render(statusHandler, "/zw/status/zfsw_mix")
+	checkGolden(t, "status-leds-norefresh.html", body)
+	_, body = render(dashboardHandler, "/zw/")
+	checkGolden(t, "dashboard-norefresh.html", volatileRE.ReplaceAllString(body, "${1}</dt>${2}VOLATILE"))
 }

@@ -2,138 +2,305 @@
 <html lang="en">
 	<head>
 		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
 		<title>zfswatcher</title>
-		<meta name="viewport" content="width=device-width, initial-scale=1.0">
 		<link href="/zw/resources/bootstrap/css/bootstrap.min.css" rel="stylesheet">
-		<link href="/zw/resources/bootstrap/css/bootstrap-theme.min.css" rel="stylesheet">
-		<style type="text/css">
-			body {
-				padding-top: 60px;
-				padding-bottom: 60px;
-			}
-		</style>
 		<link href="/zw/resources/zfswatcher.css" rel="stylesheet">
 		<link href="/zw/resources/favicon.ico" rel="shortcut icon">
-		<script src="/zw/resources/bootstrap/js/jquery.min.js"></script>
+		
 	</head>
 
 	<body>
 
-	<div class="navbar navbar-inverse navbar-fixed-top">
+	<nav class="navbar navbar-expand-md navbar-dark bg-dark mb-4" data-bs-theme="dark">
 		<div class="container-fluid">
-			<div class="navbar-header">
-				<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
-	        <span class="sr-only">Toggle navigation</span>
-	        <span class="icon-bar"></span>
-	        <span class="icon-bar"></span>
-	        <span class="icon-bar"></span>
-	      </button>
-				<a class="navbar-brand" href="/zw/">zfswatcher</a>
-	    </div>
-				<div class="navbar-collapse collapse" id="bs-example-navbar-collapse-1">
-					<ul class="nav navbar-nav">
-						<li>
-							<a href="/zw/">Dashboard</a></li>
-						<li>
-							<a href="/zw/status/">Pool Status</a></li>
-						<li class="active">
-							<a href="/zw/enclosure/">Enclosure</a></li>
-						<li>
-							<a href="/zw/statistics/">Statistics</a></li>
-						<li>
-							<a href="/zw/logs/">Logs</a></li>
-					</ul>
-					<ul class="nav navbar-nav navbar-right">
-						<li>
-							<a href="/zw/about/" class="pull-right">About</a></li>
-					</ul>
-				</div>
+			<a class="navbar-brand" href="/zw/">zfswatcher</a>
+			<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#main-nav" aria-controls="main-nav" aria-expanded="false" aria-label="Toggle navigation">
+				<span class="navbar-toggler-icon"></span>
+			</button>
+			<div class="collapse navbar-collapse" id="main-nav">
+				<ul class="navbar-nav me-auto mb-2 mb-md-0">
+					<li class="nav-item">
+						<a class="nav-link" href="/zw/">Dashboard</a></li>
+					<li class="nav-item">
+						<a class="nav-link" href="/zw/status/">Pool Status</a></li>
+					<li class="nav-item">
+						<a class="nav-link active" aria-current="page" href="/zw/enclosure/">Enclosure</a></li>
+					<li class="nav-item">
+						<a class="nav-link" href="/zw/statistics/">Statistics</a></li>
+					<li class="nav-item">
+						<a class="nav-link" href="/zw/logs/">Logs</a></li>
+				</ul>
+				<ul class="navbar-nav">
+					<li class="nav-item">
+						<a class="nav-link" href="/zw/about/">About</a></li>
+				</ul>
 			</div>
 		</div>
-	</div>
+	</nav>
 
-	<div class="container-fluid">
+	<main class="container-fluid">
 		
-		<div class="row-fluid">
 
 
-  
-  <div class="page-header" style="margin: 0px;">
-    
-    
-    
-    
-      <h1 align="center">45Drives S45 Enclosure
-      </h1>
-      <h2 align="center"><small>Front of unit</small></h2>
-      <table class="enclosure45table" align="center">
-        <tbody>
-          <tr>
-            <td id="drive1-1" class="enclosuretabletd"></td>
-            <td id="drive1-2" class="enclosuretabletd"></td>
-            <td id="drive1-3" class="enclosuretabletd"></td>
-            <td id="drive1-4" class="enclosuretabletd"></td>
-            <td id="drive1-5" class="enclosuretabletd"></td>
-            <td id="drive1-6" class="enclosuretabletd"></td>
-            <td id="drive1-7" class="enclosuretabletd"></td>
-            <td id="drive1-8" class="enclosuretabletd"></td>
-            <td id="drive1-9" class="enclosuretabletd"></td>
-            <td id="drive1-10" class="enclosuretabletd"></td>
-            <td id="drive1-11" class="enclosuretabletd"></td>
-            <td id="drive1-12" class="enclosuretabletd"></td>
-            <td id="drive1-13" class="enclosuretabletd"></td>
-            <td id="drive1-14" class="enclosuretabletd"></td>
-            <td id="drive1-15" class="enclosuretabletd"></td>
-        </tr>
-          <tr>
-            <td id="drive2-6" class="enclosuretabletd"></td>
-            <td id="drive2-5" class="enclosuretabletd"></td>
-            <td id="drive2-4" class="enclosuretabletd"></td>
-            <td id="drive2-3" class="enclosuretabletd"></td>
-            <td id="drive2-2" class="enclosuretabletd"></td>
-            <td id="drive2-1" class="enclosuretabletd"></td>
-            <td id="drive1-24" class="enclosuretabletd"></td>
-            <td id="drive1-23" class="enclosuretabletd"></td>
-            <td id="drive1-22" class="enclosuretabletd"></td>
-            <td id="drive1-21" class="enclosuretabletd"></td>
-            <td id="drive1-20" class="enclosuretabletd"></td>
-            <td id="drive1-19" class="enclosuretabletd"></td>
-            <td id="drive1-18" class="enclosuretabletd"></td>
-            <td id="drive1-17" class="enclosuretabletd"></td>
-            <td id="drive1-16" class="enclosuretabletd"></td>
-        </tr>
-          <tr>
-            <td id="drive2-7" class="enclosuretabletd"></td>
-            <td id="drive2-8" class="enclosuretabletd"></td>
-            <td id="drive2-9" class="enclosuretabletd"></td>
-            <td id="drive2-10" class="enclosuretabletd"></td>
-            <td id="drive2-11" class="enclosuretabletd"></td>
-            <td id="drive2-12" class="enclosuretabletd"></td>
-            <td id="drive2-13" class="enclosuretabletd"></td>
-            <td id="drive2-14" class="enclosuretabletd"></td>
-            <td id="drive2-15" class="enclosuretabletd"></td>
-            <td id="drive2-16" class="enclosuretabletd"></td>
-            <td id="drive2-17" class="enclosuretabletd"></td>
-            <td id="drive2-18" class="enclosuretabletd"></td>
-            <td id="drive2-19" class="enclosuretabletd"></td>
-            <td id="drive2-20" class="enclosuretabletd"></td>
-            <td id="drive2-21" class="enclosuretabletd"></td>
-        </tr>
-        </tbody>
-      </table>
 
-      <script type="application/json" id="enclosure-drives">{"drives1":[{"Indent":0,"Name":"1-3","State":"ONLINE","StateClass":""},{"Indent":0,"Name":"1-1","State":"ONLINE","StateClass":""},{"Indent":0,"Name":"1-10","State":"ONLINE","StateClass":""},{"Indent":0,"Name":"1-2","State":"FAULTED","StateClass":""}],"drives2":[{"Indent":0,"Name":"2-2","State":"ONLINE","StateClass":""},{"Indent":0,"Name":"2-1","State":"DEGRADED","StateClass":""}]}</script>
-      <script src="/zw/resources/enclosure.js"></script>
-    
-    
-    </div>
-    
+	
+		
+		<section class="enclosure mb-4">
+			<h2 class="h4 text-center">45Drives S45 Enclosure</h2>
+			<p class="text-center text-body-secondary">Front of unit</p>
+			
+			<div class="enclosure-scroll">
+				<div class="enclosure-frame">
+					
+					<div class="enclosure-row">
+						
+						<div class="enclosure-slot slot-online" title="1-1: ONLINE">
+							<kbd class="slot-name">1-1</kbd>
+							<span class="slot-state">ONLINE</span>
+						</div>
+						
+						<div class="enclosure-slot slot-faulted" title="1-2: FAULTED">
+							<kbd class="slot-name">1-2</kbd>
+							<span class="slot-state">FAULTED</span>
+						</div>
+						
+						<div class="enclosure-slot slot-online" title="1-3: ONLINE">
+							<kbd class="slot-name">1-3</kbd>
+							<span class="slot-state">ONLINE</span>
+						</div>
+						
+						<div class="enclosure-slot slot-empty" title="1-4: empty">
+							<kbd class="slot-name">1-4</kbd>
+							
+						</div>
+						
+						<div class="enclosure-slot slot-empty" title="1-5: empty">
+							<kbd class="slot-name">1-5</kbd>
+							
+						</div>
+						
+						<div class="enclosure-slot slot-empty" title="1-6: empty">
+							<kbd class="slot-name">1-6</kbd>
+							
+						</div>
+						
+						<div class="enclosure-slot slot-empty" title="1-7: empty">
+							<kbd class="slot-name">1-7</kbd>
+							
+						</div>
+						
+						<div class="enclosure-slot slot-empty" title="1-8: empty">
+							<kbd class="slot-name">1-8</kbd>
+							
+						</div>
+						
+						<div class="enclosure-slot slot-empty" title="1-9: empty">
+							<kbd class="slot-name">1-9</kbd>
+							
+						</div>
+						
+						<div class="enclosure-slot slot-online" title="1-10: ONLINE">
+							<kbd class="slot-name">1-10</kbd>
+							<span class="slot-state">ONLINE</span>
+						</div>
+						
+						<div class="enclosure-slot slot-empty" title="1-11: empty">
+							<kbd class="slot-name">1-11</kbd>
+							
+						</div>
+						
+						<div class="enclosure-slot slot-empty" title="1-12: empty">
+							<kbd class="slot-name">1-12</kbd>
+							
+						</div>
+						
+						<div class="enclosure-slot slot-empty" title="1-13: empty">
+							<kbd class="slot-name">1-13</kbd>
+							
+						</div>
+						
+						<div class="enclosure-slot slot-empty" title="1-14: empty">
+							<kbd class="slot-name">1-14</kbd>
+							
+						</div>
+						
+						<div class="enclosure-slot slot-empty" title="1-15: empty">
+							<kbd class="slot-name">1-15</kbd>
+							
+						</div>
+						
+					</div>
+					
+					<div class="enclosure-row">
+						
+						<div class="enclosure-slot slot-empty" title="2-6: empty">
+							<kbd class="slot-name">2-6</kbd>
+							
+						</div>
+						
+						<div class="enclosure-slot slot-empty" title="2-5: empty">
+							<kbd class="slot-name">2-5</kbd>
+							
+						</div>
+						
+						<div class="enclosure-slot slot-empty" title="2-4: empty">
+							<kbd class="slot-name">2-4</kbd>
+							
+						</div>
+						
+						<div class="enclosure-slot slot-empty" title="2-3: empty">
+							<kbd class="slot-name">2-3</kbd>
+							
+						</div>
+						
+						<div class="enclosure-slot slot-online" title="2-2: ONLINE">
+							<kbd class="slot-name">2-2</kbd>
+							<span class="slot-state">ONLINE</span>
+						</div>
+						
+						<div class="enclosure-slot slot-degraded" title="2-1: DEGRADED">
+							<kbd class="slot-name">2-1</kbd>
+							<span class="slot-state">DEGRADED</span>
+						</div>
+						
+						<div class="enclosure-slot slot-empty" title="1-24: empty">
+							<kbd class="slot-name">1-24</kbd>
+							
+						</div>
+						
+						<div class="enclosure-slot slot-empty" title="1-23: empty">
+							<kbd class="slot-name">1-23</kbd>
+							
+						</div>
+						
+						<div class="enclosure-slot slot-empty" title="1-22: empty">
+							<kbd class="slot-name">1-22</kbd>
+							
+						</div>
+						
+						<div class="enclosure-slot slot-empty" title="1-21: empty">
+							<kbd class="slot-name">1-21</kbd>
+							
+						</div>
+						
+						<div class="enclosure-slot slot-empty" title="1-20: empty">
+							<kbd class="slot-name">1-20</kbd>
+							
+						</div>
+						
+						<div class="enclosure-slot slot-empty" title="1-19: empty">
+							<kbd class="slot-name">1-19</kbd>
+							
+						</div>
+						
+						<div class="enclosure-slot slot-empty" title="1-18: empty">
+							<kbd class="slot-name">1-18</kbd>
+							
+						</div>
+						
+						<div class="enclosure-slot slot-empty" title="1-17: empty">
+							<kbd class="slot-name">1-17</kbd>
+							
+						</div>
+						
+						<div class="enclosure-slot slot-empty" title="1-16: empty">
+							<kbd class="slot-name">1-16</kbd>
+							
+						</div>
+						
+					</div>
+					
+					<div class="enclosure-row">
+						
+						<div class="enclosure-slot slot-empty" title="2-7: empty">
+							<kbd class="slot-name">2-7</kbd>
+							
+						</div>
+						
+						<div class="enclosure-slot slot-empty" title="2-8: empty">
+							<kbd class="slot-name">2-8</kbd>
+							
+						</div>
+						
+						<div class="enclosure-slot slot-empty" title="2-9: empty">
+							<kbd class="slot-name">2-9</kbd>
+							
+						</div>
+						
+						<div class="enclosure-slot slot-empty" title="2-10: empty">
+							<kbd class="slot-name">2-10</kbd>
+							
+						</div>
+						
+						<div class="enclosure-slot slot-empty" title="2-11: empty">
+							<kbd class="slot-name">2-11</kbd>
+							
+						</div>
+						
+						<div class="enclosure-slot slot-empty" title="2-12: empty">
+							<kbd class="slot-name">2-12</kbd>
+							
+						</div>
+						
+						<div class="enclosure-slot slot-empty" title="2-13: empty">
+							<kbd class="slot-name">2-13</kbd>
+							
+						</div>
+						
+						<div class="enclosure-slot slot-empty" title="2-14: empty">
+							<kbd class="slot-name">2-14</kbd>
+							
+						</div>
+						
+						<div class="enclosure-slot slot-empty" title="2-15: empty">
+							<kbd class="slot-name">2-15</kbd>
+							
+						</div>
+						
+						<div class="enclosure-slot slot-empty" title="2-16: empty">
+							<kbd class="slot-name">2-16</kbd>
+							
+						</div>
+						
+						<div class="enclosure-slot slot-empty" title="2-17: empty">
+							<kbd class="slot-name">2-17</kbd>
+							
+						</div>
+						
+						<div class="enclosure-slot slot-empty" title="2-18: empty">
+							<kbd class="slot-name">2-18</kbd>
+							
+						</div>
+						
+						<div class="enclosure-slot slot-empty" title="2-19: empty">
+							<kbd class="slot-name">2-19</kbd>
+							
+						</div>
+						
+						<div class="enclosure-slot slot-empty" title="2-20: empty">
+							<kbd class="slot-name">2-20</kbd>
+							
+						</div>
+						
+						<div class="enclosure-slot slot-empty" title="2-21: empty">
+							<kbd class="slot-name">2-21</kbd>
+							
+						</div>
+						
+					</div>
+					
+				</div>
+			</div>
+			
+		</section>
+		
+	
 
 
-			</div> 
-		</div> 
+	</main>
 
-		<script src="/zw/resources/bootstrap/js/bootstrap.min.js"></script>
+	<script src="/zw/resources/bootstrap/js/bootstrap.bundle.min.js"></script>
 
 	</body>
 </html>

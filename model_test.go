@@ -491,7 +491,7 @@ func TestMakeLogMsgWeb(t *testing.T) {
 	goldenSetup(t)
 	ts := time.Date(2026, 5, 6, 7, 8, 9, 0, time.UTC)
 	w := makeLogMsgWeb(Event{Time: ts, Severity: "crit", Text: "t", Attachment: "a"})
-	want := logMsgWeb{Time: "2026-05-06 07:08:09", Severity: "crit", Class: "danger", Text: "t", Attachment: "a"}
+	want := logMsgWeb{Time: "2026-05-06 07:08:09", Severity: "crit", Class: "table-danger", Text: "t", Attachment: "a"}
 	if w != want {
 		t.Errorf("got %+v", w)
 	}

@@ -1,13 +1,17 @@
 {{ template "header.html" .Nav }}
 
-<ul class="nav nav-tabs">
+<h1 class="h3 mb-3">Pool Status</h1>
+
+<ul class="nav nav-tabs mb-3">
 {{ range .SubNav }}
-	<li{{ if .Active }} class="active"{{ end }}>
-		<a href="{{ .Name }}">{{ .Name }}</a>
+	<li class="nav-item">
+		<a class="nav-link{{ if .Active }} active{{ end }}"{{ if .Active }} aria-current="page"{{ end }} href="{{ $.Nav.Root }}/status/{{ .Name }}">{{ .Name }}</a>
 	</li>
 {{ end }}
 </ul>
 
+<div id="live"{{ if .Nav.Refresh }} hx-get="{{ .Nav.RefreshURL }}" hx-trigger="every {{ .Nav.Refresh }}s" hx-swap="innerHTML"{{ end }}>
 {{ template "status-pool.html" .Data }}
+</div>
 
 {{ template "footer.html" .Nav }}

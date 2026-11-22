@@ -1,35 +1,33 @@
 {{ template "header.html" .Nav }}
 
-<table class="table table-hover">
-	<thead>
-		<tr>
-			<th style="width: 10em">Time</th>
-			<th style="width: 7em">Severity</th>
-			<th>Message</th>
-		</tr>
-	</thead>
-	<tbody>
-		{{ range $n, $d := .Data }}
-		<tr class="{{ $d.Class }}">
-			<td>{{ $d.Time }}</td>
-			<td>{{ $d.Severity }}</td>
-			<td>{{ $d.Text }}
-				{{ if $d.Attachment }}
-				<button class="btn btn-sm pull-right"
-					type="button"
-					data-toggle="collapse"
-					data-target="#attachment-{{ $n }}">
-					View attachment
-				</button>
-				<div id="attachment-{{ $n }}"
-					class="collapse">
-					<pre>{{ $d.Attachment }}</pre>
-				</div>
-				{{ end }}
-			</td>
-		</tr>
-		{{ end }}
-	</tbody>
-</table>
+<h1 class="h3 mb-3">Logs</h1>
+
+<div class="table-responsive card-table">
+	<table class="table table-hover">
+		<thead>
+			<tr>
+				<th scope="col" class="text-nowrap">Time</th>
+				<th scope="col">Severity</th>
+				<th scope="col">Message</th>
+			</tr>
+		</thead>
+		<tbody>
+			{{ range $d := .Data }}
+			<tr class="{{ $d.Class }}">
+				<td class="text-nowrap">{{ $d.Time }}</td>
+				<td>{{ $d.Severity }}</td>
+				<td>{{ $d.Text }}
+					{{ if $d.Attachment }}
+					<details class="mt-1">
+						<summary>View attachment</summary>
+						<pre class="attachment">{{ $d.Attachment }}</pre>
+					</details>
+					{{ end }}
+				</td>
+			</tr>
+			{{ end }}
+		</tbody>
+	</table>
+</div>
 
 {{ template "footer.html" .Nav }}

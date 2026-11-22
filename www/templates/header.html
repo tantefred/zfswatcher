@@ -2,57 +2,47 @@
 <html lang="en">
 	<head>
 		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
 		<title>zfswatcher</title>
-		<meta name="viewport" content="width=device-width, initial-scale=1.0">
 		<link href="{{ .Root }}/resources/bootstrap/css/bootstrap.min.css" rel="stylesheet">
-		<link href="{{ .Root }}/resources/bootstrap/css/bootstrap-theme.min.css" rel="stylesheet">
-		<style type="text/css">
-			body {
-				padding-top: 60px;
-				padding-bottom: 60px;
-			}
-		</style>
 		<link href="{{ .Root }}/resources/zfswatcher.css" rel="stylesheet">
 		<link href="{{ .Root }}/resources/favicon.ico" rel="shortcut icon">
-		<script src="{{ .Root }}/resources/bootstrap/js/jquery.min.js"></script>
+		{{ if .Refresh }}
+		<meta name="htmx-config" content='{"allowEval":false,"includeIndicatorStyles":false,"selfRequestsOnly":true}'>
+		<script src="{{ .Root }}/resources/htmx/htmx.min.js" defer></script>
+		{{ end }}
 	</head>
 
 	<body>
 
-	<div class="navbar navbar-inverse navbar-fixed-top">
+	<nav class="navbar navbar-expand-md navbar-dark bg-dark mb-4" data-bs-theme="dark">
 		<div class="container-fluid">
-			<div class="navbar-header">
-				<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
-	        <span class="sr-only">Toggle navigation</span>
-	        <span class="icon-bar"></span>
-	        <span class="icon-bar"></span>
-	        <span class="icon-bar"></span>
-	      </button>
-				<a class="navbar-brand" href="{{ .Root }}/">zfswatcher</a>
-	    </div>
-				<div class="navbar-collapse collapse" id="bs-example-navbar-collapse-1">
-					<ul class="nav navbar-nav">
-						<li{{ if .Dashboard }} class="active"{{ end }}>
-							<a href="{{ .Root }}/">Dashboard</a></li>
-						<li{{ if .PoolStatus }} class="active"{{ end }}>
-							<a href="{{ .Root }}/status/">Pool Status</a></li>
-						<li{{ if .Enclosure }} class="active"{{ end }}>
-							<a href="{{ .Root }}/enclosure/">Enclosure</a></li>
-						<li{{ if .Statistics }} class="active"{{ end }}>
-							<a href="{{ .Root }}/statistics/">Statistics</a></li>{{ if .CanLogs }}
-						<li{{ if .Logs }} class="active"{{ end }}>
-							<a href="{{ .Root }}/logs/">Logs</a></li>{{ end }}
-					</ul>
-					<ul class="nav navbar-nav navbar-right">
-						<li{{ if .About }} class="active"{{ end }}>
-							<a href="{{ .Root }}/about/" class="pull-right">About</a></li>
-					</ul>
-				</div>
+			<a class="navbar-brand" href="{{ .Root }}/">zfswatcher</a>
+			<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#main-nav" aria-controls="main-nav" aria-expanded="false" aria-label="Toggle navigation">
+				<span class="navbar-toggler-icon"></span>
+			</button>
+			<div class="collapse navbar-collapse" id="main-nav">
+				<ul class="navbar-nav me-auto mb-2 mb-md-0">
+					<li class="nav-item">
+						<a class="nav-link{{ if .Dashboard }} active{{ end }}"{{ if .Dashboard }} aria-current="page"{{ end }} href="{{ .Root }}/">Dashboard</a></li>
+					<li class="nav-item">
+						<a class="nav-link{{ if .PoolStatus }} active{{ end }}"{{ if .PoolStatus }} aria-current="page"{{ end }} href="{{ .Root }}/status/">Pool Status</a></li>
+					<li class="nav-item">
+						<a class="nav-link{{ if .Enclosure }} active{{ end }}"{{ if .Enclosure }} aria-current="page"{{ end }} href="{{ .Root }}/enclosure/">Enclosure</a></li>
+					<li class="nav-item">
+						<a class="nav-link{{ if .Statistics }} active{{ end }}"{{ if .Statistics }} aria-current="page"{{ end }} href="{{ .Root }}/statistics/">Statistics</a></li>{{ if .CanLogs }}
+					<li class="nav-item">
+						<a class="nav-link{{ if .Logs }} active{{ end }}"{{ if .Logs }} aria-current="page"{{ end }} href="{{ .Root }}/logs/">Logs</a></li>{{ end }}
+				</ul>
+				<ul class="navbar-nav">
+					<li class="nav-item">
+						<a class="nav-link{{ if .About }} active{{ end }}"{{ if .About }} aria-current="page"{{ end }} href="{{ .Root }}/about/">About</a></li>
+				</ul>
 			</div>
 		</div>
-	</div>
+	</nav>
 
-	<div class="container-fluid">
+	<main class="container-fluid">
 		{{ if .DefaultPasswordWarning }}
 		<div class="alert alert-danger" role="alert">
 			<strong>Warning:</strong> a web user still uses the well-known example
@@ -60,4 +50,3 @@
 			configuration file.
 		</div>
 		{{ end }}
-		<div class="row-fluid">

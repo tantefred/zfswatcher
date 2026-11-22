@@ -1,7 +1,13 @@
 {{ template "header.html" .Nav }}
 
-<div class="alert alert-info">
-	There are no pools.
-</div>
+<h1 class="h3 mb-3">Pool Status</h1>
+
+{{ template "no-pools" }}
 
 {{ template "footer.html" .Nav }}
+
+{{ define "no-pools" }}
+<div class="alert alert-info" role="alert">
+	There are no pools.
+</div>
+{{ end }}

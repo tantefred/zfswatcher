@@ -1,88 +1,40 @@
 {{ template "header.html" .Nav }}
+
 {{ with .Data }}
-  {{ if .ChassisEnable }}
-  <div class="page-header" style="margin: 0px;">
-    {{ if .Chassis45drives15 }}
-      <h3 align="center">45Drives AV15</h3>
-    {{ end }}
-    {{ if .Chassis45drives30 }}
-      <h3 align="center">45Drives Q30</h3>
-    {{ end }}
-    {{ if .Chassis45drives45l }}
-      <h3 align="center">45Drives S45 lite</h3>
-    {{ end }}
-    {{ if .Chassis45drives45 }}
-      <h1 align="center">45Drives S45 Enclosure
-      </h1>
-      <h2 align="center"><small>Front of unit</small></h2>
-      <table class="enclosure45table" align="center">
-        <tbody>
-          <tr>
-            <td id="drive1-1" class="enclosuretabletd"></td>
-            <td id="drive1-2" class="enclosuretabletd"></td>
-            <td id="drive1-3" class="enclosuretabletd"></td>
-            <td id="drive1-4" class="enclosuretabletd"></td>
-            <td id="drive1-5" class="enclosuretabletd"></td>
-            <td id="drive1-6" class="enclosuretabletd"></td>
-            <td id="drive1-7" class="enclosuretabletd"></td>
-            <td id="drive1-8" class="enclosuretabletd"></td>
-            <td id="drive1-9" class="enclosuretabletd"></td>
-            <td id="drive1-10" class="enclosuretabletd"></td>
-            <td id="drive1-11" class="enclosuretabletd"></td>
-            <td id="drive1-12" class="enclosuretabletd"></td>
-            <td id="drive1-13" class="enclosuretabletd"></td>
-            <td id="drive1-14" class="enclosuretabletd"></td>
-            <td id="drive1-15" class="enclosuretabletd"></td>
-        </tr>
-          <tr>
-            <td id="drive2-6" class="enclosuretabletd"></td>
-            <td id="drive2-5" class="enclosuretabletd"></td>
-            <td id="drive2-4" class="enclosuretabletd"></td>
-            <td id="drive2-3" class="enclosuretabletd"></td>
-            <td id="drive2-2" class="enclosuretabletd"></td>
-            <td id="drive2-1" class="enclosuretabletd"></td>
-            <td id="drive1-24" class="enclosuretabletd"></td>
-            <td id="drive1-23" class="enclosuretabletd"></td>
-            <td id="drive1-22" class="enclosuretabletd"></td>
-            <td id="drive1-21" class="enclosuretabletd"></td>
-            <td id="drive1-20" class="enclosuretabletd"></td>
-            <td id="drive1-19" class="enclosuretabletd"></td>
-            <td id="drive1-18" class="enclosuretabletd"></td>
-            <td id="drive1-17" class="enclosuretabletd"></td>
-            <td id="drive1-16" class="enclosuretabletd"></td>
-        </tr>
-          <tr>
-            <td id="drive2-7" class="enclosuretabletd"></td>
-            <td id="drive2-8" class="enclosuretabletd"></td>
-            <td id="drive2-9" class="enclosuretabletd"></td>
-            <td id="drive2-10" class="enclosuretabletd"></td>
-            <td id="drive2-11" class="enclosuretabletd"></td>
-            <td id="drive2-12" class="enclosuretabletd"></td>
-            <td id="drive2-13" class="enclosuretabletd"></td>
-            <td id="drive2-14" class="enclosuretabletd"></td>
-            <td id="drive2-15" class="enclosuretabletd"></td>
-            <td id="drive2-16" class="enclosuretabletd"></td>
-            <td id="drive2-17" class="enclosuretabletd"></td>
-            <td id="drive2-18" class="enclosuretabletd"></td>
-            <td id="drive2-19" class="enclosuretabletd"></td>
-            <td id="drive2-20" class="enclosuretabletd"></td>
-            <td id="drive2-21" class="enclosuretabletd"></td>
-        </tr>
-        </tbody>
-      </table>
-
-      <script type="application/json" id="enclosure-drives">{{ .EnclosureData }}</script>
-      <script src="{{ $.Nav.Root }}/resources/enclosure.js"></script>
-    {{ end }}
-    {{ if .Chassis45drives60 }}
-      <h3 align="center">45Drives XL60</h3>
-    {{ end }}
-    </div>
-    {{ else }}
-      <div class="alert alert-error">
-        Enclosure detection has not been enabled in config
-      </div>
-    {{ end }}
-
+	{{ if .ChassisEnable }}
+		{{ range .Layouts }}
+		<section class="enclosure mb-4">
+			<h2 class="h4 text-center">{{ .Title }}</h2>
+			{{ if .Subtitle }}<p class="text-center text-body-secondary">{{ .Subtitle }}</p>{{ end }}
+			{{ if .HasRows }}
+			<div class="enclosure-scroll">
+				<div class="enclosure-frame">
+					{{ range .Rows }}
+					<div class="enclosure-row">
+						{{ range . }}
+						<div class="enclosure-slot {{ .Class }}" title="{{ .Name }}: {{ if .Present }}{{ .State }}{{ else }}empty{{ end }}">
+							<kbd class="slot-name">{{ .Name }}</kbd>
+							{{ if .Present }}<span class="slot-state">{{ .State }}</span>{{ end }}
+						</div>
+						{{ end }}
+					</div>
+					{{ end }}
+				</div>
+			</div>
+			{{ else }}
+			<p class="text-center text-body-secondary">No slot layout is available for this model yet.</p>
+			{{ end }}
+		</section>
+		{{ else }}
+		<div class="alert alert-info" role="alert">
+			No chassis model is enabled in the <code>[chassis]</code> section of the configuration.
+		</div>
+		{{ end }}
+	{{ else }}
+	<div class="alert alert-warning" role="alert">
+		Enclosure detection has not been enabled in config
+	</div>
+	{{ end }}
 {{ end }}
+
 {{ template "footer.html" .Nav }}

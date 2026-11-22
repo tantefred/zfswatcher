@@ -314,9 +314,10 @@ func healthzHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// webCSP restricts the pages to their own origin. Inline styles are still
-// needed because the Bootstrap templates use style attributes.
-const webCSP = "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; " +
+// webCSP restricts the pages to their own origin. The templates have no
+// inline scripts and no style attributes (the htmx configuration comes from
+// a meta tag, htmx adds no indicator styles), so nothing inline is allowed.
+const webCSP = "default-src 'self'; script-src 'self'; style-src 'self'; " +
 	"img-src 'self' data:; frame-ancestors 'none'; base-uri 'self'; form-action 'self'"
 
 // securityHeaders adds defensive response headers to every response.
