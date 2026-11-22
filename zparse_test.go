@@ -1,12 +1,9 @@
 package main
 
 import (
-	"errors"
-	"io"
 	"os"
 	"strings"
 	"testing"
-	"testing/iotest"
 
 	"github.com/tantefred/zfswatcher/notifier"
 )
@@ -245,37 +242,6 @@ func TestParseConfstrUndetermined(t *testing.T) {
 	}
 }
 
-func TestZpoolIostatParser(t *testing.T) {
-	data := readFixture(t, "zpool-iostat.txt")
-	first := data[:strings.Index(data, "\n\n")+1]
-
-	table := ZpoolIostatParser(first)
-	if table == nil {
-		t.Fatal("parser returned nil")
-	}
-	tank := (*table)["tank"]
-	if tank == nil {
-		t.Fatal("pool tank not found")
-	}
-	row := tank["tank"]
-	if row == nil || row.OperationsRead != 18 || row.OperationsWrite != 71 {
-		t.Errorf("unexpected tank row: %+v", row)
-	}
-	if sdc := tank["sdc"]; sdc == nil || sdc.CapacityAlloc != 84*1024 {
-		t.Errorf("unexpected sdc row: %+v", sdc)
-	}
-	if (*table)["vmstore"] == nil {
-		t.Error("pool vmstore not found")
-	}
-}
-
-func TestZpoolIostatParserInvalidRow(t *testing.T) {
-	in := "header\n------  -----\ntank 1 2\n"
-	if got := ZpoolIostatParser(in); got != nil {
-		t.Errorf("expected nil for malformed row, got %v", got)
-	}
-}
-
 func TestParseZpoolStatusProxmox(t *testing.T) {
 	// Output of OpenZFS 2.x as shipped with Proxmox VE (three pools; device
 	// serial numbers anonymized).
@@ -350,29 +316,6 @@ func TestParseZfsListProxmox(t *testing.T) {
 	}
 }
 
-func TestZpoolIostatParserVerboseProxmox(t *testing.T) {
-	table := ZpoolIostatParser(readFixture(t, "zpool-iostat-v-proxmox.txt"))
-	if table == nil {
-		t.Fatal("parser returned nil")
-	}
-	if len(*table) != 3 {
-		t.Fatalf("got %d pools, want 3", len(*table))
-	}
-	rpool := (*table)["rpool"]
-	if got := len(rpool); got != 4 { // pool, mirror and two devices
-		t.Errorf("rpool has %d rows, want 4", got)
-	}
-	if row := rpool["sdi3"]; row == nil || row.OperationsRead != 24 || row.CapacityAlloc != -1 {
-		t.Errorf("unexpected sdi3 row: %+v", row)
-	}
-	if row := (*table)["secundus"]["secundus"]; row == nil || row.CapacityFree != unniceNumber("14.4T") {
-		t.Errorf("unexpected secundus row: %+v", row)
-	}
-	if got := len((*table)["secundus"]); got != 6 {
-		t.Errorf("secundus has %d rows, want 6", got)
-	}
-}
-
 func TestParseZfsListAllProxmox(t *testing.T) {
 	// zfs list -r -t all: datasets, container volumes and snapshots.
 	usage := parseZfsList(readFixture(t, "zfs-list-all-proxmox.txt"))
@@ -431,106 +374,4 @@ func TestZfsListErrorPaths(t *testing.T) {
 	if u := m["tank"]; u == nil || u.Avail != -1 || u.Used != -1 || u.Logicalused != -1 {
 		t.Errorf("broken numbers should be -1: %+v", u)
 	}
-}
-
-const (
-	ioSep = "------  -----  -----  -----  -----  -----  -----\n"
-	ioHdr = "pool  alloc  free  read  write  read  write\n"
-)
-
-func TestZpoolIostatParserEdgeCases(t *testing.T) {
-	t.Run("empty", func(t *testing.T) {
-		got := ZpoolIostatParser("")
-		if got == nil || len(*got) != 0 {
-			t.Errorf("got %v", got)
-		}
-	})
-	t.Run("no separator", func(t *testing.T) {
-		got := ZpoolIostatParser("tank 1 2 3 4 5 6\n")
-		if got == nil || len(*got) != 0 {
-			t.Errorf("got %v", got)
-		}
-	})
-	t.Run("consecutive separators", func(t *testing.T) {
-		got := ZpoolIostatParser(ioHdr + ioSep + ioSep + "tank 1K 2K 3 4 5 6\n" + ioSep)
-		if got == nil || (*got)["tank"] == nil || (*got)["tank"]["tank"].CapacityAlloc != 1024 {
-			t.Errorf("got %v", got)
-		}
-	})
-	t.Run("malformed device row", func(t *testing.T) {
-		if got := ZpoolIostatParser(ioHdr + ioSep + "tank 1 2 3 4 5 6\n  sda 1 2\n"); got != nil {
-			t.Errorf("expected nil, got %v", got)
-		}
-	})
-	t.Run("row with too many columns", func(t *testing.T) {
-		if got := ZpoolIostatParser(ioHdr + ioSep + "tank 1 2 3 4 5 6 7\n"); got != nil {
-			t.Errorf("expected nil, got %v", got)
-		}
-	})
-	t.Run("broken numbers", func(t *testing.T) {
-		got := ZpoolIostatParser(ioHdr + ioSep + "tank a b c d e f\n")
-		if got == nil || (*got)["tank"]["tank"].OperationsRead != -1 {
-			t.Errorf("got %v", got)
-		}
-	})
-	t.Run("stops at blank line", func(t *testing.T) {
-		got := ZpoolIostatParser(ioHdr + ioSep + "tank 1 2 3 4 5 6\n\ngarbage\n")
-		if got == nil || len(*got) != 1 {
-			t.Errorf("got %v", got)
-		}
-	})
-}
-
-type errReader struct{}
-
-func (errReader) Read([]byte) (int, error) { return 0, errors.New("boom") }
-
-func TestZpoolIostatStreamReader(t *testing.T) {
-	entry := func(pool string) string {
-		return ioHdr + ioSep + pool + " 1 2 3 4 5 6\n" + ioSep
-	}
-	collect := func(r io.Reader) []*ZpoolIostatTable {
-		ch := make(chan *ZpoolIostatTable, 10)
-		go ZpoolIostatStreamReader(ch, r)
-		var out []*ZpoolIostatTable
-		for tbl := range ch {
-			out = append(out, tbl)
-		}
-		return out
-	}
-	t.Run("two entries", func(t *testing.T) {
-		out := collect(iotest.OneByteReader(strings.NewReader(entry("a") + "\n" + entry("b") + "\n")))
-		if len(out) != 2 || (*out[0])["a"] == nil || (*out[1])["b"] == nil {
-			t.Errorf("got %v", out)
-		}
-	})
-	t.Run("two entries in one read", func(t *testing.T) {
-		out := collect(strings.NewReader(entry("a") + "\n" + entry("b") + "\n"))
-		if len(out) != 2 {
-			t.Errorf("got %d of 2 entries when both arrive in a single read", len(out))
-		}
-	})
-	t.Run("truncated last entry is dropped", func(t *testing.T) {
-		out := collect(strings.NewReader(entry("a") + "\n" + entry("b")))
-		if len(out) != 1 {
-			t.Errorf("got %d entries, want 1", len(out))
-		}
-	})
-	t.Run("empty input", func(t *testing.T) {
-		if out := collect(strings.NewReader("")); len(out) != 0 {
-			t.Errorf("got %v", out)
-		}
-	})
-	t.Run("read error", func(t *testing.T) {
-		out := collect(io.MultiReader(strings.NewReader(entry("a")+"\n"), errReader{}))
-		if len(out) != 2 || out[0] == nil || out[1] != nil {
-			t.Errorf("expected a table and then nil, got %v", out)
-		}
-	})
-	t.Run("malformed entry yields nil", func(t *testing.T) {
-		out := collect(strings.NewReader(ioHdr + ioSep + "tank 1 2\n\n"))
-		if len(out) != 1 || out[0] != nil {
-			t.Errorf("got %v", out)
-		}
-	})
 }

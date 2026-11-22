@@ -25,7 +25,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"io"
 	"os"
 	"os/exec"
 	"regexp"
@@ -64,48 +63,6 @@ func getCommandOutput(cmdstr string) (string, error) {
 		return "", err
 	}
 	return string(out), err
-}
-
-// A process which is run in the background with output available to us.
-type BackgroundProcess struct {
-	Cmdstr string
-	Cmd    *exec.Cmd
-	Out    io.ReadCloser
-}
-
-// Run external command in background.
-func NewBackgroundProcess(cmdstr string) (*BackgroundProcess, error) {
-	cmdf := strings.Fields(cmdstr)
-	cmd := exec.Command(cmdf[0], cmdf[1:]...) //nolint:gosec // command from admin config
-	cmdout, err := cmd.StdoutPipe()
-	if err != nil {
-		notify.Print(notifier.ERR,
-			`opening stdout pipe for "`, cmdstr, `" failed: `, err)
-		return nil, err
-	}
-	// XXX how about stderr?
-	err = cmd.Start()
-	if err != nil {
-		notify.Print(notifier.ERR,
-			`starting "`, cmdstr, `" failed: `, err)
-		return nil, err
-	}
-	return &BackgroundProcess{
-		Cmdstr: cmdstr,
-		Cmd:    cmd,
-		Out:    cmdout,
-	}, nil
-}
-
-// Stop a running background process.
-func (p *BackgroundProcess) Stop() error {
-	_ = p.Cmd.Process.Kill() // may already have exited; Wait reports the outcome
-	// We assume that the background process is behaving nicely and is
-	// not blocking signals etc.
-	err := p.Cmd.Wait()
-	// The error should always indicate that the process was killed.
-	// XXX We return error on success.
-	return err
 }
 
 // Convert floating point number with an optional multiplier suffix to the
