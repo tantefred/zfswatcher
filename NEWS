@@ -39,6 +39,11 @@ Fixes
 
  - The web server now shuts down gracefully on SIGTERM/SIGINT: running
    requests get up to 5 seconds to finish and no new ones are accepted.
+ - A pool whose configuration cannot be determined is now shown without
+   devices instead of with a bogus device named "The".
+ - The iostat stream reader no longer loses entries that arrive together
+   in a single read.
+ - A failed or malformed iostat read no longer crashes the daemon.
 
 Cleanup
 

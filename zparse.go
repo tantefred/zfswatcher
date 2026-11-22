@@ -122,7 +122,7 @@ type DevEntry struct {
 
 // Parse ZFS zpool status config section and return a tree of the volumes/containers/devices.
 func parseConfstr(confstr string) (devs []*DevEntry, err error) {
-	if confstr == "The configuration cannot be determined." {
+	if strings.TrimSpace(confstr) == "The configuration cannot be determined." {
 		return nil, errors.New("configuration can not be determined")
 	}
 	var prevIndent int
@@ -472,7 +472,12 @@ func ZpoolIostatStreamReader(ch chan *ZpoolIostatTable, r io.Reader) {
 		if n > 0 {
 			collectbuf = collectbuf + string(readbuf[:n])
 			// two consecutive newlines (an empty line) separates two iostat entries:
-			if pos := strings.Index(collectbuf, "\n\n"); pos != -1 {
+			// one read may contain several complete entries:
+			for {
+				pos := strings.Index(collectbuf, "\n\n")
+				if pos == -1 {
+					break
+				}
 				ch <- ZpoolIostatParser(collectbuf[:pos+1]) // include 1 newline
 				collectbuf = collectbuf[pos+2:]             // skip both newlines
 			}
