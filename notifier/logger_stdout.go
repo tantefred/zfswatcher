@@ -27,8 +27,18 @@ import (
 	"strings"
 )
 
-func (n *Notifier) loggerStdout(ch chan *Msg) {
-	defer n.wg.Done()
+// StdoutOutput writes messages and attachments to standard output.
+type StdoutOutput struct {
+	acceptTypes
+}
+
+// NewStdoutOutput returns an Output which prints to standard output.
+func NewStdoutOutput() *StdoutOutput {
+	return &StdoutOutput{acceptTypes{attachment: true}}
+}
+
+// Run implements Output.
+func (o *StdoutOutput) Run(ch <-chan *Msg) {
 	for m := range ch {
 		switch m.MsgType {
 		case MSGTYPE_MESSAGE:
@@ -39,18 +49,12 @@ func (n *Notifier) loggerStdout(ch chan *Msg) {
 	}
 }
 
-// AddLoggerStdout adds a logger which outputs to the standard output.
-// This can be useful for running a program in debugging mode.
+// AddLoggerStdout adds a standard output logging output.
 func (n *Notifier) AddLoggerStdout(s Severity) error {
-	switch {
-	case s < severity_MIN || s > severity_MAX:
+	if s < severity_MIN || s > severity_MAX {
 		return errors.New(`invalid "severity"`)
 	}
-	ch := make(chan *Msg, chan_SIZE)
-	n.wg.Add(1)
-	go n.loggerStdout(ch)
-	n.out = append(n.out, notifyOutput{severity: s, ch: ch, attachment: true})
-	return nil
+	return n.AddOutput(s, NewStdoutOutput())
 }
 
 // eof
