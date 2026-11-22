@@ -34,6 +34,13 @@ Internal changes
    notifier/doc.go). Log file, syslog, e-mail, standard output and
    callback outputs are now implemented with it. The configuration and
    the behaviour are unchanged.
+ - New data layer (model.go): exported types Pool (with the devices as a
+   tree), Device, Usage, Event and HostInfo without any presentation
+   details, and snapshot functions which return copies of the current
+   state. The web pages are built from these snapshots; the pages are
+   unchanged. The log buffer of the web interface now stores time and
+   severity instead of preformatted strings. This is the basis for a
+   JSON API.
 
 
 version 0.7.0 released 2026-11-22
