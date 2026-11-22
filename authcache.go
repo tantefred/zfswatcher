@@ -47,6 +47,7 @@ type authCache struct {
 	now     func() time.Time
 	key     [32]byte
 	forCfg  *cfgType // the cache is only valid for this configuration
+	gen     uint64   // incremented by flush
 	entries map[[sha256.Size]byte]authCacheEntry
 }
 
@@ -102,14 +103,32 @@ func (c *authCache) get(r *http.Request) *Principal {
 	return &p
 }
 
-// put stores a successfully checked principal.
-func (c *authCache) put(r *http.Request, p *Principal) {
+// authCacheToken identifies the configuration state a credential check
+// started with.
+type authCacheToken struct {
+	gen uint64
+	cfg *cfgType
+}
+
+// token must be taken before the credentials are checked and passed to put.
+func (c *authCache) token() authCacheToken {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+	return authCacheToken{gen: c.gen, cfg: cfg}
+}
+
+// put stores a successfully checked principal, unless the configuration
+// was reloaded since the token was taken (the result may be outdated).
+func (c *authCache) put(r *http.Request, p *Principal, tok authCacheToken) {
 	k, ok := c.cacheKey(r)
 	if !ok {
 		return
 	}
 	c.mu.Lock()
 	defer c.mu.Unlock()
+	if tok.gen != c.gen || tok.cfg != cfg {
+		return
+	}
 	now := c.now()
 	if c.forCfg != cfg {
 		c.entries = make(map[[sha256.Size]byte]authCacheEntry)
@@ -136,6 +155,7 @@ func (c *authCache) put(r *http.Request, p *Principal) {
 // flush forgets everything (configuration reload).
 func (c *authCache) flush() {
 	c.mu.Lock()
+	c.gen++
 	c.entries = make(map[[sha256.Size]byte]authCacheEntry)
 	c.mu.Unlock()
 }

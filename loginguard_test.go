@@ -538,7 +538,7 @@ func TestAuthCacheLimitAndTokenPath(t *testing.T) {
 	for i := 0; i < authCacheMaxEntries+50; i++ {
 		r := httptest.NewRequest("GET", "/x", nil)
 		r.SetBasicAuth("u", strconv.Itoa(i))
-		c.put(r, &Principal{Name: "u", Role: RoleViewer})
+		c.put(r, &Principal{Name: "u", Role: RoleViewer}, c.token())
 	}
 	if len(c.entries) > authCacheMaxEntries {
 		t.Errorf("%d entries", len(c.entries))
@@ -546,10 +546,38 @@ func TestAuthCacheLimitAndTokenPath(t *testing.T) {
 	// a Bearer header cached for the API path does not hit elsewhere
 	api := httptest.NewRequest("GET", cfg.Www.Rootdir+"/api/v1/info", nil)
 	api.Header.Set("Authorization", "Bearer t")
-	c.put(api, &Principal{Name: "t", Role: RoleViewer, Method: methodToken})
+	c.put(api, &Principal{Name: "t", Role: RoleViewer, Method: methodToken}, c.token())
 	web := httptest.NewRequest("GET", "/about/", nil)
 	web.Header.Set("Authorization", "Bearer t")
 	if c.get(api) == nil || c.get(web) != nil {
 		t.Error("token cache entry leaked to non API path")
+	}
+}
+
+// A reload between the credential check and put must not leave a result
+// of the old configuration in the cache.
+func TestAuthCacheReloadDuringCheck(t *testing.T) {
+	cfg = &cfgType{}
+	t.Cleanup(func() { cfg = nil })
+	c := newAuthCache()
+	r := httptest.NewRequest("GET", "/x", nil)
+	r.SetBasicAuth("u", "pw")
+	p := &Principal{Name: "u", Role: RoleAdmin}
+
+	tok := c.token()
+	c.flush() // reconfigure()
+	c.put(r, p, tok)
+	if c.get(r) != nil {
+		t.Error("principal checked before flush was cached")
+	}
+	tok = c.token()
+	cfg = &cfgType{} // new configuration object
+	c.put(r, p, tok)
+	if c.get(r) != nil {
+		t.Error("principal checked with the old cfg was cached")
+	}
+	c.put(r, p, c.token())
+	if c.get(r) == nil {
+		t.Error("regular put does not work")
 	}
 }

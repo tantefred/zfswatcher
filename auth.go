@@ -370,6 +370,7 @@ func requireRoleWith(a Authenticator, render errorRenderer, min Role, h http.Han
 		}
 		p := webAuthCache.get(r)
 		if p == nil {
+			tok := webAuthCache.token()
 			var key string
 			if failures > 0 {
 				// The attempt slot is reserved atomically so that
@@ -397,7 +398,7 @@ func requireRoleWith(a Authenticator, render errorRenderer, min Role, h http.Han
 				recordLoginResult(key, ip, failed)
 			}
 			if p != nil {
-				webAuthCache.put(r, p)
+				webAuthCache.put(r, p, tok)
 			}
 		}
 		if p == nil {
