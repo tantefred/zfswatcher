@@ -3,6 +3,23 @@
                            version history
 
 
+version 0.9.0 (unreleased)
+
+New features
+
+ - Webhook notifications: new sections [webhook "name"] with "enable",
+   "level", "url" (http or https), "preset", "token" and "throttle". The
+   messages of one check run are sent as one HTTP POST request. Presets:
+   generic (JSON, default), ntfy, gotify, discord and slack. The token is
+   sent as bearer token (ntfy, generic) or X-Gotify-Key (gotify). A request
+   times out after 10 s and is retried once after a network error or HTTP
+   5xx; failures are logged with log/slog (without token and query string).
+   Attachments are not sent. Examples are in the configuration files.
+ - "zfswatcher --test-notify" sends a test message (with the most urgent
+   configured level, so it reaches every channel) to all enabled outputs and exits without starting
+   the daemon. The exit code is 1 if a webhook delivery fails.
+
+
 version 0.8.0 released 2026-11-22
 
 Upgrade notes
