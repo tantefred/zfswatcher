@@ -5,6 +5,19 @@
 
 version 0.8.0 (unreleased)
 
+Upgrade notes
+
+ - The unfinished iostat stream was removed. The option "zpooliostatcmd" in
+   section [main] is obsolete: it is still accepted so that existing
+   configuration files keep working, but it has no effect and zfswatcher
+   logs a warning at startup and on reload if it is set. Remove it from
+   your configuration.
+
+Fixes
+
+ - zfswatcher no longer starts a background "zpool iostat" process that
+   only printed its output to stdout.
+
 Internal changes
 
  - The notifier package has a plug-in interface for output channels

@@ -6,8 +6,11 @@ import (
 	"path/filepath"
 	"regexp"
 	"strconv"
+	"strings"
 	"testing"
 	"time"
+
+	"github.com/tantefred/zfswatcher/notifier"
 )
 
 func unprivilegedPort(t *testing.T, addr string) {
@@ -79,5 +82,25 @@ func TestGetCfgCommandTimeout(t *testing.T) {
 		if cfgWithMain(t, "commandtimeout = "+v+"\n") != nil {
 			t.Errorf("getCfg accepted commandtimeout = %s", v)
 		}
+	}
+}
+
+func TestWarnObsoleteOptions(t *testing.T) {
+	c := cfgWithMain(t, "zpooliostatcmd = zpool iostat -v 1\n")
+	if c == nil {
+		t.Fatal("old configuration with zpooliostatcmd must still load")
+	}
+	msgs := captureNotify(t)
+	warnObsoleteOptions(c)
+	got := msgs()
+	if len(got) != 1 || !strings.Contains(got[0], "zpooliostatcmd") ||
+		got[0][:len(strconv.Itoa(int(notifier.WARNING)))] != strconv.Itoa(int(notifier.WARNING)) {
+		t.Errorf("got %q, want one WARNING about zpooliostatcmd", got)
+	}
+
+	msgs = captureNotify(t)
+	warnObsoleteOptions(cfgWithMain(t, ""))
+	if got := msgs(); len(got) != 0 {
+		t.Errorf("no warning expected without the option, got %q", got)
 	}
 }

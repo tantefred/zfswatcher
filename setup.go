@@ -53,7 +53,7 @@ type cfgType struct {
 		Zfslistrefresh     int
 		Zfslistcmd         string
 		Zfslistusagecmd    string
-		Zpooliostatcmd     string
+		Zpooliostatcmd     string // obsolete, only accepted so old configs still load
 		Pidfile            string
 		Statefile          string
 	}
@@ -403,6 +403,7 @@ func setup() {
 	// Applied at startup only: running goroutines read the value.
 	commandTimeout = time.Duration(cfg.Main.Commandtimeout) * time.Second
 	notify = setupLog(cfg)
+	warnObsoleteOptions(cfg)
 
 	if *optTest {
 		notifyCloseC := notify.Close()
@@ -411,6 +412,14 @@ func setup() {
 		case <-time.After(time.Second):
 		}
 		os.Exit(0)
+	}
+}
+
+// warnObsoleteOptions logs a warning for every removed option that is still
+// set in the configuration. The options are ignored.
+func warnObsoleteOptions(c *cfgType) {
+	if c.Main.Zpooliostatcmd != "" {
+		notify.Print(notifier.WARNING, "option \"zpooliostatcmd\" was removed and is ignored")
 	}
 }
 
@@ -435,6 +444,7 @@ func reconfigure() {
 	if time.Duration(newcfg.Main.Commandtimeout)*time.Second != commandTimeout {
 		notify.Print(notifier.WARNING, "commandtimeout change needs a restart")
 	}
+	warnObsoleteOptions(newcfg)
 	cfg = newcfg
 	newNotify := setupLog(cfg)
 	if newNotify == nil {
