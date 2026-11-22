@@ -415,7 +415,7 @@ func TestGenerateTokenRandomFailure(t *testing.T) {
 	}
 }
 
-func TestIsAPIPath(t *testing.T) {
+func TestIsTokenPath(t *testing.T) {
 	old := cfg
 	t.Cleanup(func() { cfg = old })
 	cfg = &cfgType{}
@@ -425,9 +425,20 @@ func TestIsAPIPath(t *testing.T) {
 	} {
 		cfg.Www.Rootdir = root
 		for p, want := range cases {
-			if got := isAPIPath(p); got != want {
+			if got := isTokenPath(p); got != want {
 				t.Errorf("root %q path %q: %v", root, p, got)
 			}
+		}
+	}
+	// the metrics path counts only if the endpoint is enabled
+	cfg.Www.Rootdir = "/zw"
+	if isTokenPath("/zw/metrics") {
+		t.Error("/zw/metrics accepts tokens although metrics are off")
+	}
+	cfg.Www.Metrics = true
+	for p, want := range map[string]bool{"/zw/metrics": true, "/zw/metrics/": false, "/zw/metricsx": false, "/metrics": false} {
+		if got := isTokenPath(p); got != want {
+			t.Errorf("metrics path %q: %v", p, got)
 		}
 	}
 }

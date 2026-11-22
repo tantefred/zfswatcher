@@ -18,6 +18,12 @@ New features
  - "zfswatcher --test-notify" sends a test message (with the most urgent
    configured level, so it reaches every channel) to all enabled outputs and exits without starting
    the daemon. The exit code is 1 if a webhook delivery fails.
+ - Prometheus endpoint "<rootdir>/metrics" (text format), enabled with the
+   new option "metrics = true" in [www] (default false). Role viewer; HTTP
+   Basic or an API token works (tokens are now accepted for the paths
+   below "<rootdir>/api/" and for "<rootdir>/metrics"). Metrics: pool and
+   device states, device error counters, pool space, time and result of
+   the last check. See the section "Prometheus" in README.md.
 
 
 version 0.8.0 released 2026-11-22
