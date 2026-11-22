@@ -271,7 +271,7 @@ With `metrics = true` in section `[www]` (default `false`) zfswatcher serves
 | `zfswatcher_pool_state` | `pool`, `state` | 1 for the current state, 0 for the other known ones (ONLINE, DEGRADED, FAULTED, OFFLINE, UNAVAIL, REMOVED, SUSPENDED) |
 | `zfswatcher_device_state` | `pool`, `device`, `state` | the same for every vdev and disk |
 | `zfswatcher_device_read_errors`, `_write_errors`, `_cksum_errors` | `pool`, `device` | error counters of `zpool status` (gauges: `zpool clear` resets them) |
-| `zfswatcher_pool_size_bytes`, `_allocated_bytes`, `_free_bytes`, `_used_ratio` | `pool` | space of the pool's root dataset as in `zfs list` (used + available) |
+| `zfswatcher_pool_usable_bytes`, `_used_bytes`, `_available_bytes`, `_used_ratio` | `pool` | space of the pool's root dataset as in `zfs list` (used + available) |
 | `zfswatcher_last_check_timestamp_seconds`, `zfswatcher_last_check_success` | | time and result of the last `zpool status` query |
 
 Example alert: `zfswatcher_pool_state{state="ONLINE"} == 0`.

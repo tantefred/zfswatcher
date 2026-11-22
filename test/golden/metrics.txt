@@ -646,39 +646,39 @@ zfswatcher_device_cksum_errors{pool="zfsw_rz2",device="raidz2-0"} 0
 zfswatcher_device_cksum_errors{pool="zfsw_rz2",device="zfsw_rz2"} 0
 zfswatcher_device_cksum_errors{pool="zfsw_susp",device="/var/tmp/zfsw-collect/i3"} 0
 zfswatcher_device_cksum_errors{pool="zfsw_susp",device="zfsw_susp"} 0
-# HELP zfswatcher_pool_size_bytes Usable space of the pool (used plus available, as in zfs list).
-# TYPE zfswatcher_pool_size_bytes gauge
-zfswatcher_pool_size_bytes{pool="datis"} 10737418240
-zfswatcher_pool_size_bytes{pool="rpool"} 85899345920
-zfswatcher_pool_size_bytes{pool="secundus"} 108447924224
-zfswatcher_pool_size_bytes{pool="test"} 10737418240
-zfswatcher_pool_size_bytes{pool="zfsw_mirror"} 10737418240
-zfswatcher_pool_size_bytes{pool="zfsw_mix"} 2147483648
-zfswatcher_pool_size_bytes{pool="zfsw_opt"} 5368709120
-zfswatcher_pool_size_bytes{pool="zfsw_rz2"} 2097152
-zfswatcher_pool_size_bytes{pool="zfsw_susp"} 10737418240
-# HELP zfswatcher_pool_allocated_bytes Used space of the pool as in zfs list.
-# TYPE zfswatcher_pool_allocated_bytes gauge
-zfswatcher_pool_allocated_bytes{pool="datis"} 3221225472
-zfswatcher_pool_allocated_bytes{pool="rpool"} 84825604096
-zfswatcher_pool_allocated_bytes{pool="secundus"} 1073741824
-zfswatcher_pool_allocated_bytes{pool="test"} 1073741824
-zfswatcher_pool_allocated_bytes{pool="zfsw_mirror"} 9663676416
-zfswatcher_pool_allocated_bytes{pool="zfsw_mix"} 1073741824
-zfswatcher_pool_allocated_bytes{pool="zfsw_opt"} 1073741824
-zfswatcher_pool_allocated_bytes{pool="zfsw_rz2"} 1048576
-zfswatcher_pool_allocated_bytes{pool="zfsw_susp"} 7516192768
-# HELP zfswatcher_pool_free_bytes Available space of the pool as in zfs list.
-# TYPE zfswatcher_pool_free_bytes gauge
-zfswatcher_pool_free_bytes{pool="datis"} 7516192768
-zfswatcher_pool_free_bytes{pool="rpool"} 1073741824
-zfswatcher_pool_free_bytes{pool="secundus"} 107374182400
-zfswatcher_pool_free_bytes{pool="test"} 9663676416
-zfswatcher_pool_free_bytes{pool="zfsw_mirror"} 1073741824
-zfswatcher_pool_free_bytes{pool="zfsw_mix"} 1073741824
-zfswatcher_pool_free_bytes{pool="zfsw_opt"} 4294967296
-zfswatcher_pool_free_bytes{pool="zfsw_rz2"} 1048576
-zfswatcher_pool_free_bytes{pool="zfsw_susp"} 3221225472
+# HELP zfswatcher_pool_usable_bytes Usable space of the pool root dataset (used plus available, as in zfs list).
+# TYPE zfswatcher_pool_usable_bytes gauge
+zfswatcher_pool_usable_bytes{pool="datis"} 10737418240
+zfswatcher_pool_usable_bytes{pool="rpool"} 85899345920
+zfswatcher_pool_usable_bytes{pool="secundus"} 108447924224
+zfswatcher_pool_usable_bytes{pool="test"} 10737418240
+zfswatcher_pool_usable_bytes{pool="zfsw_mirror"} 10737418240
+zfswatcher_pool_usable_bytes{pool="zfsw_mix"} 2147483648
+zfswatcher_pool_usable_bytes{pool="zfsw_opt"} 5368709120
+zfswatcher_pool_usable_bytes{pool="zfsw_rz2"} 2097152
+zfswatcher_pool_usable_bytes{pool="zfsw_susp"} 10737418240
+# HELP zfswatcher_pool_used_bytes Used space of the pool root dataset as in zfs list.
+# TYPE zfswatcher_pool_used_bytes gauge
+zfswatcher_pool_used_bytes{pool="datis"} 3221225472
+zfswatcher_pool_used_bytes{pool="rpool"} 84825604096
+zfswatcher_pool_used_bytes{pool="secundus"} 1073741824
+zfswatcher_pool_used_bytes{pool="test"} 1073741824
+zfswatcher_pool_used_bytes{pool="zfsw_mirror"} 9663676416
+zfswatcher_pool_used_bytes{pool="zfsw_mix"} 1073741824
+zfswatcher_pool_used_bytes{pool="zfsw_opt"} 1073741824
+zfswatcher_pool_used_bytes{pool="zfsw_rz2"} 1048576
+zfswatcher_pool_used_bytes{pool="zfsw_susp"} 7516192768
+# HELP zfswatcher_pool_available_bytes Available space of the pool root dataset as in zfs list.
+# TYPE zfswatcher_pool_available_bytes gauge
+zfswatcher_pool_available_bytes{pool="datis"} 7516192768
+zfswatcher_pool_available_bytes{pool="rpool"} 1073741824
+zfswatcher_pool_available_bytes{pool="secundus"} 107374182400
+zfswatcher_pool_available_bytes{pool="test"} 9663676416
+zfswatcher_pool_available_bytes{pool="zfsw_mirror"} 1073741824
+zfswatcher_pool_available_bytes{pool="zfsw_mix"} 1073741824
+zfswatcher_pool_available_bytes{pool="zfsw_opt"} 4294967296
+zfswatcher_pool_available_bytes{pool="zfsw_rz2"} 1048576
+zfswatcher_pool_available_bytes{pool="zfsw_susp"} 3221225472
 # HELP zfswatcher_pool_used_ratio Used share of the usable space, 0 to 1.
 # TYPE zfswatcher_pool_used_ratio gauge
 zfswatcher_pool_used_ratio{pool="datis"} 0.3

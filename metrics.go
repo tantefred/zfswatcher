@@ -192,11 +192,11 @@ func writeMetrics(out io.Writer, version string, pools []Pool, usage map[string]
 		name, help string
 		get        func(poolSpace) string
 	}{
-		{"zfswatcher_pool_size_bytes", "Usable space of the pool (used plus available, as in zfs list).",
+		{"zfswatcher_pool_usable_bytes", "Usable space of the pool root dataset (used plus available, as in zfs list).",
 			func(s poolSpace) string { return intValue(s.used + s.avail) }},
-		{"zfswatcher_pool_allocated_bytes", "Used space of the pool as in zfs list.",
+		{"zfswatcher_pool_used_bytes", "Used space of the pool root dataset as in zfs list.",
 			func(s poolSpace) string { return intValue(s.used) }},
-		{"zfswatcher_pool_free_bytes", "Available space of the pool as in zfs list.",
+		{"zfswatcher_pool_available_bytes", "Available space of the pool root dataset as in zfs list.",
 			func(s poolSpace) string { return intValue(s.avail) }},
 		{"zfswatcher_pool_used_ratio", "Used share of the usable space, 0 to 1.",
 			func(s poolSpace) string {

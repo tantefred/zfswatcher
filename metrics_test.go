@@ -42,7 +42,7 @@ func TestMetricsEscaping(t *testing.T) {
 			t.Errorf("missing %q in\n%s", want, out)
 		}
 	}
-	if strings.Contains(out, "last_check") || strings.Contains(out, "pool_size_bytes{") {
+	if strings.Contains(out, "last_check") || strings.Contains(out, "pool_usable_bytes{") {
 		t.Errorf("unexpected series without query and usage:\n%s", out)
 	}
 }
@@ -64,7 +64,7 @@ func TestMetricsUnknownStateAndMissingValues(t *testing.T) {
 			t.Errorf("missing %q", want)
 		}
 	}
-	for _, bad := range []string{`device="logs"`, "write_errors{", "pool_free_bytes{"} {
+	for _, bad := range []string{`device="logs"`, "write_errors{", "pool_available_bytes{"} {
 		if strings.Contains(out, bad) {
 			t.Errorf("unexpected %q", bad)
 		}
