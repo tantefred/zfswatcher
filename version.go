@@ -1,6 +1,6 @@
 package main
 
-const VERSION = "0.8.0"
+const VERSION = "0.9.0"
 
 // buildVersion is the version shown by "zfswatcher -v" and on the about page.
 // Development builds override it with -ldflags "-X main.buildVersion=...".

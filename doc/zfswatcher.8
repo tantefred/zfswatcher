@@ -18,7 +18,7 @@
 .\" You should have received a copy of the GNU General Public License
 .\" along with zfswatcher. If not, see <http://www.gnu.org/licenses/>.
 .\"
-.TH ZFSWATCHER 8 "2026-11-22" "version 0.8.0"
+.TH ZFSWATCHER 8 "2026-11-23" "version 0.9.0"
 .SH NAME
 zfswatcher \- ZFS pool monitoring and notification daemon
 .SH SYNOPSIS
@@ -78,7 +78,8 @@ Send one test message to all enabled outputs (log files, syslog, e-mail,
 webhooks) and exit; the daemon is not started. The message has the most urgent
 .B level
 of the enabled outputs, so it reaches every one of them without being more
-urgent than necessary. Without an enabled output the exit status is 1. The exit status is 1 if a webhook delivery fails (the other outputs
+urgent than necessary. Without an enabled output the exit status is 1.
+The exit status is also 1 if a webhook delivery fails (the other outputs
 are best effort) or an output cannot be set up.
 .TP
 .BR \-t ", " \-\-test
@@ -126,12 +127,13 @@ header for
 .B loginlockout
 seconds (default 60), without checking any credentials. A successful login
 does not reset the counter (failures only expire with the window), IPv6
-clients are counted per /64 prefix, all further unknown clients share one counter
-with the same limits if the table of 10000 tracked clients is full of locked
-out ones, and
+clients are counted per /64 prefix, all further unknown clients share one
+counter with the same limits if the table of 10000 tracked clients is full
+of locked out ones, and
 .B /healthz
 is not affected. Successful credential checks are cached in memory for
-5 minutes (a keyed hash, not the credentials) and forgotten on reload. One message per lockout is sent with the severity
+5 minutes (a keyed hash, not the credentials) and forgotten on reload.
+One message per lockout is sent with the severity
 .B loginlockout
 of the
 .B [severity]
@@ -270,7 +272,7 @@ modern approach and allows system process management daemons such as
 and
 .BR systemd (8)
 to keep better control of the service. This can be worked around by
-using a tool such as 
+using a tool such as
 .BR start-stop-daemon (8).
 .PP
 Currently an external utility called
