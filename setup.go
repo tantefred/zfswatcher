@@ -511,6 +511,7 @@ func reconfigure() {
 	}
 	warnObsoleteOptions(newcfg)
 	cfg = newcfg
+	webAuthCache.flush()
 	newNotify := setupLog(cfg)
 	if newNotify == nil {
 		notify.Print(notifier.CRIT, "error setting up logs, keeping old logging configuration")

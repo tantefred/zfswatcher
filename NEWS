@@ -14,7 +14,8 @@ Upgrade notes
    or token check, and one message with the severity of the new option
    "loginlockout" in [severity] (default warning) is sent. A successful login
    does not reset the counter, failures only expire with the window. IPv6
-   clients are counted per /64 prefix. "loginfailures = 0" switches the limit
+   clients are counted per /64 prefix. Successful credential checks are cached for 5 minutes
+   to save CPU. "loginfailures = 0" switches the limit
    off. Behind a
    reverse proxy set "trustedproxies" in [www], otherwise all clients share
    the address of the proxy and one attacker locks out everybody.

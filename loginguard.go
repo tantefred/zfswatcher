@@ -126,6 +126,23 @@ const (
 	loginOverflow1              // like loginOverflow, first time (to be reported)
 )
 
+// lockedFor reports whether the client is locked out and for how many more
+// seconds.
+func (g *loginGuard) lockedFor(ip string) (int, bool) {
+	key := loginKey(ip)
+	g.mu.Lock()
+	defer g.mu.Unlock()
+	e, ok := g.entries[key]
+	if !ok || !e.locked() {
+		return 0, false
+	}
+	now := g.now()
+	if !now.Before(e.lockedUntil) {
+		return 0, false
+	}
+	return ceilSeconds(e.lockedUntil.Sub(now)), true
+}
+
 // begin reserves an attempt slot for the client. With loginAllow the caller
 // must call end exactly once. Otherwise it returns the seconds to wait.
 func (g *loginGuard) begin(ip string, failures int, window time.Duration) (key string, v loginVerdict, retry int) {

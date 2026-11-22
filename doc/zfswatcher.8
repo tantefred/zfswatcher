@@ -109,7 +109,8 @@ seconds (default 60), without checking any credentials. A successful login
 does not reset the counter (failures only expire with the window), IPv6
 clients are counted per /64 prefix, and
 .B /healthz
-is not affected. One message per lockout is sent with the severity
+is not affected. Successful credential checks are cached in memory for
+5 minutes (a keyed hash, not the credentials) and forgotten on reload. One message per lockout is sent with the severity
 .B loginlockout
 of the
 .B [severity]

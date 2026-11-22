@@ -327,6 +327,11 @@ func plainError(w http.ResponseWriter, _ *http.Request, code int, msg string) {
 	http.Error(w, msg, code)
 }
 
+func tooManyRequests(w http.ResponseWriter, r *http.Request, render errorRenderer, secs int) {
+	w.Header().Set("Retry-After", strconv.Itoa(secs))
+	render(w, r, http.StatusTooManyRequests, "429 Too Many Requests")
+}
+
 func loginWindow() time.Duration { return time.Duration(cfg.Www.Loginwindow) * time.Second }
 
 // recordLoginResult releases the attempt slot and counts a failed login. It
@@ -352,31 +357,44 @@ func requireRoleWith(a Authenticator, render errorRenderer, min Role, h http.Han
 	return func(w http.ResponseWriter, r *http.Request) {
 		ip := clientIP(r)
 		failures := cfg.Www.Loginfailures
-		var key string
 		if failures > 0 {
-			// Locked out clients are rejected before any (expensive)
-			// credential check; the slot is reserved atomically so that
-			// parallel requests cannot exceed the limit.
-			var v loginVerdict
-			var secs int
-			key, v, secs = webLoginGuard.begin(ip, failures, loginWindow())
-			if v != loginAllow {
-				if v == loginOverflow1 && notify != nil {
-					notify.Printf(cfg.Severity.Loginlockout,
-						"web login: too many clients are locked out, refusing all unknown clients until some lockouts expire")
-				}
-				w.Header().Set("Retry-After", strconv.Itoa(secs))
-				render(w, r, http.StatusTooManyRequests, "429 Too Many Requests")
+			// Locked out clients are rejected first, even with valid
+			// (cached) credentials.
+			if secs, locked := webLoginGuard.lockedFor(ip); locked {
+				tooManyRequests(w, r, render, secs)
 				return
 			}
 		}
-		p, err := a.Authenticate(r)
-		failed := p == nil && err != nil
-		if failed && notify != nil {
-			notify.Printf(notifier.WARNING, "web login failed for %s from %s", err, ip)
-		}
-		if failures > 0 {
-			recordLoginResult(key, ip, failed)
+		p := webAuthCache.get(r)
+		if p == nil {
+			var key string
+			if failures > 0 {
+				// The attempt slot is reserved atomically so that
+				// parallel requests cannot exceed the limit.
+				var v loginVerdict
+				var secs int
+				key, v, secs = webLoginGuard.begin(ip, failures, loginWindow())
+				if v != loginAllow {
+					if v == loginOverflow1 && notify != nil {
+						notify.Printf(cfg.Severity.Loginlockout,
+							"web login: too many clients are locked out, refusing all unknown clients until some lockouts expire")
+					}
+					tooManyRequests(w, r, render, secs)
+					return
+				}
+			}
+			var err error
+			p, err = a.Authenticate(r)
+			failed := p == nil && err != nil
+			if failed && notify != nil {
+				notify.Printf(notifier.WARNING, "web login failed for %s from %s", err, ip)
+			}
+			if failures > 0 {
+				recordLoginResult(key, ip, failed)
+			}
+			if p != nil {
+				webAuthCache.put(r, p)
+			}
 		}
 		if p == nil {
 			w.Header().Set("WWW-Authenticate", `Basic realm="`+authRealm+`", charset="UTF-8"`)

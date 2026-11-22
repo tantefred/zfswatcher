@@ -414,3 +414,110 @@ func TestGetCfgLoginBackoff(t *testing.T) {
 		}
 	}
 }
+
+// cacheSetup is backoffSetup plus a fresh credential cache with a fake clock.
+func cacheSetup(t *testing.T) (*fakeClock, *countingAuth, http.HandlerFunc) {
+	t.Helper()
+	clk, a, h := backoffSetup(t)
+	old := webAuthCache
+	t.Cleanup(func() { webAuthCache = old })
+	webAuthCache = newAuthCache()
+	webAuthCache.now = clk.now
+	return clk, a, h
+}
+
+func TestAuthCacheParallelNeverRateLimited(t *testing.T) {
+	_, a, h := cacheSetup(t)
+	if w := loginReq(h, "192.0.2.1", "good"); w.Code != 200 {
+		t.Fatalf("first: %d", w.Code)
+	}
+	var wg sync.WaitGroup
+	var bad atomic.Int32
+	for i := 0; i < 100; i++ {
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			if w := loginReq(h, "192.0.2.1", "good"); w.Code != 200 {
+				bad.Add(1)
+			}
+		}()
+	}
+	wg.Wait()
+	if bad.Load() != 0 {
+		t.Errorf("%d requests were refused", bad.Load())
+	}
+	if a.calls != 1 {
+		t.Errorf("%d credential checks, want 1", a.calls)
+	}
+}
+
+func TestAuthCacheLockedIPStillRefused(t *testing.T) {
+	_, _, h := cacheSetup(t)
+	loginReq(h, "192.0.2.1", "good") // cached
+	for i := 0; i < 3; i++ {
+		loginReq(h, "192.0.2.1", "bad")
+	}
+	if w := loginReq(h, "192.0.2.1", "good"); w.Code != 429 {
+		t.Errorf("got %d, want 429", w.Code)
+	}
+}
+
+func TestAuthCacheTTLAndFlush(t *testing.T) {
+	clk, a, h := cacheSetup(t)
+	loginReq(h, "192.0.2.1", "good")
+	loginReq(h, "192.0.2.1", "good")
+	if a.calls != 1 {
+		t.Fatalf("calls %d", a.calls)
+	}
+	clk.advance(authCacheTTL + time.Second)
+	loginReq(h, "192.0.2.1", "good")
+	if a.calls != 2 {
+		t.Errorf("calls %d after TTL, want 2", a.calls)
+	}
+	webAuthCache.flush()
+	loginReq(h, "192.0.2.1", "good")
+	if a.calls != 3 {
+		t.Errorf("calls %d after flush, want 3", a.calls)
+	}
+	// a new configuration object invalidates it too
+	cfg2 := *cfg
+	cfg = &cfg2
+	loginReq(h, "192.0.2.1", "good")
+	if a.calls != 4 {
+		t.Errorf("calls %d after reload, want 4", a.calls)
+	}
+}
+
+func TestAuthCacheWrongPasswordNeverHits(t *testing.T) {
+	_, a, h := cacheSetup(t)
+	loginReq(h, "192.0.2.1", "good")
+	if w := loginReq(h, "192.0.2.2", "bad"); w.Code != 401 {
+		t.Errorf("got %d, want 401", w.Code)
+	}
+	if a.calls != 2 {
+		t.Errorf("calls %d, want 2", a.calls)
+	}
+}
+
+func TestAuthCacheLimitAndTokenPath(t *testing.T) {
+	c := newAuthCache()
+	cfg = &cfgType{}
+	t.Cleanup(func() { cfg = nil })
+	for i := 0; i < authCacheMaxEntries+50; i++ {
+		r := httptest.NewRequest("GET", "/x", nil)
+		r.SetBasicAuth("u", strconv.Itoa(i))
+		c.put(r, &Principal{Name: "u", Role: RoleViewer})
+	}
+	if len(c.entries) > authCacheMaxEntries {
+		t.Errorf("%d entries", len(c.entries))
+	}
+	// a Bearer header cached for the API path does not hit elsewhere
+	api := httptest.NewRequest("GET", cfg.Www.Rootdir+"/api/v1/info", nil)
+	api.Header.Set("Authorization", "Bearer t")
+	c.put(api, &Principal{Name: "t", Role: RoleViewer, Method: methodToken})
+	web := httptest.NewRequest("GET", "/about/", nil)
+	web.Header.Set("Authorization", "Bearer t")
+	if c.get(api) == nil || c.get(web) != nil {
+		t.Error("token cache entry leaked to non API path")
+	}
+}
