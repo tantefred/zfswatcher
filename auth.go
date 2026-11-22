@@ -290,14 +290,17 @@ func (tokenAuthenticator) Authenticate(r *http.Request) (*Principal, error) {
 	return found, nil
 }
 
-// isAPIPath reports whether the path belongs to the API, the only place
-// where tokens are accepted.
-func isAPIPath(path string) bool {
-	api := cfg.Www.Rootdir + "/api"
-	return path == api || strings.HasPrefix(path, api+"/")
+// isTokenPath reports whether tokens are accepted for the path: below
+// "<rootdir>/api/" and for the Prometheus endpoint "<rootdir>/metrics".
+func isTokenPath(path string) bool {
+	root := cfg.Www.Rootdir
+	if path == root+"/api" || strings.HasPrefix(path, root+"/api/") {
+		return true
+	}
+	return cfg.Www.Metrics && path == root+"/metrics"
 }
 
-// chainAuthenticator tries Basic first; for API paths it falls back to
+// chainAuthenticator tries Basic first; for token paths it falls back to
 // tokens. Everything else accepts Basic only.
 type chainAuthenticator struct {
 	basic, token Authenticator
@@ -311,7 +314,7 @@ func (c chainAuthenticator) Authenticate(r *http.Request) (*Principal, error) {
 	if p, err := c.basic.Authenticate(r); p != nil || err != nil {
 		return p, err
 	}
-	if isAPIPath(r.URL.Path) {
+	if isTokenPath(r.URL.Path) {
 		return c.token.Authenticate(r)
 	}
 	return nil, nil

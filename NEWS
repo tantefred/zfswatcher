@@ -7,6 +7,23 @@ version 0.9.0 (unreleased)
 
 New features
 
+ - Webhook notifications: new sections [webhook "name"] with "enable",
+   "level", "url" (http or https), "preset", "token" and "throttle". The
+   messages of one check run are sent as one HTTP POST request. Presets:
+   generic (JSON, default), ntfy, gotify, discord and slack. The token is
+   sent as bearer token (ntfy, generic) or X-Gotify-Key (gotify). A request
+   times out after 10 s and is retried once after a network error or HTTP
+   5xx; failures are logged with log/slog (without token and query string).
+   Attachments are not sent. Examples are in the configuration files.
+ - "zfswatcher --test-notify" sends a test message (with the most urgent
+   configured level, so it reaches every channel) to all enabled outputs and exits without starting
+   the daemon. The exit code is 1 if a webhook delivery fails.
+ - Prometheus endpoint "<rootdir>/metrics" (text format), enabled with the
+   new option "metrics = true" in [www] (default false). Role viewer; HTTP
+   Basic or an API token works (tokens are now accepted for the paths
+   below "<rootdir>/api/" and for "<rootdir>/metrics"). Metrics: pool and
+   device states, device error counters, pool space, time and result of
+   the last check. See the section "Prometheus" in README.md.
  - The logs page and /api/v1/events keep their history across restarts and
    updates: the events of the log buffer ("logbuffer" in [www]) are saved in
    the state file ("statefile") and loaded again at startup. They are

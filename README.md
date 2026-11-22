@@ -11,7 +11,7 @@
 ZFS pool monitoring and notification daemon.
 
 Zfswatcher watches the state of your ZFS pools and notifies you about
-problems by e-mail, syslog or log file. It can also manage enclosure LEDs
+problems by e-mail, webhook (ntfy, Gotify, Discord, Slack), syslog or log file. It can also manage enclosure LEDs
 and provides an optional embedded web interface.
 
 Supported operating systems: Linux, FreeBSD and Solaris/Illumos
@@ -177,6 +177,26 @@ Some notes:
 
 - E-mail notifications are disabled by default.
 
+- Webhooks (section `[webhook "name"]`) send the messages of one check run
+  as a single HTTP POST request. `preset` selects the format: `generic`
+  (JSON with `host`, `severity`, `title` and a `messages` list, the
+  default), `ntfy` (text body, headers `Title`, `Priority`, `Tags`),
+  `gotify`, `discord` or `slack`. `token` becomes
+  `Authorization: Bearer` (ntfy, generic) or `X-Gotify-Key` (gotify);
+  `throttle` limits the requests per time (seconds) like for e-mail.
+  Attachments are not sent. A request times out after 10 s and is repeated
+  once after a network error or an HTTP 5xx; failures are logged to the
+  diagnostics (journal), without the token and without the query string of
+  the URL. Commented examples are in the configuration file.
+
+- `zfswatcher --test-notify` sends one test message to all enabled outputs
+  and exits without starting the daemon. The message has the most urgent
+  `level` of the enabled outputs (for example `warning` if levels `warning`
+  and `info` are configured), so it reaches every channel without being more
+  urgent than needed. Without enabled outputs it exits with code 1. The exit code is 1 if a webhook
+  delivery fails (other channels are best effort), which also makes it
+  usable in scripts.
+
 - The embedded web server is disabled by default. When enabled it listens on
   `127.0.0.1:8081` (`bind` in the `[www]` section), meant for a reverse proxy
   on the same host. Use `bind = :8081` to listen on all interfaces. Put TLS
@@ -218,7 +238,7 @@ Some notes:
 - API tokens: an `[apitoken "name"]` section (`enable`, `hash`, `role`) lets
   scripts and monitoring tools call the API below `<rootdir>/api/` with
   `Authorization: Bearer <token>`. Tokens work **only** for paths under
-  `/api/`; the web pages accept the password login only, and the password
+  `/api/` and for `/metrics` (if enabled, see "Prometheus"); the web pages accept the password login only, and the password
   login also works for the API. `zfswatcher -T` (`--generate-token`) creates
   a token and prints it once together with the line `hash = sha256:...` for
   the configuration; only the hash is stored, so save the token right away.
@@ -260,6 +280,45 @@ curl -H "Authorization: Bearer zfsw_..." "https://host:8990/api/v1/events?limit=
 ```
 
 The API is new and may still change incompatibly until version 1.0.
+
+## Prometheus
+
+With `metrics = true` in section `[www]` (default `false`) zfswatcher serves
+`<rootdir>/metrics` in the Prometheus text format. It needs the role
+`viewer`, accepts HTTP Basic and API tokens, and answers only `GET` and
+`HEAD`. Without the option the path serves no metrics.
+
+| Metric | Labels | Meaning |
+|--------|--------|---------|
+| `zfswatcher_build_info` | `version` | always 1 |
+| `zfswatcher_pool_state` | `pool`, `state` | 1 for the current state, 0 for the other known ones (ONLINE, DEGRADED, FAULTED, OFFLINE, UNAVAIL, REMOVED, SUSPENDED) |
+| `zfswatcher_device_state` | `pool`, `device`, `state` | the same for every vdev and disk |
+| `zfswatcher_device_read_errors`, `_write_errors`, `_cksum_errors` | `pool`, `device` | error counters of `zpool status` (gauges: `zpool clear` resets them) |
+| `zfswatcher_pool_usable_bytes`, `_used_bytes`, `_available_bytes`, `_used_ratio` | `pool` | space of the pool's root dataset as in `zfs list` (used + available) |
+| `zfswatcher_last_check_timestamp_seconds`, `zfswatcher_last_check_success` | | time and result of the last `zpool status` query |
+
+Example alert: `zfswatcher_pool_state{state="ONLINE"} == 0`.
+
+Create a token with `zfswatcher -T`, put the `[apitoken]` section with
+`role = viewer` into the configuration, and store the token in a file only
+Prometheus can read (`/etc/prometheus/zfswatcher.token`):
+
+```
+scrape_configs:
+  - job_name: zfswatcher
+    scheme: https
+    metrics_path: /metrics        # <rootdir>/metrics
+    authorization:
+      type: Bearer                # the default
+      credentials_file: /etc/prometheus/zfswatcher.token
+    static_configs:
+      - targets: ["host:8990"]
+```
+
+Older Prometheus versions use `bearer_token_file:` instead of
+`authorization:`. HTTP Basic works with `basic_auth:` (`username`,
+`password_file`).
+
 
 ## Reverse proxy
 
