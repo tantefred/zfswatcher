@@ -3,6 +3,17 @@
                            version history
 
 
+version 0.8.0 (unreleased)
+
+Internal changes
+
+ - The notifier package has a plug-in interface for output channels
+   (notifier.Output and Notifier.AddOutput, documented in
+   notifier/doc.go). Log file, syslog, e-mail, standard output and
+   callback outputs are now implemented with it. The configuration and
+   the behaviour are unchanged.
+
+
 version 0.7.0 released 2026-11-22
 
 Upgrade notes
