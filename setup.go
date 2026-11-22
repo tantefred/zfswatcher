@@ -75,6 +75,7 @@ type cfgType struct {
 		Devadditionalinfochanged notifier.Severity
 		Devadditionalinfocleared notifier.Severity
 		Usedspace                percentageToSeverityMap
+		Loginlockout             notifier.Severity
 	}
 	Leds struct {
 		Enable      bool
@@ -124,6 +125,9 @@ type cfgType struct {
 		Rootdir              string
 		Trustedproxies       string
 		Metrics              bool
+		Loginfailures        int
+		Loginwindow          int
+		Loginlockout         int
 		Severitycssclassmap  severityToWwwClassMap
 		Poolstatecssclassmap stringToStringMap
 		Devstatecssclassmap  stringToStringMap
@@ -370,6 +374,10 @@ func getCfg() *cfgType {
 	// Without this the web server would listen on port 80.
 	c.Www.Bind = defaultWwwBind
 	c.Www.Refresh = defaultWwwRefresh
+	c.Www.Loginfailures = defaultLoginFailures
+	c.Www.Loginwindow = defaultLoginWindow
+	c.Www.Loginlockout = defaultLoginLockout
+	c.Severity.Loginlockout = notifier.WARNING
 	c.Severity.Pooladded = notifier.INFO
 	c.Severity.Poolremoved = notifier.INFO
 	c.Severity.Poolstatuschanged = notifier.INFO
@@ -392,6 +400,7 @@ func getCfg() *cfgType {
 	checkCfgErr(cfgFile, "www", "", "trustedproxies", err, &errorSeen)
 	checkCfgErr(cfgFile, "main", "", "commandtimeout", checkCommandTimeout(c.Main.Commandtimeout), &errorSeen)
 	checkCfgErr(cfgFile, "www", "", "refresh", checkWwwRefresh(c.Www.Refresh), &errorSeen)
+	checkCfgErr(cfgFile, "www", "", "loginfailures", checkLoginBackoff(c.Www.Loginfailures, c.Www.Loginwindow, c.Www.Loginlockout), &errorSeen)
 	checkAuthCfg(&c, &errorSeen)
 	checkWebhookCfg(&c, &errorSeen)
 	translateLegacyCSSClasses(&c)
@@ -622,6 +631,7 @@ func reconfigure() {
 	}
 	warnObsoleteOptions(newcfg)
 	cfg = newcfg
+	webAuthCache.flush()
 	newNotify := setupLog(cfg)
 	if newNotify == nil {
 		notify.Print(notifier.CRIT, "error setting up logs, keeping old logging configuration")

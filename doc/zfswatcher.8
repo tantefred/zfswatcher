@@ -110,6 +110,41 @@ If true, the Prometheus endpoint
 is served (text exposition format 0.0.4, GET and HEAD only, role viewer,
 HTTP Basic or API token). See the section "Prometheus" in README.md.
 .TP
+.BR loginfailures ", " loginwindow ", " loginlockout
+In section
+.BR [www] :
+protection against password guessing. After
+.B loginfailures
+failed logins (wrong password, unknown user or invalid API token; default 5)
+from one client address within
+.B loginwindow
+seconds (default 60) the address is answered with
+.B 429 Too Many Requests
+and a
+.B Retry-After
+header for
+.B loginlockout
+seconds (default 60), without checking any credentials. A successful login
+does not reset the counter (failures only expire with the window), IPv6
+clients are counted per /64 prefix, all further unknown clients share one counter
+with the same limits if the table of 10000 tracked clients is full of locked
+out ones, and
+.B /healthz
+is not affected. Successful credential checks are cached in memory for
+5 minutes (a keyed hash, not the credentials) and forgotten on reload. One message per lockout is sent with the severity
+.B loginlockout
+of the
+.B [severity]
+section (default warning). 0 for
+.B loginfailures
+switches the protection off. The window and lockout must be 1 to 86400
+seconds. Behind a reverse proxy set
+.B trustedproxies
+in
+.BR [www] ,
+otherwise all clients have the address of the proxy and one attacker locks
+everybody out.
+.TP
 .BR severitycssclassmap ", " poolstatecssclassmap ", " devstatecssclassmap ", " usedstatecssclassmap
 In section
 .BR [www] :

@@ -5,6 +5,22 @@
 
 version 0.9.0 (unreleased)
 
+Upgrade notes
+
+ - Failed web logins are now limited per client address (new options
+   "loginfailures", "loginwindow" and "loginlockout" in [www], defaults 5
+   failures within 60 seconds, lockout 60 seconds). A locked out client gets
+   "429 Too Many Requests" with a Retry-After header, without any password
+   or token check, and one message with the severity of the new option
+   "loginlockout" in [severity] (default warning) is sent. A successful login
+   does not reset the counter, failures only expire with the window. IPv6
+   clients are counted per /64 prefix. If the table of tracked clients is full
+   of locked out clients, all further unknown clients share one counter with
+   the same limits. Successful credential checks are cached for 5 minutes
+   to save CPU. "loginfailures = 0" switches the limit off. Behind a reverse
+   proxy set "trustedproxies" in [www], otherwise all clients share the
+   address of the proxy and one attacker locks out everybody.
+
 New features
 
  - Webhook notifications: new sections [webhook "name"] with "enable",
@@ -16,8 +32,9 @@ New features
    5xx; failures are logged with log/slog (without token and query string).
    Attachments are not sent. Examples are in the configuration files.
  - "zfswatcher --test-notify" sends a test message (with the most urgent
-   configured level, so it reaches every channel) to all enabled outputs and exits without starting
-   the daemon. The exit code is 1 if a webhook delivery fails.
+   configured level, so it reaches every channel) to all enabled outputs
+   and exits without starting the daemon. The exit code is 1 if a webhook
+   delivery fails.
  - Prometheus endpoint "<rootdir>/metrics" (text format), enabled with the
    new option "metrics = true" in [www] (default false). Role viewer; HTTP
    Basic or an API token works (tokens are now accepted for the paths
