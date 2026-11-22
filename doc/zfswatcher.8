@@ -27,6 +27,7 @@ zfswatcher \- ZFS pool monitoring and notification daemon
 .IR config-file \|]
 .RB [\| \-d \|]
 .RB [\| \-P \|]
+.RB [\| \-T \|]
 .RB [\| \-t \|]
 .RB [\| \-v \|]
 .SH DESCRIPTION
@@ -60,11 +61,64 @@ without echo and asked for twice; otherwise one line is read from standard
 input, so the option can be used in scripts. Hashes in the older MD5 crypt
 format ("$1$...") are still accepted in the configuration but are deprecated.
 .TP
+.BR \-T ", " \-\-generate\-token
+Generate a new API token (the string "zfsw_" followed by 43 random
+characters) and print it once, together with the line
+.B hash = sha256:\fI...\fR
+for an
+.B apitoken
+section of the configuration file. Only the hash is stored in the
+configuration, so the token must be saved immediately. See
+.B CONFIGURATION
+below.
+.TP
 .BR \-t ", " \-\-test
 Test the configuration file syntax and exit.
 .TP
 .BR \-v ", " \-\-version
 Print version information and exit.
+.SH CONFIGURATION
+Besides the options described in the configuration file comments, two
+settings control who may do what in the web interface.
+.TP
+.B role
+In a
+.B wwwuser
+or
+.B apitoken
+section: one of
+.BR viewer ,
+.B operator
+or
+.BR admin .
+A viewer may see the dashboard, pool status, usage, statistics, enclosure
+and about pages. An operator may additionally see the logs and switch the
+locate LEDs. An admin may do everything (currently the same as an operator).
+Without
+.B role
+the user is an admin. An invalid value is a configuration error.
+.TP
+.B apitoken
+Section
+.RB [ apitoken
+.IR \(dqname\(dq ]
+with
+.BR enable ,
+.B hash
+and
+.BR role .
+The hash has the form
+.B sha256:\fI64 hexadecimal digits\fR
+and is produced by
+.BR "zfswatcher \-T" .
+A client sends the token as
+.B Authorization: Bearer
+.IR token .
+Tokens are accepted only for paths below
+.IR <rootdir>/api/ ;
+for all other pages only HTTP Basic authentication of a
+.B wwwuser
+works. Basic authentication is accepted for the API as well.
 .SH SIGNALS
 .TP
 .B SIGHUP

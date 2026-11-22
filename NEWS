@@ -12,6 +12,23 @@ Upgrade notes
    configuration files keep working, but it has no effect and zfswatcher
    logs a warning at startup and on reload if it is set. Remove it from
    your configuration.
+ - Web users now have a role (new option "role" in [wwwuser]): "viewer",
+   "operator" or "admin". Without "role" a user is an admin, so existing
+   configurations behave as before. A viewer sees the dashboard, status,
+   usage, statistics, enclosure and about pages, but not the logs and has
+   no locate buttons; an operator may additionally see the logs and
+   switch locate LEDs. An invalid role is a configuration error.
+
+New features
+
+ - API tokens: new sections [apitoken "name"] with "enable", "hash"
+   ("sha256:" and 64 hex digits) and "role". A token is sent as
+   "Authorization: Bearer <token>" and is accepted only for paths below
+   "<rootdir>/api/" (the API itself follows in a later version). Password
+   login works for the API as well.
+ - "zfswatcher -T" (--generate-token) creates a new API token, prints it
+   once and shows the matching "hash = sha256:..." line for the
+   configuration.
 
 Changes
 
