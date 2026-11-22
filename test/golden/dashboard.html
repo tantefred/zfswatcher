@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<title>zfswatcher</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<link href="/zw/resources/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+		<link href="/zw/resources/bootstrap/css/bootstrap-theme.min.css" rel="stylesheet">
+		<style type="text/css">
+			body {
+				padding-top: 60px;
+				padding-bottom: 60px;
+			}
+		</style>
+		<link href="/zw/resources/zfswatcher.css" rel="stylesheet">
+		<link href="/zw/resources/favicon.ico" rel="shortcut icon">
+		<script src="/zw/resources/bootstrap/js/jquery.min.js"></script>
+	</head>
+
+	<body>
+
+	<div class="navbar navbar-inverse navbar-fixed-top">
+		<div class="container-fluid">
+			<div class="navbar-header">
+				<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+	        <span class="sr-only">Toggle navigation</span>
+	        <span class="icon-bar"></span>
+	        <span class="icon-bar"></span>
+	        <span class="icon-bar"></span>
+	      </button>
+				<a class="navbar-brand" href="/zw/">zfswatcher</a>
+	    </div>
+				<div class="navbar-collapse collapse" id="bs-example-navbar-collapse-1">
+					<ul class="nav navbar-nav">
+						<li class="active">
+							<a href="/zw/">Dashboard</a></li>
+						<li>
+							<a href="/zw/status/">Pool Status</a></li>
+						<li>
+							<a href="/zw/enclosure/">Enclosure</a></li>
+						<li>
+							<a href="/zw/statistics/">Statistics</a></li>
+						<li>
+							<a href="/zw/logs/">Logs</a></li>
+					</ul>
+					<ul class="nav navbar-nav navbar-right">
+						<li>
+							<a href="/zw/about/" class="pull-right">About</a></li>
+					</ul>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="container-fluid">
+		
+		<div class="row-fluid">
+
+
+
+	<dl class="dl-horizontal">
+		<dt>load averages:</dt><dd>VOLATILE
+		<dt>system uptime:</dt><dd>VOLATILE</dd>
+		<dt>zfswatcher uptime:</dt><dd>VOLATILE</dd>
+	</dl>
+	
+	<table class="table table-zfswatcher-dashboard table-hover">
+		<thead>
+			<tr>
+				<th style="width: 10%">Pool</th>
+				<th style="width: 10%">State</th>
+				<th style="text-align: right; width: 8%">Total</th>
+				<th style="text-align: right; width: 8%">Used</th>
+				<th style="text-align: right; width: 5%">%</th>
+				<th style="text-align: right; width: 8%">Avail</th>
+				<th style="text-align: right; width: 5%">%</th>
+				<th style="width: 15%"></th>
+				<th style="text-align: right; width: 8%">Logical Used</th>
+				<th style="text-align: right; width: 12%">Compression Ratio</th>
+				<th style="width: 14%"></th>
+			</tr>
+		</thead>
+		<tbody>
+			
+			<tr>
+				<td><a href="/zw/status/zfsw_mix">zfsw_mix</a></td>
+				<td class="success">ONLINE</td>
+				<td style="text-align: right">2G</td>
+				<td style="text-align: right">1024M</td>
+				<td style="text-align: right">50%</td>
+				<td style="text-align: right">1024M</td>
+				<td style="text-align: right">50%</td>
+				<td style="padding-left: 2em">
+					<a href="/zw/usage/zfsw_mix">
+					<div class="progress progress-zfswatcher-dashboard">
+					
+						<div class="progress-bar progress-bar-info" style="width: 50%"></div>
+						<div class="progress-bar	progress-bar-success" style="width: 50%"></div>
+					
+					</div>
+					</a>
+				</td>
+				<td style="text-align: right">3G</td>
+				<td style="text-align: right">1.50x</td>
+				<td></td>
+			</tr>
+			
+			<tr>
+				<td><a href="/zw/status/test">test</a></td>
+				<td class="warning">DEGRADED</td>
+				<td style="text-align: right">10G</td>
+				<td style="text-align: right">1024M</td>
+				<td style="text-align: right">10%</td>
+				<td style="text-align: right">9G</td>
+				<td style="text-align: right">90%</td>
+				<td style="padding-left: 2em">
+					<a href="/zw/usage/test">
+					<div class="progress progress-zfswatcher-dashboard">
+					
+						<div class="progress-bar progress-bar-info" style="width: 10%"></div>
+						<div class="progress-bar	progress-bar-success" style="width: 90%"></div>
+					
+					</div>
+					</a>
+				</td>
+				<td style="text-align: right">1024M</td>
+				<td style="text-align: right">1.00x</td>
+				<td></td>
+			</tr>
+			
+			<tr>
+				<td><a href="/zw/status/zfsw_mirror">zfsw_mirror</a></td>
+				<td class="success">ONLINE</td>
+				<td style="text-align: right">10G</td>
+				<td style="text-align: right">9G</td>
+				<td style="text-align: right">90%</td>
+				<td style="text-align: right">1024M</td>
+				<td style="text-align: right">10%</td>
+				<td style="padding-left: 2em">
+					<a href="/zw/usage/zfsw_mirror">
+					<div class="progress progress-zfswatcher-dashboard">
+					
+						<div class="progress-bar progress-bar-danger" style="width: 90%"></div>
+						<div class="progress-bar	progress-bar-success" style="width: 10%"></div>
+					
+					</div>
+					</a>
+				</td>
+				<td style="text-align: right">18G</td>
+				<td style="text-align: right">2.00x</td>
+				<td></td>
+			</tr>
+			
+			<tr>
+				<td><a href="/zw/status/datis">datis</a></td>
+				<td class="success">ONLINE</td>
+				<td style="text-align: right">10G</td>
+				<td style="text-align: right">3G</td>
+				<td style="text-align: right">30%</td>
+				<td style="text-align: right">7G</td>
+				<td style="text-align: right">70%</td>
+				<td style="padding-left: 2em">
+					<a href="/zw/usage/datis">
+					<div class="progress progress-zfswatcher-dashboard">
+					
+						<div class="progress-bar progress-bar-info" style="width: 30%"></div>
+						<div class="progress-bar	progress-bar-success" style="width: 70%"></div>
+					
+					</div>
+					</a>
+				</td>
+				<td style="text-align: right">4G</td>
+				<td style="text-align: right">1.35x</td>
+				<td></td>
+			</tr>
+			
+			<tr>
+				<td><a href="/zw/status/rpool">rpool</a></td>
+				<td class="success">ONLINE</td>
+				<td style="text-align: right">80G</td>
+				<td style="text-align: right">79G</td>
+				<td style="text-align: right">99%</td>
+				<td style="text-align: right">1024M</td>
+				<td style="text-align: right">1%</td>
+				<td style="padding-left: 2em">
+					<a href="/zw/usage/rpool">
+					<div class="progress progress-zfswatcher-dashboard">
+					
+						<div class="progress-bar progress-bar-danger" style="width: 99%"></div>
+						<div class="progress-bar	progress-bar-success" style="width: 1%"></div>
+					
+					</div>
+					</a>
+				</td>
+				<td style="text-align: right">80G</td>
+				<td style="text-align: right">1.10x</td>
+				<td></td>
+			</tr>
+			
+			<tr>
+				<td><a href="/zw/status/secundus">secundus</a></td>
+				<td class="success">ONLINE</td>
+				<td style="text-align: right">101G</td>
+				<td style="text-align: right">1024M</td>
+				<td style="text-align: right">1%</td>
+				<td style="text-align: right">100G</td>
+				<td style="text-align: right">99%</td>
+				<td style="padding-left: 2em">
+					<a href="/zw/usage/secundus">
+					<div class="progress progress-zfswatcher-dashboard">
+					
+						<div class="progress-bar progress-bar-info" style="width: 1%"></div>
+						<div class="progress-bar	progress-bar-success" style="width: 99%"></div>
+					
+					</div>
+					</a>
+				</td>
+				<td style="text-align: right">1024M</td>
+				<td style="text-align: right">1.00x</td>
+				<td></td>
+			</tr>
+			
+			<tr>
+				<td><a href="/zw/status/zfsw_draid">zfsw_draid</a></td>
+				<td class="warning">DEGRADED</td>
+				<td style="text-align: right">-</td>
+				<td style="text-align: right">-</td>
+				<td style="text-align: right">0%</td>
+				<td style="text-align: right">-</td>
+				<td style="text-align: right">0%</td>
+				<td style="padding-left: 2em">
+					<a href="/zw/usage/zfsw_draid">
+					<div class="progress progress-zfswatcher-dashboard">
+					
+					</div>
+					</a>
+				</td>
+				<td style="text-align: right">-</td>
+				<td style="text-align: right"></td>
+				<td></td>
+			</tr>
+			
+			<tr>
+				<td><a href="/zw/status/zfsw_susp">zfsw_susp</a></td>
+				<td class="success">ONLINE</td>
+				<td style="text-align: right">10G</td>
+				<td style="text-align: right">7G</td>
+				<td style="text-align: right">70%</td>
+				<td style="text-align: right">3G</td>
+				<td style="text-align: right">30%</td>
+				<td style="padding-left: 2em">
+					<a href="/zw/usage/zfsw_susp">
+					<div class="progress progress-zfswatcher-dashboard">
+					
+						<div class="progress-bar progress-bar-warning" style="width: 70%"></div>
+						<div class="progress-bar	progress-bar-success" style="width: 30%"></div>
+					
+					</div>
+					</a>
+				</td>
+				<td style="text-align: right">7G</td>
+				<td style="text-align: right">1.00x</td>
+				<td></td>
+			</tr>
+			
+			<tr>
+				<td><a href="/zw/status/zfsw_rz2">zfsw_rz2</a></td>
+				<td class="warning">DEGRADED</td>
+				<td style="text-align: right">2M</td>
+				<td style="text-align: right">1024K</td>
+				<td style="text-align: right">50%</td>
+				<td style="text-align: right">1024K</td>
+				<td style="text-align: right">50%</td>
+				<td style="padding-left: 2em">
+					<a href="/zw/usage/zfsw_rz2">
+					<div class="progress progress-zfswatcher-dashboard">
+					
+						<div class="progress-bar progress-bar-info" style="width: 50%"></div>
+						<div class="progress-bar	progress-bar-success" style="width: 50%"></div>
+					
+					</div>
+					</a>
+				</td>
+				<td style="text-align: right">2M</td>
+				<td style="text-align: right">1.00x</td>
+				<td></td>
+			</tr>
+			
+			<tr>
+				<td><a href="/zw/status/zfsw_opt">zfsw_opt</a></td>
+				<td class="success">ONLINE</td>
+				<td style="text-align: right">5G</td>
+				<td style="text-align: right">1024M</td>
+				<td style="text-align: right">20%</td>
+				<td style="text-align: right">4G</td>
+				<td style="text-align: right">80%</td>
+				<td style="padding-left: 2em">
+					<a href="/zw/usage/zfsw_opt">
+					<div class="progress progress-zfswatcher-dashboard">
+					
+						<div class="progress-bar progress-bar-info" style="width: 20%"></div>
+						<div class="progress-bar	progress-bar-success" style="width: 80%"></div>
+					
+					</div>
+					</a>
+				</td>
+				<td style="text-align: right">-</td>
+				<td style="text-align: right">-</td>
+				<td></td>
+			</tr>
+			
+		</tbody>
+	</table>
+	
+	
+
+			</div> 
+		</div> 
+
+		<script src="/zw/resources/bootstrap/js/bootstrap.min.js"></script>
+
+	</body>
+</html>
+
