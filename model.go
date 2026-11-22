@@ -251,6 +251,18 @@ func snapshotPools() []Pool {
 	return pools
 }
 
+// snapshotState returns the pools and the usage entries of one and the same
+// moment.
+func snapshotState() ([]Pool, map[string]Usage) {
+	currentState.mutex.RLock()
+	defer currentState.mutex.RUnlock()
+	pools := make([]Pool, 0, len(currentState.state))
+	for _, p := range currentState.state {
+		pools = append(pools, poolFromParsed(p))
+	}
+	return pools, usageMapFromParsed(currentState.usage)
+}
+
 // snapshotPool returns a copy of the pool with the given name.
 func snapshotPool(name string) (Pool, bool) {
 	currentState.mutex.RLock()

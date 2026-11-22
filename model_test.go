@@ -336,6 +336,20 @@ func TestSnapshotPoolsAreCopies(t *testing.T) {
 	}
 }
 
+func TestSnapshotState(t *testing.T) {
+	pools := parseFixturePools(t, "zpool-status-vdev-classes.txt")
+	setTestState(t, pools, map[string]*PoolUsageType{"zfsw_mix": {Name: "zfsw_mix", Avail: 3, Used: 1}})
+	p, u := snapshotState()
+	if len(p) != 1 || u["zfsw_mix"].UsedPercent != 25 {
+		t.Fatalf("%+v %+v", p, u)
+	}
+	u["zfsw_mix"] = Usage{}
+	p[0].Name = "x"
+	if p2, u2 := snapshotState(); p2[0].Name != "zfsw_mix" || u2["zfsw_mix"].Used != 1 {
+		t.Error("snapshotState returned references")
+	}
+}
+
 func TestSnapshotEmptyState(t *testing.T) {
 	setTestState(t, nil, nil)
 	if p := snapshotPools(); p == nil || len(p) != 0 {
