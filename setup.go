@@ -487,6 +487,7 @@ func reconfigure() {
 	oldnotify := notify
 	notify = newNotify
 	oldnotify.Close()
+	notify.Print(notifier.INFO, "configuration reloaded")
 	// XXX restart web
 }
 
