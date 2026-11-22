@@ -18,6 +18,22 @@ Upgrade notes
    usage, statistics, enclosure and about pages, but not the logs and has
    no locate buttons; an operator may additionally see the logs and
    switch locate LEDs. An invalid role is a configuration error.
+ - The web interface now uses Bootstrap 5. The CSS class maps in [www]
+   (severitycssclassmap, poolstatecssclassmap, devstatecssclassmap,
+   usedstatecssclassmap) use the new class names in the example
+   configurations: text-error -> text-danger, text-muted ->
+   text-body-secondary, progress-bar-info/-warning/-danger/-success (and
+   bar-* of the illumos example) -> bg-info/bg-warning/bg-danger/bg-success,
+   and for log lines error/danger -> table-danger, warning -> table-warning,
+   info -> table-info, success -> table-success. Existing configuration
+   files with the old names keep working: zfswatcher translates them when
+   the configuration is loaded, without a warning. Custom templates in an
+   own templatedir must be ported to Bootstrap 5 and must not use inline
+   scripts or style attributes any more (the Content-Security-Policy no
+   longer allows inline styles).
+ - New option "refresh" in [www] (default 10): the dashboard and the pool
+   status reload their content every N seconds (2 to 3600, 0 = off; other
+   values are configuration errors). The page works without it.
 
 New features
 
@@ -37,6 +53,14 @@ New features
 
 Changes
 
+ - Web interface: Bootstrap 3.4.1 and jQuery 3.7.1 were replaced by
+   Bootstrap 5.3.9 (new layout, responsive, works on phones) and htmx 2.0.11
+   for the automatic refresh of the dashboard and the pool status (no
+   jQuery any more). The pages have no inline scripts or styles, so the
+   Content-Security-Policy no longer contains 'unsafe-inline' for styles.
+   The enclosure page is rendered on the server from layout data, without
+   JavaScript; its slots are filled by the device name ("1-3" is slot 1-3),
+   no longer by the position in the list. The background image was removed.
  - Internal diagnostics (debug output such as runtime statistics on
    SIGUSR1, and internal errors of the notifier library) are now written
    with log/slog to stderr, which is the journal under systemd

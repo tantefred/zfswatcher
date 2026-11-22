@@ -1,5 +1,9 @@
 {{ template "header.html" .Nav }}
 
+<h1 class="h3 mb-3">Pool Status</h1>
+
+<div id="live"{{ if .Nav.Refresh }} hx-get="{{ .Nav.RefreshURL }}" hx-trigger="every {{ .Nav.Refresh }}s" hx-swap="innerHTML"{{ end }}>
 {{ template "status-pool.html" .Data }}
+</div>
 
 {{ template "footer.html" .Nav }}

@@ -28,16 +28,29 @@ License: GPL-3.0+
 #  - gopkg.in/gcfg.v1               2012 Péter Surányi, 2009 The Go Authors, BSD-3-clause
 #  - github.com/spf13/pflag         2012 Alex Ogier, 2012 The Go Authors, BSD-3-clause
 
-# Bootstrap 3.4.1 and jQuery 3.7.1 (bundled, minified)
-Files: www/resources/bootstrap/js/bootstrap.min.js
-       www/resources/bootstrap/css/*
-Copyright: 2011-2019 Twitter, Inc.
-           2011-2019 The Bootstrap Authors
+# Bootstrap 5.3.9 (bundled, minified; the bundle includes Popper) and htmx 2.0.11
+Files: www/resources/bootstrap/css/*
+       www/resources/bootstrap/js/*
+       www/resources/bootstrap/LICENSE
+Copyright: 2011-2026 The Bootstrap Authors
+           Popper contributors (Popper 2)
 License: Expat
 
-Files: www/resources/bootstrap/js/jquery.min.js
-Copyright: OpenJS Foundation and other contributors
-License: Expat
+Files: www/resources/htmx/*
+Copyright: htmx contributors (Big Sky Software)
+License: 0BSD
+
+License: 0BSD
+ Permission to use, copy, modify, and/or distribute this software for
+ any purpose with or without fee is hereby granted.
+ .
+ THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL
+ WARRANTIES WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES
+ OF MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE
+ FOR ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY
+ DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN
+ AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT
+ OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 License: Expat
  Permission is hereby granted, free of charge, to any person obtaining a

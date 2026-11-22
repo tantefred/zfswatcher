@@ -78,8 +78,30 @@ Test the configuration file syntax and exit.
 .BR \-v ", " \-\-version
 Print version information and exit.
 .SH CONFIGURATION
-Besides the options described in the configuration file comments, two
-settings control who may do what in the web interface.
+Besides the options described in the configuration file comments, a few
+settings control the web interface.
+.TP
+.B refresh
+In section
+.BR [www] :
+the interval in seconds (2 to 3600) at which the dashboard and the pool
+status pages reload their content in the browser (using htmx). The default
+is 10,
+.B 0
+switches the refresh off. The pages work without JavaScript, they just do
+not update. Any other value is a configuration error.
+.TP
+.BR severitycssclassmap ", " poolstatecssclassmap ", " devstatecssclassmap ", " usedstatecssclassmap
+In section
+.BR [www] :
+CSS classes of the Bootstrap 5 based pages. The class names of the former
+Bootstrap 3 pages (for example
+.BR text\-error ,
+.BR progress\-bar\-warning
+or
+.B error
+for log lines) are still accepted and translated when the configuration is
+loaded.
 .TP
 .B role
 In a

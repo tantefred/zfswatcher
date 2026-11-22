@@ -1,60 +1,67 @@
 {{ template "header.html" .Nav }}
 
-{{ with .Data }}
-	<dl class="dl-horizontal">
-		<dt>load averages:</dt><dd>{{ index .SysLoadaverage 0 | printf "%.2f" }}, {{ index .SysLoadaverage 1 | printf "%.2f" }}, {{ index .SysLoadaverage 2 | printf "%.2f" }}
-		<dt>system uptime:</dt><dd>{{ .SysUptime }}</dd>
-		<dt>zfswatcher uptime:</dt><dd>{{ .ZfswatcherUptime }}</dd>
-	</dl>
-	{{ if .Pools }}
-	<table class="table table-zfswatcher-dashboard table-hover">
-		<thead>
-			<tr>
-				<th style="width: 10%">Pool</th>
-				<th style="width: 10%">State</th>
-				<th style="text-align: right; width: 8%">Total</th>
-				<th style="text-align: right; width: 8%">Used</th>
-				<th style="text-align: right; width: 5%">%</th>
-				<th style="text-align: right; width: 8%">Avail</th>
-				<th style="text-align: right; width: 5%">%</th>
-				<th style="width: 15%"></th>
-				<th style="text-align: right; width: 8%">Logical Used</th>
-				<th style="text-align: right; width: 12%">Compression Ratio</th>
-				<th style="width: 14%"></th>
-			</tr>
-		</thead>
-		<tbody>
-			{{ range .Pools }}
-			<tr>
-				<td><a href="{{ .Root }}/status/{{ .Name }}">{{ .Name }}</a></td>
-				<td class="{{ .StateClass }}">{{ .State }}</td>
-				<td style="text-align: right">{{ nicenumber .Total }}</td>
-				<td style="text-align: right">{{ nicenumber .Used }}</td>
-				<td style="text-align: right">{{ .UsedPercent }}%</td>
-				<td style="text-align: right">{{ nicenumber .Avail }}</td>
-				<td style="text-align: right">{{ .AvailPercent }}%</td>
-				<td style="padding-left: 2em">
-					<a href="{{ .Root }}/usage/{{ .Name }}">
-					<div class="progress progress-zfswatcher-dashboard">
-					{{ if or .UsedPercent .AvailPercent }}
-						<div class="progress-bar {{ .UsedClass }}" style="width: {{ .UsedPercent }}%"></div>
-						<div class="progress-bar	progress-bar-success" style="width: {{ .AvailPercent }}%"></div>
-					{{ end }}
-					</div>
-					</a>
-				</td>
-				<td style="text-align: right">{{ nicenumber .Logicalused }}</td>
-				<td style="text-align: right">{{ .Compressratio }}</td>
-				<td></td>
-			</tr>
-			{{ end }}
-		</tbody>
-	</table>
-	{{ end }}
-	{{ else }}
-	<div class="alert alert-info">
-		There are no pools.
-	</div>
-	{{ end }}
+<h1 class="h3 mb-3">Dashboard</h1>
+
+<div id="live"{{ if .Nav.Refresh }} hx-get="{{ .Nav.RefreshURL }}" hx-trigger="every {{ .Nav.Refresh }}s" hx-swap="innerHTML"{{ end }}>
+{{ template "dashboard-content" .Data }}
+</div>
 
 {{ template "footer.html" .Nav }}
+
+{{ define "dashboard-content" }}
+	<dl class="row">
+		<dt class="col-sm-3 col-lg-2">load averages</dt>
+		<dd class="col-sm-9 col-lg-10">{{ index .SysLoadaverage 0 | printf "%.2f" }}, {{ index .SysLoadaverage 1 | printf "%.2f" }}, {{ index .SysLoadaverage 2 | printf "%.2f" }}</dd>
+		<dt class="col-sm-3 col-lg-2">system uptime</dt>
+		<dd class="col-sm-9 col-lg-10">{{ .SysUptime }}</dd>
+		<dt class="col-sm-3 col-lg-2">zfswatcher uptime</dt>
+		<dd class="col-sm-9 col-lg-10">{{ .ZfswatcherUptime }}</dd>
+	</dl>
+	{{ if .Pools }}
+	<div class="table-responsive card-table">
+		<table class="table table-hover">
+			<thead>
+				<tr>
+					<th scope="col">Pool</th>
+					<th scope="col">State</th>
+					<th scope="col" class="num">Total</th>
+					<th scope="col" class="num">Used</th>
+					<th scope="col" class="num">%</th>
+					<th scope="col" class="num">Avail</th>
+					<th scope="col" class="num">%</th>
+					<th scope="col"><span class="visually-hidden">Usage</span></th>
+					<th scope="col" class="num">Logical Used</th>
+					<th scope="col" class="num">Compression Ratio</th>
+				</tr>
+			</thead>
+			<tbody>
+				{{ range .Pools }}
+				<tr>
+					<td><a href="{{ .Root }}/status/{{ .Name }}">{{ .Name }}</a></td>
+					<td class="{{ .StateClass }}">{{ .State }}</td>
+					<td class="num">{{ nicenumber .Total }}</td>
+					<td class="num">{{ nicenumber .Used }}</td>
+					<td class="num">{{ .UsedPercent }}%</td>
+					<td class="num">{{ nicenumber .Avail }}</td>
+					<td class="num">{{ .AvailPercent }}%</td>
+					<td class="dash-bar">
+						<a href="{{ .Root }}/usage/{{ .Name }}" title="Show the datasets of {{ .Name }}">
+						<div class="progress" role="progressbar" aria-label="Used space of {{ .Name }}" aria-valuenow="{{ .UsedPercent }}" aria-valuemin="0" aria-valuemax="100">
+						{{ if or .UsedPercent .AvailPercent }}
+							<div class="progress-bar {{ .UsedClass }} {{ .UsedBar }}"></div>
+							<div class="progress-bar bg-success-subtle {{ .AvailBar }}"></div>
+						{{ end }}
+						</div>
+						</a>
+					</td>
+					<td class="num">{{ nicenumber .Logicalused }}</td>
+					<td class="num">{{ .Compressratio }}</td>
+				</tr>
+				{{ end }}
+			</tbody>
+		</table>
+	</div>
+	{{ else }}
+	{{ template "no-pools" }}
+	{{ end }}
+{{ end }}

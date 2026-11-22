@@ -106,6 +106,7 @@ type cfgType struct {
 		Enable               bool
 		Level                notifier.Severity
 		Logbuffer            int
+		Refresh              int
 		Bind                 string
 		Certfile             string
 		Keyfile              string
@@ -273,6 +274,24 @@ func checkCommandTimeout(sec int) error {
 	return nil
 }
 
+// Allowed range of the web page refresh in seconds; 0 switches it off.
+const (
+	minWwwRefreshSeconds = 2
+	maxWwwRefreshSeconds = 3600
+)
+
+// defaultWwwRefresh is the default refresh interval of the web pages.
+const defaultWwwRefresh = 10
+
+// checkWwwRefresh validates the automatic refresh interval of the web pages.
+func checkWwwRefresh(sec int) error {
+	if sec != 0 && (sec < minWwwRefreshSeconds || sec > maxWwwRefreshSeconds) {
+		return fmt.Errorf("value %d out of range, must be 0 (off) or between %d and %d seconds",
+			sec, minWwwRefreshSeconds, maxWwwRefreshSeconds)
+	}
+	return nil
+}
+
 // checkRefresh validates a refresh interval given in seconds.
 func checkRefresh(sec int) error {
 	if sec < minRefreshSeconds || sec > maxRefreshSeconds {
@@ -324,6 +343,7 @@ func getCfg() *cfgType {
 	c.Leds.Ledctlcmd = "ledctl"
 	// Without this the web server would listen on port 80.
 	c.Www.Bind = defaultWwwBind
+	c.Www.Refresh = defaultWwwRefresh
 	c.Severity.Pooladded = notifier.INFO
 	c.Severity.Poolremoved = notifier.INFO
 	c.Severity.Poolstatuschanged = notifier.INFO
@@ -345,7 +365,9 @@ func getCfg() *cfgType {
 	_, err = parseTrustedProxies(c.Www.Trustedproxies)
 	checkCfgErr(cfgFile, "www", "", "trustedproxies", err, &errorSeen)
 	checkCfgErr(cfgFile, "main", "", "commandtimeout", checkCommandTimeout(c.Main.Commandtimeout), &errorSeen)
+	checkCfgErr(cfgFile, "www", "", "refresh", checkWwwRefresh(c.Www.Refresh), &errorSeen)
 	checkAuthCfg(&c, &errorSeen)
+	translateLegacyCSSClasses(&c)
 
 	if errorSeen {
 		return nil

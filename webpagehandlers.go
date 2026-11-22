@@ -27,8 +27,7 @@ import (
 	"log/slog"
 	"net/http"
 	"net/url"
-	"regexp"
-	"sort"
+	"strconv"
 	"strings"
 	"sync"
 	"time"
@@ -71,6 +70,11 @@ type webNav struct {
 	// what the role of the user allows
 	CanLogs   bool
 	CanLocate bool
+	// automatic refresh of the live part of the page (dashboard, pool
+	// status): the interval in seconds, 0 for none, and the URL of the
+	// fragment which is loaded
+	Refresh    int
+	RefreshURL string
 }
 
 // newWebNav returns the navigation for the user of the request. The
@@ -82,6 +86,50 @@ func newWebNav(r *http.Request) webNav {
 		CanLogs:   role >= RoleOperator,
 		CanLocate: role >= RoleOperator,
 	}
+}
+
+// live enables the automatic refresh of the page content, which is loaded
+// from the fragment of the given path. The refresh is off with
+// "refresh = 0".
+func (wn *webNav) live(path string) {
+	if cfg.Www.Refresh > 0 {
+		wn.Refresh = cfg.Www.Refresh
+		wn.RefreshURL = path + "?" + fragmentQuery
+	}
+}
+
+// fragmentQuery selects the fragment of a page: just the live part of the
+// content, as loaded by the automatic refresh.
+const fragmentQuery = "fragment=1"
+
+func isFragment(r *http.Request) bool {
+	return r.URL.Query().Get("fragment") == "1"
+}
+
+// executeFragment renders the named template of a fragment response.
+func executeFragment(w http.ResponseWriter, name string, data any) {
+	w.Header().Set("Content-Type", "text/html; charset=utf-8")
+	w.Header().Set("Cache-Control", "no-store")
+	if err := templates.ExecuteTemplate(w, name, data); err != nil {
+		notify.Printf(notifier.ERR, "error executing template: %s", err)
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+	}
+}
+
+// executePoolGone answers the refresh of a pool page whose pool has
+// vanished. A 4xx answer would not be swapped by htmx and the page would
+// stay stale, so the answer is 200 with a notice. The HX-Retarget and
+// HX-Reswap headers make htmx replace the whole live container, including
+// its hx-get and hx-trigger attributes, so the polling stops. This needs no
+// script and nothing the CSP forbids, and keeps the notice on the page
+// (HX-Redirect would load another page without telling why).
+func executePoolGone(w http.ResponseWriter, pool string) {
+	w.Header().Set("HX-Retarget", "#live")
+	w.Header().Set("HX-Reswap", "outerHTML")
+	executeFragment(w, "pool-gone", map[string]string{
+		"Name": pool,
+		"Root": cfg.Www.Rootdir,
+	})
 }
 
 // DefaultPasswordWarning tells the header template whether to show the
@@ -102,18 +150,18 @@ type webData struct {
 }
 
 type devStatusWeb struct {
-	Indent     int
-	Name       string
-	EnableLed  bool
-	Locate     bool
-	State      string
-	StateClass string
-	Read       int64
-	Write      int64
-	Cksum      int64
-	Rest       string
-	Root       string
-	Return     string
+	IndentClass string
+	Name        string
+	EnableLed   bool
+	Locate      bool
+	State       string
+	StateClass  string
+	Read        int64
+	Write       int64
+	Cksum       int64
+	Rest        string
+	Root        string
+	Return      string
 }
 
 type poolStatusWeb struct {
@@ -131,24 +179,13 @@ type poolStatusWeb struct {
 	Logicalused   int64
 	UsedPercent   int
 	UsedClass     string
+	UsedBar       string
 	Avail         int64
 	AvailPercent  int
+	AvailBar      string
 	Total         int64
 	Root          string
 	Compressratio string
-}
-
-type chassisStatusWeb struct {
-	N    int
-	Devs []devChassisStatusWeb
-	Root string
-}
-
-type devChassisStatusWeb struct {
-	Indent     int
-	Name       string
-	State      string
-	StateClass string
 }
 
 type dashboardWeb struct {
@@ -159,15 +196,8 @@ type dashboardWeb struct {
 }
 
 type enclosureWeb struct {
-	ChassisEnable      bool
-	Chassis45drives15  bool
-	Chassis45drives30  bool
-	Chassis45drives45l bool
-	Chassis45drives45  bool
-	Chassis45drives60  bool
-	Drives1            []*devChassisStatusWeb
-	Drives2            []*devChassisStatusWeb
-	EnclosureData      map[string][]*devChassisStatusWeb
+	ChassisEnable bool
+	Layouts       []enclosureView
 }
 
 // wwwLogBuffer keeps the most recent log messages for the logs page and the
@@ -216,9 +246,18 @@ func makeLogMsgWeb(e Event) logMsgWeb {
 // model (Pool, Device, Usage, Event) into the structures used by the
 // templates (CSS classes, indentation, URLs).
 
-// devIndent is the left padding in em of a device at the given tree depth.
-func devIndent(depth int) int {
-	return 1 + 2*depth
+// maxDepthClass is the deepest indentation which has a css class.
+const maxDepthClass = 12
+
+// devIndentClass is the css class which indents a device at the given tree
+// depth.
+func devIndentClass(depth int) string {
+	return "depth-" + strconv.Itoa(min(max(depth, 0), maxDepthClass))
+}
+
+// barClass is the css class for a bar of the given width in percent.
+func barClass(percent int) string {
+	return "pct-" + strconv.Itoa(min(max(percent, 0), 100))
 }
 
 func makePoolStatusWeb(pool Pool, usage map[string]Usage, canLocate bool) *poolStatusWeb {
@@ -248,19 +287,21 @@ func makePoolStatusWeb(pool Pool, usage map[string]Usage, canLocate bool) *poolS
 		usedSeverity, _ := cfg.Severity.Usedspace.GetByPercentage(u.UsedPercent)
 		statusWeb.UsedClass = cfg.Www.Usedstatecssclassmap[usedSeverity]
 	}
+	statusWeb.UsedBar = barClass(statusWeb.UsedPercent)
+	statusWeb.AvailBar = barClass(statusWeb.AvailPercent)
 
 	pool.Walk(func(dev Device, depth int) {
 		devw := devStatusWeb{
-			Indent:     devIndent(depth),
-			Name:       dev.Name,
-			State:      dev.State,
-			StateClass: cfg.Www.Devstatecssclassmap[dev.State],
-			Read:       dev.Read,
-			Write:      dev.Write,
-			Cksum:      dev.Cksum,
-			Rest:       dev.Info,
-			Root:       cfg.Www.Rootdir,
-			Return:     cfg.Www.Rootdir + "/status/" + url.PathEscape(pool.Name),
+			IndentClass: devIndentClass(depth),
+			Name:        dev.Name,
+			State:       dev.State,
+			StateClass:  cfg.Www.Devstatecssclassmap[dev.State],
+			Read:        dev.Read,
+			Write:       dev.Write,
+			Cksum:       dev.Cksum,
+			Rest:        dev.Info,
+			Root:        cfg.Www.Rootdir,
+			Return:      cfg.Www.Rootdir + "/status/" + url.PathEscape(pool.Name),
 		}
 		if canLocate && cfg.Leds.Enable && len(dev.Children) == 0 {
 			loc, err := locateQuery(dev.Name)
@@ -271,20 +312,6 @@ func makePoolStatusWeb(pool Pool, usage map[string]Usage, canLocate bool) *poolS
 			}
 		}
 		statusWeb.Devs = append(statusWeb.Devs, devw)
-	})
-	return statusWeb
-}
-
-func makeChassisStatusWeb(pool Pool) *chassisStatusWeb {
-	statusWeb := &chassisStatusWeb{
-		Root: cfg.Www.Rootdir,
-	}
-	pool.Walk(func(dev Device, depth int) {
-		statusWeb.Devs = append(statusWeb.Devs, devChassisStatusWeb{
-			Indent: devIndent(depth),
-			Name:   dev.Name,
-			State:  dev.State,
-		})
 	})
 	return statusWeb
 }
@@ -303,6 +330,14 @@ func statusHandler(w http.ResponseWriter, r *http.Request) {
 	state, usage := snapshotState()
 
 	if len(state) == 0 {
+		if isFragment(r) {
+			if pool != "" {
+				executePoolGone(w, pool)
+			} else {
+				executeFragment(w, "no-pools", nil)
+			}
+			return
+		}
 		err := templates.ExecuteTemplate(w, "status-none.html", &webData{Nav: wn})
 		if err != nil {
 			notify.Printf(notifier.ERR, "error executing template: %s", err)
@@ -326,11 +361,21 @@ func statusHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if match == -1 {
+		if isFragment(r) {
+			executePoolGone(w, pool)
+			return
+		}
 		http.Error(w, "Bad Request", http.StatusBadRequest)
 		return
 	}
 
 	ws := makePoolStatusWeb(state[match], usage, wn.CanLocate)
+
+	if isFragment(r) {
+		executeFragment(w, "status-pool.html", ws)
+		return
+	}
+	wn.live(cfg.Www.Rootdir + "/status/" + url.PathEscape(pool))
 
 	var err error
 
@@ -392,6 +437,12 @@ func dashboardHandler(w http.ResponseWriter, r *http.Request) {
 		SysLoadaverage:   host.LoadAverage,
 		Pools:            ws,
 	}
+
+	if isFragment(r) {
+		executeFragment(w, "dashboard-content", d)
+		return
+	}
+	wn.live(cfg.Www.Rootdir + "/")
 
 	err := templates.ExecuteTemplate(w, "dashboard.html", &webData{Nav: wn, Data: d})
 	if err != nil {
@@ -493,64 +544,12 @@ func enclosureHandler(w http.ResponseWriter, r *http.Request) {
 	wn := newWebNav(r)
 	wn.Enclosure = true
 
-	state := snapshotPools()
-
-	var ws []*chassisStatusWeb
-	var wsx []*devChassisStatusWeb
-	var wsz []*devChassisStatusWeb
-
-	for n, s := range state {
-		ws = append(ws, makeChassisStatusWeb(s))
-		ws[n].N = n
-	}
-
-	regx, _ := regexp.Compile("^1-.*")
-	regy, _ := regexp.Compile("^2-.*")
-
-	for _, v := range ws {
-		for _, x := range v.Devs {
-			wsa := &devChassisStatusWeb{
-				Name:  x.Name,
-				State: x.State,
-			}
-			if regx.MatchString(x.Name) {
-				wsx = append(wsx, wsa)
-			} else if regy.MatchString(x.Name) {
-				wsz = append(wsz, wsa)
-			}
+	ewd := &enclosureWeb{ChassisEnable: cfg.Chassis.Enable}
+	if ewd.ChassisEnable {
+		states := deviceStates(snapshotPools())
+		for _, l := range enclosureLayouts() {
+			ewd.Layouts = append(ewd.Layouts, fillEnclosureLayout(l, states))
 		}
-	}
-
-	sort.Slice(wsx, func(i, j int) bool {
-		switch strings.Compare(wsx[i].Name[:1], wsx[j].Name[:1]) {
-		case -1:
-			return true
-		case 1:
-			return false
-		}
-		return wsx[i].State > wsx[j].State
-	})
-
-	sort.Slice(wsz, func(i, j int) bool {
-		switch strings.Compare(wsz[i].Name[:1], wsz[j].Name[:1]) {
-		case -1:
-			return true
-		case 1:
-			return false
-		}
-		return wsz[i].State > wsz[j].State
-	})
-
-	ewd := &enclosureWeb{
-		ChassisEnable:      cfg.Chassis.Enable,
-		Chassis45drives15:  cfg.Chassis.Chassis45drives15,
-		Chassis45drives30:  cfg.Chassis.Chassis45drives30,
-		Chassis45drives45l: cfg.Chassis.Chassis45drives45l,
-		Chassis45drives45:  cfg.Chassis.Chassis45drives45,
-		Chassis45drives60:  cfg.Chassis.Chassis45drives60,
-		Drives1:            wsx,
-		Drives2:            wsz,
-		EnclosureData:      map[string][]*devChassisStatusWeb{"drives1": wsx, "drives2": wsz},
 	}
 
 	err := templates.ExecuteTemplate(w, "enclosure.html", &webData{Nav: wn, Data: ewd})

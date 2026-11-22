@@ -3,321 +3,315 @@
 <html lang="en">
 	<head>
 		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
 		<title>zfswatcher</title>
-		<meta name="viewport" content="width=device-width, initial-scale=1.0">
 		<link href="/zw/resources/bootstrap/css/bootstrap.min.css" rel="stylesheet">
-		<link href="/zw/resources/bootstrap/css/bootstrap-theme.min.css" rel="stylesheet">
-		<style type="text/css">
-			body {
-				padding-top: 60px;
-				padding-bottom: 60px;
-			}
-		</style>
 		<link href="/zw/resources/zfswatcher.css" rel="stylesheet">
 		<link href="/zw/resources/favicon.ico" rel="shortcut icon">
-		<script src="/zw/resources/bootstrap/js/jquery.min.js"></script>
+		
+		<meta name="htmx-config" content='{"allowEval":false,"includeIndicatorStyles":false,"selfRequestsOnly":true}'>
+		<script src="/zw/resources/htmx/htmx.min.js" defer></script>
+		
 	</head>
 
 	<body>
 
-	<div class="navbar navbar-inverse navbar-fixed-top">
+	<nav class="navbar navbar-expand-md navbar-dark bg-dark mb-4" data-bs-theme="dark">
 		<div class="container-fluid">
-			<div class="navbar-header">
-				<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
-	        <span class="sr-only">Toggle navigation</span>
-	        <span class="icon-bar"></span>
-	        <span class="icon-bar"></span>
-	        <span class="icon-bar"></span>
-	      </button>
-				<a class="navbar-brand" href="/zw/">zfswatcher</a>
-	    </div>
-				<div class="navbar-collapse collapse" id="bs-example-navbar-collapse-1">
-					<ul class="nav navbar-nav">
-						<li>
-							<a href="/zw/">Dashboard</a></li>
-						<li class="active">
-							<a href="/zw/status/">Pool Status</a></li>
-						<li>
-							<a href="/zw/enclosure/">Enclosure</a></li>
-						<li>
-							<a href="/zw/statistics/">Statistics</a></li>
-						<li>
-							<a href="/zw/logs/">Logs</a></li>
-					</ul>
-					<ul class="nav navbar-nav navbar-right">
-						<li>
-							<a href="/zw/about/" class="pull-right">About</a></li>
-					</ul>
-				</div>
+			<a class="navbar-brand" href="/zw/">zfswatcher</a>
+			<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#main-nav" aria-controls="main-nav" aria-expanded="false" aria-label="Toggle navigation">
+				<span class="navbar-toggler-icon"></span>
+			</button>
+			<div class="collapse navbar-collapse" id="main-nav">
+				<ul class="navbar-nav me-auto mb-2 mb-md-0">
+					<li class="nav-item">
+						<a class="nav-link" href="/zw/">Dashboard</a></li>
+					<li class="nav-item">
+						<a class="nav-link active" aria-current="page" href="/zw/status/">Pool Status</a></li>
+					<li class="nav-item">
+						<a class="nav-link" href="/zw/enclosure/">Enclosure</a></li>
+					<li class="nav-item">
+						<a class="nav-link" href="/zw/statistics/">Statistics</a></li>
+					<li class="nav-item">
+						<a class="nav-link" href="/zw/logs/">Logs</a></li>
+				</ul>
+				<ul class="navbar-nav">
+					<li class="nav-item">
+						<a class="nav-link" href="/zw/about/">About</a></li>
+				</ul>
 			</div>
 		</div>
-	</div>
+	</nav>
 
-	<div class="container-fluid">
+	<main class="container-fluid">
 		
-		<div class="row-fluid">
 
 
-<ul class="nav nav-tabs">
+<h1 class="h3 mb-3">Pool Status</h1>
 
-	<li class="active">
-		<a href="zfsw_mix">zfsw_mix</a>
+<ul class="nav nav-tabs mb-3">
+
+	<li class="nav-item">
+		<a class="nav-link active" aria-current="page" href="/zw/status/zfsw_mix">zfsw_mix</a>
 	</li>
 
-	<li>
-		<a href="test">test</a>
+	<li class="nav-item">
+		<a class="nav-link" href="/zw/status/test">test</a>
 	</li>
 
-	<li>
-		<a href="zfsw_mirror">zfsw_mirror</a>
+	<li class="nav-item">
+		<a class="nav-link" href="/zw/status/zfsw_mirror">zfsw_mirror</a>
 	</li>
 
-	<li>
-		<a href="datis">datis</a>
+	<li class="nav-item">
+		<a class="nav-link" href="/zw/status/datis">datis</a>
 	</li>
 
-	<li>
-		<a href="rpool">rpool</a>
+	<li class="nav-item">
+		<a class="nav-link" href="/zw/status/rpool">rpool</a>
 	</li>
 
-	<li>
-		<a href="secundus">secundus</a>
+	<li class="nav-item">
+		<a class="nav-link" href="/zw/status/secundus">secundus</a>
 	</li>
 
-	<li>
-		<a href="zfsw_draid">zfsw_draid</a>
+	<li class="nav-item">
+		<a class="nav-link" href="/zw/status/zfsw_draid">zfsw_draid</a>
 	</li>
 
-	<li>
-		<a href="zfsw_susp">zfsw_susp</a>
+	<li class="nav-item">
+		<a class="nav-link" href="/zw/status/zfsw_susp">zfsw_susp</a>
 	</li>
 
-	<li>
-		<a href="zfsw_rz2">zfsw_rz2</a>
+	<li class="nav-item">
+		<a class="nav-link" href="/zw/status/zfsw_rz2">zfsw_rz2</a>
 	</li>
 
-	<li>
-		<a href="zfsw_opt">zfsw_opt</a>
+	<li class="nav-item">
+		<a class="nav-link" href="/zw/status/zfsw_opt">zfsw_opt</a>
 	</li>
 
 </ul>
 
-	<dl class="dl-horizontal">
-		<dt>name:</dt><dd>zfsw_mix</dd>
-		<dt>state:</dt><dd class="success">ONLINE</dd>
+<div id="live" hx-get="/zw/status/zfsw_mix?fragment=1" hx-trigger="every 10s" hx-swap="innerHTML">
+	<dl class="row">
+		<dt class="col-sm-2">name</dt><dd class="col-sm-10">zfsw_mix</dd>
+		<dt class="col-sm-2">state</dt><dd class="col-sm-10 text-success">ONLINE</dd>
 		
 		
 		
 		
 	</dl>
-	<table class="table table-condensed table-hover">
-		<thead>
-			<tr>
-				<th style="width: 30%">Name</th>
-				<th style="width: 4%">Loc</th>
-				<th style="width: 15%">State</th>
-				<th style="text-align: right; width: 8%">Read</th>
-				<th style="text-align: right; width: 8%">Write</th>
-				<th style="text-align: right; width: 8%">Cksum</th>
-				<th style="width: 31%"></th>
-			</tr>
-		</thead>
-		<tbody>
-			
-			<tr>
-				<td style="padding-left: 1em">zfsw_mix</td>
-				<td>
+	<div class="table-responsive card-table">
+		<table class="table table-sm table-hover">
+			<thead>
+				<tr>
+					<th scope="col">Name</th>
+					<th scope="col">Loc</th>
+					<th scope="col">State</th>
+					<th scope="col" class="num">Read</th>
+					<th scope="col" class="num">Write</th>
+					<th scope="col" class="num">Cksum</th>
+					<th scope="col"><span class="visually-hidden">Additional information</span></th>
+				</tr>
+			</thead>
+			<tbody>
 				
-				</td>
-				<td class="success">ONLINE</td>
-				<td style="text-align: right">0</td>
-				<td style="text-align: right">0</td>
-				<td style="text-align: right">0</td>
-				<td style=""></td>
-			</tr>
-			
-			<tr>
-				<td style="padding-left: 3em">raidz1-0</td>
-				<td>
+				<tr>
+					<td class="dev-name depth-0">zfsw_mix</td>
+					<td>
+					
+					</td>
+					<td class="text-success">ONLINE</td>
+					<td class="num">0</td>
+					<td class="num">0</td>
+					<td class="num">0</td>
+					<td></td>
+				</tr>
 				
-				</td>
-				<td class="success">ONLINE</td>
-				<td style="text-align: right">0</td>
-				<td style="text-align: right">0</td>
-				<td style="text-align: right">0</td>
-				<td style=""></td>
-			</tr>
-			
-			<tr>
-				<td style="padding-left: 5em">/var/tmp/zfsw-collect/c1</td>
-				<td>
+				<tr>
+					<td class="dev-name depth-1">raidz1-0</td>
+					<td>
+					
+					</td>
+					<td class="text-success">ONLINE</td>
+					<td class="num">0</td>
+					<td class="num">0</td>
+					<td class="num">0</td>
+					<td></td>
+				</tr>
 				
-				</td>
-				<td class="success">ONLINE</td>
-				<td style="text-align: right">0</td>
-				<td style="text-align: right">0</td>
-				<td style="text-align: right">0</td>
-				<td style=""></td>
-			</tr>
-			
-			<tr>
-				<td style="padding-left: 5em">/var/tmp/zfsw-collect/c2</td>
-				<td>
+				<tr>
+					<td class="dev-name depth-2">/var/tmp/zfsw-collect/c1</td>
+					<td>
+					
+					</td>
+					<td class="text-success">ONLINE</td>
+					<td class="num">0</td>
+					<td class="num">0</td>
+					<td class="num">0</td>
+					<td></td>
+				</tr>
 				
-				</td>
-				<td class="success">ONLINE</td>
-				<td style="text-align: right">0</td>
-				<td style="text-align: right">0</td>
-				<td style="text-align: right">0</td>
-				<td style=""></td>
-			</tr>
-			
-			<tr>
-				<td style="padding-left: 5em">/var/tmp/zfsw-collect/c3</td>
-				<td>
+				<tr>
+					<td class="dev-name depth-2">/var/tmp/zfsw-collect/c2</td>
+					<td>
+					
+					</td>
+					<td class="text-success">ONLINE</td>
+					<td class="num">0</td>
+					<td class="num">0</td>
+					<td class="num">0</td>
+					<td></td>
+				</tr>
 				
-				</td>
-				<td class="success">ONLINE</td>
-				<td style="text-align: right">0</td>
-				<td style="text-align: right">0</td>
-				<td style="text-align: right">0</td>
-				<td style=""></td>
-			</tr>
-			
-			<tr>
-				<td style="padding-left: 1em">dedup</td>
-				<td>
+				<tr>
+					<td class="dev-name depth-2">/var/tmp/zfsw-collect/c3</td>
+					<td>
+					
+					</td>
+					<td class="text-success">ONLINE</td>
+					<td class="num">0</td>
+					<td class="num">0</td>
+					<td class="num">0</td>
+					<td></td>
+				</tr>
 				
-				</td>
-				<td class=""></td>
-				<td style="text-align: right">-</td>
-				<td style="text-align: right">-</td>
-				<td style="text-align: right">-</td>
-				<td style=""></td>
-			</tr>
-			
-			<tr>
-				<td style="padding-left: 3em">/var/tmp/zfsw-collect/c8</td>
-				<td>
+				<tr>
+					<td class="dev-name depth-0">dedup</td>
+					<td>
+					
+					</td>
+					<td class=""></td>
+					<td class="num">-</td>
+					<td class="num">-</td>
+					<td class="num">-</td>
+					<td></td>
+				</tr>
 				
-				</td>
-				<td class="success">ONLINE</td>
-				<td style="text-align: right">0</td>
-				<td style="text-align: right">0</td>
-				<td style="text-align: right">0</td>
-				<td style=""></td>
-			</tr>
-			
-			<tr>
-				<td style="padding-left: 1em">special</td>
-				<td>
+				<tr>
+					<td class="dev-name depth-1">/var/tmp/zfsw-collect/c8</td>
+					<td>
+					
+					</td>
+					<td class="text-success">ONLINE</td>
+					<td class="num">0</td>
+					<td class="num">0</td>
+					<td class="num">0</td>
+					<td></td>
+				</tr>
 				
-				</td>
-				<td class=""></td>
-				<td style="text-align: right">-</td>
-				<td style="text-align: right">-</td>
-				<td style="text-align: right">-</td>
-				<td style=""></td>
-			</tr>
-			
-			<tr>
-				<td style="padding-left: 3em">/var/tmp/zfsw-collect/c7</td>
-				<td>
+				<tr>
+					<td class="dev-name depth-0">special</td>
+					<td>
+					
+					</td>
+					<td class=""></td>
+					<td class="num">-</td>
+					<td class="num">-</td>
+					<td class="num">-</td>
+					<td></td>
+				</tr>
 				
-				</td>
-				<td class="success">ONLINE</td>
-				<td style="text-align: right">0</td>
-				<td style="text-align: right">0</td>
-				<td style="text-align: right">0</td>
-				<td style=""></td>
-			</tr>
-			
-			<tr>
-				<td style="padding-left: 1em">logs</td>
-				<td>
+				<tr>
+					<td class="dev-name depth-1">/var/tmp/zfsw-collect/c7</td>
+					<td>
+					
+					</td>
+					<td class="text-success">ONLINE</td>
+					<td class="num">0</td>
+					<td class="num">0</td>
+					<td class="num">0</td>
+					<td></td>
+				</tr>
 				
-				</td>
-				<td class=""></td>
-				<td style="text-align: right">-</td>
-				<td style="text-align: right">-</td>
-				<td style="text-align: right">-</td>
-				<td style=""></td>
-			</tr>
-			
-			<tr>
-				<td style="padding-left: 3em">/var/tmp/zfsw-collect/c4</td>
-				<td>
+				<tr>
+					<td class="dev-name depth-0">logs</td>
+					<td>
+					
+					</td>
+					<td class=""></td>
+					<td class="num">-</td>
+					<td class="num">-</td>
+					<td class="num">-</td>
+					<td></td>
+				</tr>
 				
-				</td>
-				<td class="success">ONLINE</td>
-				<td style="text-align: right">0</td>
-				<td style="text-align: right">0</td>
-				<td style="text-align: right">0</td>
-				<td style=""></td>
-			</tr>
-			
-			<tr>
-				<td style="padding-left: 1em">cache</td>
-				<td>
+				<tr>
+					<td class="dev-name depth-1">/var/tmp/zfsw-collect/c4</td>
+					<td>
+					
+					</td>
+					<td class="text-success">ONLINE</td>
+					<td class="num">0</td>
+					<td class="num">0</td>
+					<td class="num">0</td>
+					<td></td>
+				</tr>
 				
-				</td>
-				<td class=""></td>
-				<td style="text-align: right">-</td>
-				<td style="text-align: right">-</td>
-				<td style="text-align: right">-</td>
-				<td style=""></td>
-			</tr>
-			
-			<tr>
-				<td style="padding-left: 3em">/var/tmp/zfsw-collect/c5</td>
-				<td>
+				<tr>
+					<td class="dev-name depth-0">cache</td>
+					<td>
+					
+					</td>
+					<td class=""></td>
+					<td class="num">-</td>
+					<td class="num">-</td>
+					<td class="num">-</td>
+					<td></td>
+				</tr>
 				
-				</td>
-				<td class="success">ONLINE</td>
-				<td style="text-align: right">0</td>
-				<td style="text-align: right">0</td>
-				<td style="text-align: right">0</td>
-				<td style=""></td>
-			</tr>
-			
-			<tr>
-				<td style="padding-left: 1em">spares</td>
-				<td>
+				<tr>
+					<td class="dev-name depth-1">/var/tmp/zfsw-collect/c5</td>
+					<td>
+					
+					</td>
+					<td class="text-success">ONLINE</td>
+					<td class="num">0</td>
+					<td class="num">0</td>
+					<td class="num">0</td>
+					<td></td>
+				</tr>
 				
-				</td>
-				<td class=""></td>
-				<td style="text-align: right">-</td>
-				<td style="text-align: right">-</td>
-				<td style="text-align: right">-</td>
-				<td style=""></td>
-			</tr>
-			
-			<tr>
-				<td style="padding-left: 3em">/var/tmp/zfsw-collect/c6</td>
-				<td>
+				<tr>
+					<td class="dev-name depth-0">spares</td>
+					<td>
+					
+					</td>
+					<td class=""></td>
+					<td class="num">-</td>
+					<td class="num">-</td>
+					<td class="num">-</td>
+					<td></td>
+				</tr>
 				
-				</td>
-				<td class="info">AVAIL</td>
-				<td style="text-align: right">-</td>
-				<td style="text-align: right">-</td>
-				<td style="text-align: right">-</td>
-				<td style=""></td>
-			</tr>
-			
-		</tbody>
-	</table>
+				<tr>
+					<td class="dev-name depth-1">/var/tmp/zfsw-collect/c6</td>
+					<td>
+					
+					</td>
+					<td class="text-info">AVAIL</td>
+					<td class="num">-</td>
+					<td class="num">-</td>
+					<td class="num">-</td>
+					<td></td>
+				</tr>
+				
+			</tbody>
+		</table>
+	</div>
 
-	<dl class="dl-horizontal">
-		
-		<dt>errors:</dt><dd>No known data errors</dd>
-		
+	
+	<dl class="row mt-3">
+		<dt class="col-sm-2">errors</dt><dd class="col-sm-10">No known data errors</dd>
 	</dl>
+	
 
+</div>
 
-			</div> 
-		</div> 
+	</main>
 
-		<script src="/zw/resources/bootstrap/js/bootstrap.min.js"></script>
+	<script src="/zw/resources/bootstrap/js/bootstrap.bundle.min.js"></script>
 
 	</body>
 </html>
@@ -327,295 +321,289 @@
 <html lang="en">
 	<head>
 		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
 		<title>zfswatcher</title>
-		<meta name="viewport" content="width=device-width, initial-scale=1.0">
 		<link href="/zw/resources/bootstrap/css/bootstrap.min.css" rel="stylesheet">
-		<link href="/zw/resources/bootstrap/css/bootstrap-theme.min.css" rel="stylesheet">
-		<style type="text/css">
-			body {
-				padding-top: 60px;
-				padding-bottom: 60px;
-			}
-		</style>
 		<link href="/zw/resources/zfswatcher.css" rel="stylesheet">
 		<link href="/zw/resources/favicon.ico" rel="shortcut icon">
-		<script src="/zw/resources/bootstrap/js/jquery.min.js"></script>
+		
+		<meta name="htmx-config" content='{"allowEval":false,"includeIndicatorStyles":false,"selfRequestsOnly":true}'>
+		<script src="/zw/resources/htmx/htmx.min.js" defer></script>
+		
 	</head>
 
 	<body>
 
-	<div class="navbar navbar-inverse navbar-fixed-top">
+	<nav class="navbar navbar-expand-md navbar-dark bg-dark mb-4" data-bs-theme="dark">
 		<div class="container-fluid">
-			<div class="navbar-header">
-				<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
-	        <span class="sr-only">Toggle navigation</span>
-	        <span class="icon-bar"></span>
-	        <span class="icon-bar"></span>
-	        <span class="icon-bar"></span>
-	      </button>
-				<a class="navbar-brand" href="/zw/">zfswatcher</a>
-	    </div>
-				<div class="navbar-collapse collapse" id="bs-example-navbar-collapse-1">
-					<ul class="nav navbar-nav">
-						<li>
-							<a href="/zw/">Dashboard</a></li>
-						<li class="active">
-							<a href="/zw/status/">Pool Status</a></li>
-						<li>
-							<a href="/zw/enclosure/">Enclosure</a></li>
-						<li>
-							<a href="/zw/statistics/">Statistics</a></li>
-						<li>
-							<a href="/zw/logs/">Logs</a></li>
-					</ul>
-					<ul class="nav navbar-nav navbar-right">
-						<li>
-							<a href="/zw/about/" class="pull-right">About</a></li>
-					</ul>
-				</div>
+			<a class="navbar-brand" href="/zw/">zfswatcher</a>
+			<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#main-nav" aria-controls="main-nav" aria-expanded="false" aria-label="Toggle navigation">
+				<span class="navbar-toggler-icon"></span>
+			</button>
+			<div class="collapse navbar-collapse" id="main-nav">
+				<ul class="navbar-nav me-auto mb-2 mb-md-0">
+					<li class="nav-item">
+						<a class="nav-link" href="/zw/">Dashboard</a></li>
+					<li class="nav-item">
+						<a class="nav-link active" aria-current="page" href="/zw/status/">Pool Status</a></li>
+					<li class="nav-item">
+						<a class="nav-link" href="/zw/enclosure/">Enclosure</a></li>
+					<li class="nav-item">
+						<a class="nav-link" href="/zw/statistics/">Statistics</a></li>
+					<li class="nav-item">
+						<a class="nav-link" href="/zw/logs/">Logs</a></li>
+				</ul>
+				<ul class="navbar-nav">
+					<li class="nav-item">
+						<a class="nav-link" href="/zw/about/">About</a></li>
+				</ul>
 			</div>
 		</div>
-	</div>
+	</nav>
 
-	<div class="container-fluid">
+	<main class="container-fluid">
 		
-		<div class="row-fluid">
 
 
-<ul class="nav nav-tabs">
+<h1 class="h3 mb-3">Pool Status</h1>
 
-	<li>
-		<a href="zfsw_mix">zfsw_mix</a>
+<ul class="nav nav-tabs mb-3">
+
+	<li class="nav-item">
+		<a class="nav-link" href="/zw/status/zfsw_mix">zfsw_mix</a>
 	</li>
 
-	<li class="active">
-		<a href="test">test</a>
+	<li class="nav-item">
+		<a class="nav-link active" aria-current="page" href="/zw/status/test">test</a>
 	</li>
 
-	<li>
-		<a href="zfsw_mirror">zfsw_mirror</a>
+	<li class="nav-item">
+		<a class="nav-link" href="/zw/status/zfsw_mirror">zfsw_mirror</a>
 	</li>
 
-	<li>
-		<a href="datis">datis</a>
+	<li class="nav-item">
+		<a class="nav-link" href="/zw/status/datis">datis</a>
 	</li>
 
-	<li>
-		<a href="rpool">rpool</a>
+	<li class="nav-item">
+		<a class="nav-link" href="/zw/status/rpool">rpool</a>
 	</li>
 
-	<li>
-		<a href="secundus">secundus</a>
+	<li class="nav-item">
+		<a class="nav-link" href="/zw/status/secundus">secundus</a>
 	</li>
 
-	<li>
-		<a href="zfsw_draid">zfsw_draid</a>
+	<li class="nav-item">
+		<a class="nav-link" href="/zw/status/zfsw_draid">zfsw_draid</a>
 	</li>
 
-	<li>
-		<a href="zfsw_susp">zfsw_susp</a>
+	<li class="nav-item">
+		<a class="nav-link" href="/zw/status/zfsw_susp">zfsw_susp</a>
 	</li>
 
-	<li>
-		<a href="zfsw_rz2">zfsw_rz2</a>
+	<li class="nav-item">
+		<a class="nav-link" href="/zw/status/zfsw_rz2">zfsw_rz2</a>
 	</li>
 
-	<li>
-		<a href="zfsw_opt">zfsw_opt</a>
+	<li class="nav-item">
+		<a class="nav-link" href="/zw/status/zfsw_opt">zfsw_opt</a>
 	</li>
 
 </ul>
 
-	<dl class="dl-horizontal">
-		<dt>name:</dt><dd>test</dd>
-		<dt>state:</dt><dd class="warning">DEGRADED</dd>
+<div id="live" hx-get="/zw/status/test?fragment=1" hx-trigger="every 10s" hx-swap="innerHTML">
+	<dl class="row">
+		<dt class="col-sm-2">name</dt><dd class="col-sm-10">test</dd>
+		<dt class="col-sm-2">state</dt><dd class="col-sm-10 text-warning">DEGRADED</dd>
 		
-		<dt>status:</dt><dd>One or more devices could not be used because the label is missing or
+		<dt class="col-sm-2">status</dt><dd class="col-sm-10">One or more devices could not be used because the label is missing or
 invalid.  Sufficient replicas exist for the pool to continue
 functioning in a degraded state.</dd>
 		
 		
-		<dt>action:</dt><dd>Replace the device using &#39;zpool replace&#39;.</dd>
+		<dt class="col-sm-2">action</dt><dd class="col-sm-10">Replace the device using &#39;zpool replace&#39;.</dd>
 		
 		
-		<dt>see:</dt><dd><a href="http://zfsonlinux.org/msg/ZFS-8000-4J" target="_blank">http://zfsonlinux.org/msg/ZFS-8000-4J</a></dd>
+		<dt class="col-sm-2">see</dt><dd class="col-sm-10"><a href="http://zfsonlinux.org/msg/ZFS-8000-4J" target="_blank" rel="noopener noreferrer">http://zfsonlinux.org/msg/ZFS-8000-4J</a></dd>
 		
 		
-		<dt>scan:</dt><dd>resilvered 674M in 0h3m with 0 errors on Tue Dec 18 00:19:59 2012</dd>
-		
-	</dl>
-	<table class="table table-condensed table-hover">
-		<thead>
-			<tr>
-				<th style="width: 30%">Name</th>
-				<th style="width: 4%">Loc</th>
-				<th style="width: 15%">State</th>
-				<th style="text-align: right; width: 8%">Read</th>
-				<th style="text-align: right; width: 8%">Write</th>
-				<th style="text-align: right; width: 8%">Cksum</th>
-				<th style="width: 31%"></th>
-			</tr>
-		</thead>
-		<tbody>
-			
-			<tr>
-				<td style="padding-left: 1em">test</td>
-				<td>
-				
-				</td>
-				<td class="warning">DEGRADED</td>
-				<td style="text-align: right">0</td>
-				<td style="text-align: right">0</td>
-				<td style="text-align: right">0</td>
-				<td style=""></td>
-			</tr>
-			
-			<tr>
-				<td style="padding-left: 3em">raidz3-0</td>
-				<td>
-				
-				</td>
-				<td class="warning">DEGRADED</td>
-				<td style="text-align: right">0</td>
-				<td style="text-align: right">0</td>
-				<td style="text-align: right">0</td>
-				<td style=""></td>
-			</tr>
-			
-			<tr>
-				<td style="padding-left: 5em">B0</td>
-				<td>
-				
-				</td>
-				<td class="">UNAVAIL</td>
-				<td style="text-align: right">0</td>
-				<td style="text-align: right">0</td>
-				<td style="text-align: right">0</td>
-				<td style=""></td>
-			</tr>
-			
-			<tr>
-				<td style="padding-left: 5em">A1</td>
-				<td>
-				
-				</td>
-				<td class="success">ONLINE</td>
-				<td style="text-align: right">0</td>
-				<td style="text-align: right">0</td>
-				<td style="text-align: right">0</td>
-				<td style=""></td>
-			</tr>
-			
-			<tr>
-				<td style="padding-left: 5em">A2</td>
-				<td>
-				
-				</td>
-				<td class="success">ONLINE</td>
-				<td style="text-align: right">0</td>
-				<td style="text-align: right">0</td>
-				<td style="text-align: right">0</td>
-				<td style=""></td>
-			</tr>
-			
-			<tr>
-				<td style="padding-left: 5em">A3</td>
-				<td>
-				
-				</td>
-				<td class="success">ONLINE</td>
-				<td style="text-align: right">0</td>
-				<td style="text-align: right">0</td>
-				<td style="text-align: right">0</td>
-				<td style=""></td>
-			</tr>
-			
-			<tr>
-				<td style="padding-left: 5em">A4</td>
-				<td>
-				
-				</td>
-				<td class="success">ONLINE</td>
-				<td style="text-align: right">0</td>
-				<td style="text-align: right">0</td>
-				<td style="text-align: right">0</td>
-				<td style=""></td>
-			</tr>
-			
-			<tr>
-				<td style="padding-left: 5em">A5</td>
-				<td>
-				
-				</td>
-				<td class="success">ONLINE</td>
-				<td style="text-align: right">0</td>
-				<td style="text-align: right">0</td>
-				<td style="text-align: right">0</td>
-				<td style=""></td>
-			</tr>
-			
-			<tr>
-				<td style="padding-left: 5em">A6</td>
-				<td>
-				
-				</td>
-				<td class="success">ONLINE</td>
-				<td style="text-align: right">0</td>
-				<td style="text-align: right">0</td>
-				<td style="text-align: right">0</td>
-				<td style=""></td>
-			</tr>
-			
-			<tr>
-				<td style="padding-left: 1em">spares</td>
-				<td>
-				
-				</td>
-				<td class=""></td>
-				<td style="text-align: right">-</td>
-				<td style="text-align: right">-</td>
-				<td style="text-align: right">-</td>
-				<td style=""></td>
-			</tr>
-			
-			<tr>
-				<td style="padding-left: 3em">B1</td>
-				<td>
-				
-				</td>
-				<td class="">UNAVAIL</td>
-				<td style="text-align: right">-</td>
-				<td style="text-align: right">-</td>
-				<td style="text-align: right">-</td>
-				<td style=""></td>
-			</tr>
-			
-			<tr>
-				<td style="padding-left: 3em">B2</td>
-				<td>
-				
-				</td>
-				<td class="">UNAVAIL</td>
-				<td style="text-align: right">-</td>
-				<td style="text-align: right">-</td>
-				<td style="text-align: right">-</td>
-				<td style=""></td>
-			</tr>
-			
-		</tbody>
-	</table>
-
-	<dl class="dl-horizontal">
-		
-		<dt>errors:</dt><dd>No known data errors</dd>
+		<dt class="col-sm-2">scan</dt><dd class="col-sm-10">resilvered 674M in 0h3m with 0 errors on Tue Dec 18 00:19:59 2012</dd>
 		
 	</dl>
+	<div class="table-responsive card-table">
+		<table class="table table-sm table-hover">
+			<thead>
+				<tr>
+					<th scope="col">Name</th>
+					<th scope="col">Loc</th>
+					<th scope="col">State</th>
+					<th scope="col" class="num">Read</th>
+					<th scope="col" class="num">Write</th>
+					<th scope="col" class="num">Cksum</th>
+					<th scope="col"><span class="visually-hidden">Additional information</span></th>
+				</tr>
+			</thead>
+			<tbody>
+				
+				<tr>
+					<td class="dev-name depth-0">test</td>
+					<td>
+					
+					</td>
+					<td class="text-warning">DEGRADED</td>
+					<td class="num">0</td>
+					<td class="num">0</td>
+					<td class="num">0</td>
+					<td></td>
+				</tr>
+				
+				<tr>
+					<td class="dev-name depth-1">raidz3-0</td>
+					<td>
+					
+					</td>
+					<td class="text-warning">DEGRADED</td>
+					<td class="num">0</td>
+					<td class="num">0</td>
+					<td class="num">0</td>
+					<td></td>
+				</tr>
+				
+				<tr>
+					<td class="dev-name depth-2">B0</td>
+					<td>
+					
+					</td>
+					<td class="">UNAVAIL</td>
+					<td class="num">0</td>
+					<td class="num">0</td>
+					<td class="num">0</td>
+					<td></td>
+				</tr>
+				
+				<tr>
+					<td class="dev-name depth-2">A1</td>
+					<td>
+					
+					</td>
+					<td class="text-success">ONLINE</td>
+					<td class="num">0</td>
+					<td class="num">0</td>
+					<td class="num">0</td>
+					<td></td>
+				</tr>
+				
+				<tr>
+					<td class="dev-name depth-2">A2</td>
+					<td>
+					
+					</td>
+					<td class="text-success">ONLINE</td>
+					<td class="num">0</td>
+					<td class="num">0</td>
+					<td class="num">0</td>
+					<td></td>
+				</tr>
+				
+				<tr>
+					<td class="dev-name depth-2">A3</td>
+					<td>
+					
+					</td>
+					<td class="text-success">ONLINE</td>
+					<td class="num">0</td>
+					<td class="num">0</td>
+					<td class="num">0</td>
+					<td></td>
+				</tr>
+				
+				<tr>
+					<td class="dev-name depth-2">A4</td>
+					<td>
+					
+					</td>
+					<td class="text-success">ONLINE</td>
+					<td class="num">0</td>
+					<td class="num">0</td>
+					<td class="num">0</td>
+					<td></td>
+				</tr>
+				
+				<tr>
+					<td class="dev-name depth-2">A5</td>
+					<td>
+					
+					</td>
+					<td class="text-success">ONLINE</td>
+					<td class="num">0</td>
+					<td class="num">0</td>
+					<td class="num">0</td>
+					<td></td>
+				</tr>
+				
+				<tr>
+					<td class="dev-name depth-2">A6</td>
+					<td>
+					
+					</td>
+					<td class="text-success">ONLINE</td>
+					<td class="num">0</td>
+					<td class="num">0</td>
+					<td class="num">0</td>
+					<td></td>
+				</tr>
+				
+				<tr>
+					<td class="dev-name depth-0">spares</td>
+					<td>
+					
+					</td>
+					<td class=""></td>
+					<td class="num">-</td>
+					<td class="num">-</td>
+					<td class="num">-</td>
+					<td></td>
+				</tr>
+				
+				<tr>
+					<td class="dev-name depth-1">B1</td>
+					<td>
+					
+					</td>
+					<td class="">UNAVAIL</td>
+					<td class="num">-</td>
+					<td class="num">-</td>
+					<td class="num">-</td>
+					<td></td>
+				</tr>
+				
+				<tr>
+					<td class="dev-name depth-1">B2</td>
+					<td>
+					
+					</td>
+					<td class="">UNAVAIL</td>
+					<td class="num">-</td>
+					<td class="num">-</td>
+					<td class="num">-</td>
+					<td></td>
+				</tr>
+				
+			</tbody>
+		</table>
+	</div>
 
+	
+	<dl class="row mt-3">
+		<dt class="col-sm-2">errors</dt><dd class="col-sm-10">No known data errors</dd>
+	</dl>
+	
 
-			</div> 
-		</div> 
+</div>
 
-		<script src="/zw/resources/bootstrap/js/bootstrap.min.js"></script>
+	</main>
+
+	<script src="/zw/resources/bootstrap/js/bootstrap.bundle.min.js"></script>
 
 	</body>
 </html>
@@ -625,222 +613,216 @@ functioning in a degraded state.</dd>
 <html lang="en">
 	<head>
 		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
 		<title>zfswatcher</title>
-		<meta name="viewport" content="width=device-width, initial-scale=1.0">
 		<link href="/zw/resources/bootstrap/css/bootstrap.min.css" rel="stylesheet">
-		<link href="/zw/resources/bootstrap/css/bootstrap-theme.min.css" rel="stylesheet">
-		<style type="text/css">
-			body {
-				padding-top: 60px;
-				padding-bottom: 60px;
-			}
-		</style>
 		<link href="/zw/resources/zfswatcher.css" rel="stylesheet">
 		<link href="/zw/resources/favicon.ico" rel="shortcut icon">
-		<script src="/zw/resources/bootstrap/js/jquery.min.js"></script>
+		
+		<meta name="htmx-config" content='{"allowEval":false,"includeIndicatorStyles":false,"selfRequestsOnly":true}'>
+		<script src="/zw/resources/htmx/htmx.min.js" defer></script>
+		
 	</head>
 
 	<body>
 
-	<div class="navbar navbar-inverse navbar-fixed-top">
+	<nav class="navbar navbar-expand-md navbar-dark bg-dark mb-4" data-bs-theme="dark">
 		<div class="container-fluid">
-			<div class="navbar-header">
-				<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
-	        <span class="sr-only">Toggle navigation</span>
-	        <span class="icon-bar"></span>
-	        <span class="icon-bar"></span>
-	        <span class="icon-bar"></span>
-	      </button>
-				<a class="navbar-brand" href="/zw/">zfswatcher</a>
-	    </div>
-				<div class="navbar-collapse collapse" id="bs-example-navbar-collapse-1">
-					<ul class="nav navbar-nav">
-						<li>
-							<a href="/zw/">Dashboard</a></li>
-						<li class="active">
-							<a href="/zw/status/">Pool Status</a></li>
-						<li>
-							<a href="/zw/enclosure/">Enclosure</a></li>
-						<li>
-							<a href="/zw/statistics/">Statistics</a></li>
-						<li>
-							<a href="/zw/logs/">Logs</a></li>
-					</ul>
-					<ul class="nav navbar-nav navbar-right">
-						<li>
-							<a href="/zw/about/" class="pull-right">About</a></li>
-					</ul>
-				</div>
+			<a class="navbar-brand" href="/zw/">zfswatcher</a>
+			<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#main-nav" aria-controls="main-nav" aria-expanded="false" aria-label="Toggle navigation">
+				<span class="navbar-toggler-icon"></span>
+			</button>
+			<div class="collapse navbar-collapse" id="main-nav">
+				<ul class="navbar-nav me-auto mb-2 mb-md-0">
+					<li class="nav-item">
+						<a class="nav-link" href="/zw/">Dashboard</a></li>
+					<li class="nav-item">
+						<a class="nav-link active" aria-current="page" href="/zw/status/">Pool Status</a></li>
+					<li class="nav-item">
+						<a class="nav-link" href="/zw/enclosure/">Enclosure</a></li>
+					<li class="nav-item">
+						<a class="nav-link" href="/zw/statistics/">Statistics</a></li>
+					<li class="nav-item">
+						<a class="nav-link" href="/zw/logs/">Logs</a></li>
+				</ul>
+				<ul class="navbar-nav">
+					<li class="nav-item">
+						<a class="nav-link" href="/zw/about/">About</a></li>
+				</ul>
 			</div>
 		</div>
-	</div>
+	</nav>
 
-	<div class="container-fluid">
+	<main class="container-fluid">
 		
-		<div class="row-fluid">
 
 
-<ul class="nav nav-tabs">
+<h1 class="h3 mb-3">Pool Status</h1>
 
-	<li>
-		<a href="zfsw_mix">zfsw_mix</a>
+<ul class="nav nav-tabs mb-3">
+
+	<li class="nav-item">
+		<a class="nav-link" href="/zw/status/zfsw_mix">zfsw_mix</a>
 	</li>
 
-	<li>
-		<a href="test">test</a>
+	<li class="nav-item">
+		<a class="nav-link" href="/zw/status/test">test</a>
 	</li>
 
-	<li class="active">
-		<a href="zfsw_mirror">zfsw_mirror</a>
+	<li class="nav-item">
+		<a class="nav-link active" aria-current="page" href="/zw/status/zfsw_mirror">zfsw_mirror</a>
 	</li>
 
-	<li>
-		<a href="datis">datis</a>
+	<li class="nav-item">
+		<a class="nav-link" href="/zw/status/datis">datis</a>
 	</li>
 
-	<li>
-		<a href="rpool">rpool</a>
+	<li class="nav-item">
+		<a class="nav-link" href="/zw/status/rpool">rpool</a>
 	</li>
 
-	<li>
-		<a href="secundus">secundus</a>
+	<li class="nav-item">
+		<a class="nav-link" href="/zw/status/secundus">secundus</a>
 	</li>
 
-	<li>
-		<a href="zfsw_draid">zfsw_draid</a>
+	<li class="nav-item">
+		<a class="nav-link" href="/zw/status/zfsw_draid">zfsw_draid</a>
 	</li>
 
-	<li>
-		<a href="zfsw_susp">zfsw_susp</a>
+	<li class="nav-item">
+		<a class="nav-link" href="/zw/status/zfsw_susp">zfsw_susp</a>
 	</li>
 
-	<li>
-		<a href="zfsw_rz2">zfsw_rz2</a>
+	<li class="nav-item">
+		<a class="nav-link" href="/zw/status/zfsw_rz2">zfsw_rz2</a>
 	</li>
 
-	<li>
-		<a href="zfsw_opt">zfsw_opt</a>
+	<li class="nav-item">
+		<a class="nav-link" href="/zw/status/zfsw_opt">zfsw_opt</a>
 	</li>
 
 </ul>
 
-	<dl class="dl-horizontal">
-		<dt>name:</dt><dd>zfsw_mirror</dd>
-		<dt>state:</dt><dd class="success">ONLINE</dd>
+<div id="live" hx-get="/zw/status/zfsw_mirror?fragment=1" hx-trigger="every 10s" hx-swap="innerHTML">
+	<dl class="row">
+		<dt class="col-sm-2">name</dt><dd class="col-sm-10">zfsw_mirror</dd>
+		<dt class="col-sm-2">state</dt><dd class="col-sm-10 text-success">ONLINE</dd>
 		
-		<dt>status:</dt><dd>One or more devices is currently being resilvered.  The pool will
+		<dt class="col-sm-2">status</dt><dd class="col-sm-10">One or more devices is currently being resilvered.  The pool will
 continue to function, possibly in a degraded state.</dd>
 		
 		
-		<dt>action:</dt><dd>Wait for the resilver to complete.</dd>
+		<dt class="col-sm-2">action</dt><dd class="col-sm-10">Wait for the resilver to complete.</dd>
 		
 		
 		
-		<dt>scan:</dt><dd>resilver in progress since Sat Nov 21 20:55:12 2026
+		<dt class="col-sm-2">scan</dt><dd class="col-sm-10">resilver in progress since Sat Nov 21 20:55:12 2026
 401M / 401M scanned, 23.9M / 401M issued at 23.9M/s
 7.97M resilvered, 5.97% done, 00:00:15 to go</dd>
 		
 	</dl>
-	<table class="table table-condensed table-hover">
-		<thead>
-			<tr>
-				<th style="width: 30%">Name</th>
-				<th style="width: 4%">Loc</th>
-				<th style="width: 15%">State</th>
-				<th style="text-align: right; width: 8%">Read</th>
-				<th style="text-align: right; width: 8%">Write</th>
-				<th style="text-align: right; width: 8%">Cksum</th>
-				<th style="width: 31%"></th>
-			</tr>
-		</thead>
-		<tbody>
-			
-			<tr>
-				<td style="padding-left: 1em">zfsw_mirror</td>
-				<td>
+	<div class="table-responsive card-table">
+		<table class="table table-sm table-hover">
+			<thead>
+				<tr>
+					<th scope="col">Name</th>
+					<th scope="col">Loc</th>
+					<th scope="col">State</th>
+					<th scope="col" class="num">Read</th>
+					<th scope="col" class="num">Write</th>
+					<th scope="col" class="num">Cksum</th>
+					<th scope="col"><span class="visually-hidden">Additional information</span></th>
+				</tr>
+			</thead>
+			<tbody>
 				
-				</td>
-				<td class="success">ONLINE</td>
-				<td style="text-align: right">0</td>
-				<td style="text-align: right">0</td>
-				<td style="text-align: right">0</td>
-				<td style=""></td>
-			</tr>
-			
-			<tr>
-				<td style="padding-left: 3em">mirror-0</td>
-				<td>
+				<tr>
+					<td class="dev-name depth-0">zfsw_mirror</td>
+					<td>
+					
+					</td>
+					<td class="text-success">ONLINE</td>
+					<td class="num">0</td>
+					<td class="num">0</td>
+					<td class="num">0</td>
+					<td></td>
+				</tr>
 				
-				</td>
-				<td class="success">ONLINE</td>
-				<td style="text-align: right">0</td>
-				<td style="text-align: right">0</td>
-				<td style="text-align: right">0</td>
-				<td style=""></td>
-			</tr>
-			
-			<tr>
-				<td style="padding-left: 5em">/var/tmp/zfsw-collect/m1</td>
-				<td>
+				<tr>
+					<td class="dev-name depth-1">mirror-0</td>
+					<td>
+					
+					</td>
+					<td class="text-success">ONLINE</td>
+					<td class="num">0</td>
+					<td class="num">0</td>
+					<td class="num">0</td>
+					<td></td>
+				</tr>
 				
-				</td>
-				<td class="success">ONLINE</td>
-				<td style="text-align: right">0</td>
-				<td style="text-align: right">0</td>
-				<td style="text-align: right">0</td>
-				<td style=""></td>
-			</tr>
-			
-			<tr>
-				<td style="padding-left: 5em">replacing-1</td>
-				<td>
+				<tr>
+					<td class="dev-name depth-2">/var/tmp/zfsw-collect/m1</td>
+					<td>
+					
+					</td>
+					<td class="text-success">ONLINE</td>
+					<td class="num">0</td>
+					<td class="num">0</td>
+					<td class="num">0</td>
+					<td></td>
+				</tr>
 				
-				</td>
-				<td class="success">ONLINE</td>
-				<td style="text-align: right">0</td>
-				<td style="text-align: right">0</td>
-				<td style="text-align: right">0</td>
-				<td style=""></td>
-			</tr>
-			
-			<tr>
-				<td style="padding-left: 7em">/var/tmp/zfsw-collect/m2</td>
-				<td>
+				<tr>
+					<td class="dev-name depth-2">replacing-1</td>
+					<td>
+					
+					</td>
+					<td class="text-success">ONLINE</td>
+					<td class="num">0</td>
+					<td class="num">0</td>
+					<td class="num">0</td>
+					<td></td>
+				</tr>
 				
-				</td>
-				<td class="success">ONLINE</td>
-				<td style="text-align: right">0</td>
-				<td style="text-align: right">0</td>
-				<td style="text-align: right">0</td>
-				<td style=""></td>
-			</tr>
-			
-			<tr>
-				<td style="padding-left: 7em">/var/tmp/zfsw-collect/m3</td>
-				<td>
+				<tr>
+					<td class="dev-name depth-3">/var/tmp/zfsw-collect/m2</td>
+					<td>
+					
+					</td>
+					<td class="text-success">ONLINE</td>
+					<td class="num">0</td>
+					<td class="num">0</td>
+					<td class="num">0</td>
+					<td></td>
+				</tr>
 				
-				</td>
-				<td class="success">ONLINE</td>
-				<td style="text-align: right">0</td>
-				<td style="text-align: right">0</td>
-				<td style="text-align: right">0</td>
-				<td style="">(resilvering)</td>
-			</tr>
-			
-		</tbody>
-	</table>
+				<tr>
+					<td class="dev-name depth-3">/var/tmp/zfsw-collect/m3</td>
+					<td>
+					
+					</td>
+					<td class="text-success">ONLINE</td>
+					<td class="num">0</td>
+					<td class="num">0</td>
+					<td class="num">0</td>
+					<td>(resilvering)</td>
+				</tr>
+				
+			</tbody>
+		</table>
+	</div>
 
-	<dl class="dl-horizontal">
-		
-		<dt>errors:</dt><dd>No known data errors</dd>
-		
+	
+	<dl class="row mt-3">
+		<dt class="col-sm-2">errors</dt><dd class="col-sm-10">No known data errors</dd>
 	</dl>
+	
 
+</div>
 
-			</div> 
-		</div> 
+	</main>
 
-		<script src="/zw/resources/bootstrap/js/bootstrap.min.js"></script>
+	<script src="/zw/resources/bootstrap/js/bootstrap.bundle.min.js"></script>
 
 	</body>
 </html>
@@ -850,210 +832,204 @@ continue to function, possibly in a degraded state.</dd>
 <html lang="en">
 	<head>
 		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
 		<title>zfswatcher</title>
-		<meta name="viewport" content="width=device-width, initial-scale=1.0">
 		<link href="/zw/resources/bootstrap/css/bootstrap.min.css" rel="stylesheet">
-		<link href="/zw/resources/bootstrap/css/bootstrap-theme.min.css" rel="stylesheet">
-		<style type="text/css">
-			body {
-				padding-top: 60px;
-				padding-bottom: 60px;
-			}
-		</style>
 		<link href="/zw/resources/zfswatcher.css" rel="stylesheet">
 		<link href="/zw/resources/favicon.ico" rel="shortcut icon">
-		<script src="/zw/resources/bootstrap/js/jquery.min.js"></script>
+		
+		<meta name="htmx-config" content='{"allowEval":false,"includeIndicatorStyles":false,"selfRequestsOnly":true}'>
+		<script src="/zw/resources/htmx/htmx.min.js" defer></script>
+		
 	</head>
 
 	<body>
 
-	<div class="navbar navbar-inverse navbar-fixed-top">
+	<nav class="navbar navbar-expand-md navbar-dark bg-dark mb-4" data-bs-theme="dark">
 		<div class="container-fluid">
-			<div class="navbar-header">
-				<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
-	        <span class="sr-only">Toggle navigation</span>
-	        <span class="icon-bar"></span>
-	        <span class="icon-bar"></span>
-	        <span class="icon-bar"></span>
-	      </button>
-				<a class="navbar-brand" href="/zw/">zfswatcher</a>
-	    </div>
-				<div class="navbar-collapse collapse" id="bs-example-navbar-collapse-1">
-					<ul class="nav navbar-nav">
-						<li>
-							<a href="/zw/">Dashboard</a></li>
-						<li class="active">
-							<a href="/zw/status/">Pool Status</a></li>
-						<li>
-							<a href="/zw/enclosure/">Enclosure</a></li>
-						<li>
-							<a href="/zw/statistics/">Statistics</a></li>
-						<li>
-							<a href="/zw/logs/">Logs</a></li>
-					</ul>
-					<ul class="nav navbar-nav navbar-right">
-						<li>
-							<a href="/zw/about/" class="pull-right">About</a></li>
-					</ul>
-				</div>
+			<a class="navbar-brand" href="/zw/">zfswatcher</a>
+			<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#main-nav" aria-controls="main-nav" aria-expanded="false" aria-label="Toggle navigation">
+				<span class="navbar-toggler-icon"></span>
+			</button>
+			<div class="collapse navbar-collapse" id="main-nav">
+				<ul class="navbar-nav me-auto mb-2 mb-md-0">
+					<li class="nav-item">
+						<a class="nav-link" href="/zw/">Dashboard</a></li>
+					<li class="nav-item">
+						<a class="nav-link active" aria-current="page" href="/zw/status/">Pool Status</a></li>
+					<li class="nav-item">
+						<a class="nav-link" href="/zw/enclosure/">Enclosure</a></li>
+					<li class="nav-item">
+						<a class="nav-link" href="/zw/statistics/">Statistics</a></li>
+					<li class="nav-item">
+						<a class="nav-link" href="/zw/logs/">Logs</a></li>
+				</ul>
+				<ul class="navbar-nav">
+					<li class="nav-item">
+						<a class="nav-link" href="/zw/about/">About</a></li>
+				</ul>
 			</div>
 		</div>
-	</div>
+	</nav>
 
-	<div class="container-fluid">
+	<main class="container-fluid">
 		
-		<div class="row-fluid">
 
 
-<ul class="nav nav-tabs">
+<h1 class="h3 mb-3">Pool Status</h1>
 
-	<li>
-		<a href="zfsw_mix">zfsw_mix</a>
+<ul class="nav nav-tabs mb-3">
+
+	<li class="nav-item">
+		<a class="nav-link" href="/zw/status/zfsw_mix">zfsw_mix</a>
 	</li>
 
-	<li>
-		<a href="test">test</a>
+	<li class="nav-item">
+		<a class="nav-link" href="/zw/status/test">test</a>
 	</li>
 
-	<li>
-		<a href="zfsw_mirror">zfsw_mirror</a>
+	<li class="nav-item">
+		<a class="nav-link" href="/zw/status/zfsw_mirror">zfsw_mirror</a>
 	</li>
 
-	<li class="active">
-		<a href="datis">datis</a>
+	<li class="nav-item">
+		<a class="nav-link active" aria-current="page" href="/zw/status/datis">datis</a>
 	</li>
 
-	<li>
-		<a href="rpool">rpool</a>
+	<li class="nav-item">
+		<a class="nav-link" href="/zw/status/rpool">rpool</a>
 	</li>
 
-	<li>
-		<a href="secundus">secundus</a>
+	<li class="nav-item">
+		<a class="nav-link" href="/zw/status/secundus">secundus</a>
 	</li>
 
-	<li>
-		<a href="zfsw_draid">zfsw_draid</a>
+	<li class="nav-item">
+		<a class="nav-link" href="/zw/status/zfsw_draid">zfsw_draid</a>
 	</li>
 
-	<li>
-		<a href="zfsw_susp">zfsw_susp</a>
+	<li class="nav-item">
+		<a class="nav-link" href="/zw/status/zfsw_susp">zfsw_susp</a>
 	</li>
 
-	<li>
-		<a href="zfsw_rz2">zfsw_rz2</a>
+	<li class="nav-item">
+		<a class="nav-link" href="/zw/status/zfsw_rz2">zfsw_rz2</a>
 	</li>
 
-	<li>
-		<a href="zfsw_opt">zfsw_opt</a>
+	<li class="nav-item">
+		<a class="nav-link" href="/zw/status/zfsw_opt">zfsw_opt</a>
 	</li>
 
 </ul>
 
-	<dl class="dl-horizontal">
-		<dt>name:</dt><dd>datis</dd>
-		<dt>state:</dt><dd class="success">ONLINE</dd>
+<div id="live" hx-get="/zw/status/datis?fragment=1" hx-trigger="every 10s" hx-swap="innerHTML">
+	<dl class="row">
+		<dt class="col-sm-2">name</dt><dd class="col-sm-10">datis</dd>
+		<dt class="col-sm-2">state</dt><dd class="col-sm-10 text-success">ONLINE</dd>
 		
-		<dt>status:</dt><dd>Some supported and requested features are not enabled on the pool.
+		<dt class="col-sm-2">status</dt><dd class="col-sm-10">Some supported and requested features are not enabled on the pool.
 The pool can still be used, but some features are unavailable.</dd>
 		
 		
-		<dt>action:</dt><dd>Enable all features using &#39;zpool upgrade&#39;. Once this is done,
+		<dt class="col-sm-2">action</dt><dd class="col-sm-10">Enable all features using &#39;zpool upgrade&#39;. Once this is done,
 the pool may no longer be accessible by software that does not support
 the features. See zpool-features(7) for details.</dd>
 		
 		
 		
-		<dt>scan:</dt><dd>scrub repaired 0B in 09:27:59 with 0 errors on Sun Nov  8 09:52:00 2026</dd>
+		<dt class="col-sm-2">scan</dt><dd class="col-sm-10">scrub repaired 0B in 09:27:59 with 0 errors on Sun Nov  8 09:52:00 2026</dd>
 		
 	</dl>
-	<table class="table table-condensed table-hover">
-		<thead>
-			<tr>
-				<th style="width: 30%">Name</th>
-				<th style="width: 4%">Loc</th>
-				<th style="width: 15%">State</th>
-				<th style="text-align: right; width: 8%">Read</th>
-				<th style="text-align: right; width: 8%">Write</th>
-				<th style="text-align: right; width: 8%">Cksum</th>
-				<th style="width: 31%"></th>
-			</tr>
-		</thead>
-		<tbody>
-			
-			<tr>
-				<td style="padding-left: 1em">datis</td>
-				<td>
+	<div class="table-responsive card-table">
+		<table class="table table-sm table-hover">
+			<thead>
+				<tr>
+					<th scope="col">Name</th>
+					<th scope="col">Loc</th>
+					<th scope="col">State</th>
+					<th scope="col" class="num">Read</th>
+					<th scope="col" class="num">Write</th>
+					<th scope="col" class="num">Cksum</th>
+					<th scope="col"><span class="visually-hidden">Additional information</span></th>
+				</tr>
+			</thead>
+			<tbody>
 				
-				</td>
-				<td class="success">ONLINE</td>
-				<td style="text-align: right">0</td>
-				<td style="text-align: right">0</td>
-				<td style="text-align: right">0</td>
-				<td style=""></td>
-			</tr>
-			
-			<tr>
-				<td style="padding-left: 3em">raidz1-0</td>
-				<td>
+				<tr>
+					<td class="dev-name depth-0">datis</td>
+					<td>
+					
+					</td>
+					<td class="text-success">ONLINE</td>
+					<td class="num">0</td>
+					<td class="num">0</td>
+					<td class="num">0</td>
+					<td></td>
+				</tr>
 				
-				</td>
-				<td class="success">ONLINE</td>
-				<td style="text-align: right">0</td>
-				<td style="text-align: right">0</td>
-				<td style="text-align: right">0</td>
-				<td style=""></td>
-			</tr>
-			
-			<tr>
-				<td style="padding-left: 5em">ata-WDC_WD80EMZZ-11B4FB0_WD-CA0AAAAA</td>
-				<td>
+				<tr>
+					<td class="dev-name depth-1">raidz1-0</td>
+					<td>
+					
+					</td>
+					<td class="text-success">ONLINE</td>
+					<td class="num">0</td>
+					<td class="num">0</td>
+					<td class="num">0</td>
+					<td></td>
+				</tr>
 				
-				</td>
-				<td class="success">ONLINE</td>
-				<td style="text-align: right">0</td>
-				<td style="text-align: right">0</td>
-				<td style="text-align: right">0</td>
-				<td style=""></td>
-			</tr>
-			
-			<tr>
-				<td style="padding-left: 5em">ata-WDC_WD80EMZZ-11B4FB0_WD-CA0BBBBB</td>
-				<td>
+				<tr>
+					<td class="dev-name depth-2">ata-WDC_WD80EMZZ-11B4FB0_WD-CA0AAAAA</td>
+					<td>
+					
+					</td>
+					<td class="text-success">ONLINE</td>
+					<td class="num">0</td>
+					<td class="num">0</td>
+					<td class="num">0</td>
+					<td></td>
+				</tr>
 				
-				</td>
-				<td class="success">ONLINE</td>
-				<td style="text-align: right">0</td>
-				<td style="text-align: right">0</td>
-				<td style="text-align: right">0</td>
-				<td style=""></td>
-			</tr>
-			
-			<tr>
-				<td style="padding-left: 5em">ata-WDC_WD80EMZZ-11B4FB0_WD-CA0CCCCC</td>
-				<td>
+				<tr>
+					<td class="dev-name depth-2">ata-WDC_WD80EMZZ-11B4FB0_WD-CA0BBBBB</td>
+					<td>
+					
+					</td>
+					<td class="text-success">ONLINE</td>
+					<td class="num">0</td>
+					<td class="num">0</td>
+					<td class="num">0</td>
+					<td></td>
+				</tr>
 				
-				</td>
-				<td class="success">ONLINE</td>
-				<td style="text-align: right">0</td>
-				<td style="text-align: right">0</td>
-				<td style="text-align: right">0</td>
-				<td style=""></td>
-			</tr>
-			
-		</tbody>
-	</table>
+				<tr>
+					<td class="dev-name depth-2">ata-WDC_WD80EMZZ-11B4FB0_WD-CA0CCCCC</td>
+					<td>
+					
+					</td>
+					<td class="text-success">ONLINE</td>
+					<td class="num">0</td>
+					<td class="num">0</td>
+					<td class="num">0</td>
+					<td></td>
+				</tr>
+				
+			</tbody>
+		</table>
+	</div>
 
-	<dl class="dl-horizontal">
-		
-		<dt>errors:</dt><dd>No known data errors</dd>
-		
+	
+	<dl class="row mt-3">
+		<dt class="col-sm-2">errors</dt><dd class="col-sm-10">No known data errors</dd>
 	</dl>
+	
 
+</div>
 
-			</div> 
-		</div> 
+	</main>
 
-		<script src="/zw/resources/bootstrap/js/bootstrap.min.js"></script>
+	<script src="/zw/resources/bootstrap/js/bootstrap.bundle.min.js"></script>
 
 	</body>
 </html>
@@ -1063,191 +1039,185 @@ the features. See zpool-features(7) for details.</dd>
 <html lang="en">
 	<head>
 		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
 		<title>zfswatcher</title>
-		<meta name="viewport" content="width=device-width, initial-scale=1.0">
 		<link href="/zw/resources/bootstrap/css/bootstrap.min.css" rel="stylesheet">
-		<link href="/zw/resources/bootstrap/css/bootstrap-theme.min.css" rel="stylesheet">
-		<style type="text/css">
-			body {
-				padding-top: 60px;
-				padding-bottom: 60px;
-			}
-		</style>
 		<link href="/zw/resources/zfswatcher.css" rel="stylesheet">
 		<link href="/zw/resources/favicon.ico" rel="shortcut icon">
-		<script src="/zw/resources/bootstrap/js/jquery.min.js"></script>
+		
+		<meta name="htmx-config" content='{"allowEval":false,"includeIndicatorStyles":false,"selfRequestsOnly":true}'>
+		<script src="/zw/resources/htmx/htmx.min.js" defer></script>
+		
 	</head>
 
 	<body>
 
-	<div class="navbar navbar-inverse navbar-fixed-top">
+	<nav class="navbar navbar-expand-md navbar-dark bg-dark mb-4" data-bs-theme="dark">
 		<div class="container-fluid">
-			<div class="navbar-header">
-				<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
-	        <span class="sr-only">Toggle navigation</span>
-	        <span class="icon-bar"></span>
-	        <span class="icon-bar"></span>
-	        <span class="icon-bar"></span>
-	      </button>
-				<a class="navbar-brand" href="/zw/">zfswatcher</a>
-	    </div>
-				<div class="navbar-collapse collapse" id="bs-example-navbar-collapse-1">
-					<ul class="nav navbar-nav">
-						<li>
-							<a href="/zw/">Dashboard</a></li>
-						<li class="active">
-							<a href="/zw/status/">Pool Status</a></li>
-						<li>
-							<a href="/zw/enclosure/">Enclosure</a></li>
-						<li>
-							<a href="/zw/statistics/">Statistics</a></li>
-						<li>
-							<a href="/zw/logs/">Logs</a></li>
-					</ul>
-					<ul class="nav navbar-nav navbar-right">
-						<li>
-							<a href="/zw/about/" class="pull-right">About</a></li>
-					</ul>
-				</div>
+			<a class="navbar-brand" href="/zw/">zfswatcher</a>
+			<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#main-nav" aria-controls="main-nav" aria-expanded="false" aria-label="Toggle navigation">
+				<span class="navbar-toggler-icon"></span>
+			</button>
+			<div class="collapse navbar-collapse" id="main-nav">
+				<ul class="navbar-nav me-auto mb-2 mb-md-0">
+					<li class="nav-item">
+						<a class="nav-link" href="/zw/">Dashboard</a></li>
+					<li class="nav-item">
+						<a class="nav-link active" aria-current="page" href="/zw/status/">Pool Status</a></li>
+					<li class="nav-item">
+						<a class="nav-link" href="/zw/enclosure/">Enclosure</a></li>
+					<li class="nav-item">
+						<a class="nav-link" href="/zw/statistics/">Statistics</a></li>
+					<li class="nav-item">
+						<a class="nav-link" href="/zw/logs/">Logs</a></li>
+				</ul>
+				<ul class="navbar-nav">
+					<li class="nav-item">
+						<a class="nav-link" href="/zw/about/">About</a></li>
+				</ul>
 			</div>
 		</div>
-	</div>
+	</nav>
 
-	<div class="container-fluid">
+	<main class="container-fluid">
 		
-		<div class="row-fluid">
 
 
-<ul class="nav nav-tabs">
+<h1 class="h3 mb-3">Pool Status</h1>
 
-	<li>
-		<a href="zfsw_mix">zfsw_mix</a>
+<ul class="nav nav-tabs mb-3">
+
+	<li class="nav-item">
+		<a class="nav-link" href="/zw/status/zfsw_mix">zfsw_mix</a>
 	</li>
 
-	<li>
-		<a href="test">test</a>
+	<li class="nav-item">
+		<a class="nav-link" href="/zw/status/test">test</a>
 	</li>
 
-	<li>
-		<a href="zfsw_mirror">zfsw_mirror</a>
+	<li class="nav-item">
+		<a class="nav-link" href="/zw/status/zfsw_mirror">zfsw_mirror</a>
 	</li>
 
-	<li>
-		<a href="datis">datis</a>
+	<li class="nav-item">
+		<a class="nav-link" href="/zw/status/datis">datis</a>
 	</li>
 
-	<li class="active">
-		<a href="rpool">rpool</a>
+	<li class="nav-item">
+		<a class="nav-link active" aria-current="page" href="/zw/status/rpool">rpool</a>
 	</li>
 
-	<li>
-		<a href="secundus">secundus</a>
+	<li class="nav-item">
+		<a class="nav-link" href="/zw/status/secundus">secundus</a>
 	</li>
 
-	<li>
-		<a href="zfsw_draid">zfsw_draid</a>
+	<li class="nav-item">
+		<a class="nav-link" href="/zw/status/zfsw_draid">zfsw_draid</a>
 	</li>
 
-	<li>
-		<a href="zfsw_susp">zfsw_susp</a>
+	<li class="nav-item">
+		<a class="nav-link" href="/zw/status/zfsw_susp">zfsw_susp</a>
 	</li>
 
-	<li>
-		<a href="zfsw_rz2">zfsw_rz2</a>
+	<li class="nav-item">
+		<a class="nav-link" href="/zw/status/zfsw_rz2">zfsw_rz2</a>
 	</li>
 
-	<li>
-		<a href="zfsw_opt">zfsw_opt</a>
+	<li class="nav-item">
+		<a class="nav-link" href="/zw/status/zfsw_opt">zfsw_opt</a>
 	</li>
 
 </ul>
 
-	<dl class="dl-horizontal">
-		<dt>name:</dt><dd>rpool</dd>
-		<dt>state:</dt><dd class="success">ONLINE</dd>
+<div id="live" hx-get="/zw/status/rpool?fragment=1" hx-trigger="every 10s" hx-swap="innerHTML">
+	<dl class="row">
+		<dt class="col-sm-2">name</dt><dd class="col-sm-10">rpool</dd>
+		<dt class="col-sm-2">state</dt><dd class="col-sm-10 text-success">ONLINE</dd>
 		
 		
 		
 		
-		<dt>scan:</dt><dd>scrub repaired 0B in 00:04:19 with 0 errors on Sun Nov  8 00:28:22 2026</dd>
-		
-	</dl>
-	<table class="table table-condensed table-hover">
-		<thead>
-			<tr>
-				<th style="width: 30%">Name</th>
-				<th style="width: 4%">Loc</th>
-				<th style="width: 15%">State</th>
-				<th style="text-align: right; width: 8%">Read</th>
-				<th style="text-align: right; width: 8%">Write</th>
-				<th style="text-align: right; width: 8%">Cksum</th>
-				<th style="width: 31%"></th>
-			</tr>
-		</thead>
-		<tbody>
-			
-			<tr>
-				<td style="padding-left: 1em">rpool</td>
-				<td>
-				
-				</td>
-				<td class="success">ONLINE</td>
-				<td style="text-align: right">0</td>
-				<td style="text-align: right">0</td>
-				<td style="text-align: right">0</td>
-				<td style=""></td>
-			</tr>
-			
-			<tr>
-				<td style="padding-left: 3em">mirror-0</td>
-				<td>
-				
-				</td>
-				<td class="success">ONLINE</td>
-				<td style="text-align: right">0</td>
-				<td style="text-align: right">0</td>
-				<td style="text-align: right">0</td>
-				<td style=""></td>
-			</tr>
-			
-			<tr>
-				<td style="padding-left: 5em">ata-SanDisk_SSD_PLUS_120GB_201911A0000A-part3</td>
-				<td>
-				
-				</td>
-				<td class="success">ONLINE</td>
-				<td style="text-align: right">0</td>
-				<td style="text-align: right">0</td>
-				<td style="text-align: right">0</td>
-				<td style=""></td>
-			</tr>
-			
-			<tr>
-				<td style="padding-left: 5em">sdi3</td>
-				<td>
-				
-				</td>
-				<td class="success">ONLINE</td>
-				<td style="text-align: right">0</td>
-				<td style="text-align: right">0</td>
-				<td style="text-align: right">0</td>
-				<td style=""></td>
-			</tr>
-			
-		</tbody>
-	</table>
-
-	<dl class="dl-horizontal">
-		
-		<dt>errors:</dt><dd>No known data errors</dd>
+		<dt class="col-sm-2">scan</dt><dd class="col-sm-10">scrub repaired 0B in 00:04:19 with 0 errors on Sun Nov  8 00:28:22 2026</dd>
 		
 	</dl>
+	<div class="table-responsive card-table">
+		<table class="table table-sm table-hover">
+			<thead>
+				<tr>
+					<th scope="col">Name</th>
+					<th scope="col">Loc</th>
+					<th scope="col">State</th>
+					<th scope="col" class="num">Read</th>
+					<th scope="col" class="num">Write</th>
+					<th scope="col" class="num">Cksum</th>
+					<th scope="col"><span class="visually-hidden">Additional information</span></th>
+				</tr>
+			</thead>
+			<tbody>
+				
+				<tr>
+					<td class="dev-name depth-0">rpool</td>
+					<td>
+					
+					</td>
+					<td class="text-success">ONLINE</td>
+					<td class="num">0</td>
+					<td class="num">0</td>
+					<td class="num">0</td>
+					<td></td>
+				</tr>
+				
+				<tr>
+					<td class="dev-name depth-1">mirror-0</td>
+					<td>
+					
+					</td>
+					<td class="text-success">ONLINE</td>
+					<td class="num">0</td>
+					<td class="num">0</td>
+					<td class="num">0</td>
+					<td></td>
+				</tr>
+				
+				<tr>
+					<td class="dev-name depth-2">ata-SanDisk_SSD_PLUS_120GB_201911A0000A-part3</td>
+					<td>
+					
+					</td>
+					<td class="text-success">ONLINE</td>
+					<td class="num">0</td>
+					<td class="num">0</td>
+					<td class="num">0</td>
+					<td></td>
+				</tr>
+				
+				<tr>
+					<td class="dev-name depth-2">sdi3</td>
+					<td>
+					
+					</td>
+					<td class="text-success">ONLINE</td>
+					<td class="num">0</td>
+					<td class="num">0</td>
+					<td class="num">0</td>
+					<td></td>
+				</tr>
+				
+			</tbody>
+		</table>
+	</div>
 
+	
+	<dl class="row mt-3">
+		<dt class="col-sm-2">errors</dt><dd class="col-sm-10">No known data errors</dd>
+	</dl>
+	
 
-			</div> 
-		</div> 
+</div>
 
-		<script src="/zw/resources/bootstrap/js/bootstrap.min.js"></script>
+	</main>
+
+	<script src="/zw/resources/bootstrap/js/bootstrap.bundle.min.js"></script>
 
 	</body>
 </html>
@@ -1257,215 +1227,209 @@ the features. See zpool-features(7) for details.</dd>
 <html lang="en">
 	<head>
 		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
 		<title>zfswatcher</title>
-		<meta name="viewport" content="width=device-width, initial-scale=1.0">
 		<link href="/zw/resources/bootstrap/css/bootstrap.min.css" rel="stylesheet">
-		<link href="/zw/resources/bootstrap/css/bootstrap-theme.min.css" rel="stylesheet">
-		<style type="text/css">
-			body {
-				padding-top: 60px;
-				padding-bottom: 60px;
-			}
-		</style>
 		<link href="/zw/resources/zfswatcher.css" rel="stylesheet">
 		<link href="/zw/resources/favicon.ico" rel="shortcut icon">
-		<script src="/zw/resources/bootstrap/js/jquery.min.js"></script>
+		
+		<meta name="htmx-config" content='{"allowEval":false,"includeIndicatorStyles":false,"selfRequestsOnly":true}'>
+		<script src="/zw/resources/htmx/htmx.min.js" defer></script>
+		
 	</head>
 
 	<body>
 
-	<div class="navbar navbar-inverse navbar-fixed-top">
+	<nav class="navbar navbar-expand-md navbar-dark bg-dark mb-4" data-bs-theme="dark">
 		<div class="container-fluid">
-			<div class="navbar-header">
-				<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
-	        <span class="sr-only">Toggle navigation</span>
-	        <span class="icon-bar"></span>
-	        <span class="icon-bar"></span>
-	        <span class="icon-bar"></span>
-	      </button>
-				<a class="navbar-brand" href="/zw/">zfswatcher</a>
-	    </div>
-				<div class="navbar-collapse collapse" id="bs-example-navbar-collapse-1">
-					<ul class="nav navbar-nav">
-						<li>
-							<a href="/zw/">Dashboard</a></li>
-						<li class="active">
-							<a href="/zw/status/">Pool Status</a></li>
-						<li>
-							<a href="/zw/enclosure/">Enclosure</a></li>
-						<li>
-							<a href="/zw/statistics/">Statistics</a></li>
-						<li>
-							<a href="/zw/logs/">Logs</a></li>
-					</ul>
-					<ul class="nav navbar-nav navbar-right">
-						<li>
-							<a href="/zw/about/" class="pull-right">About</a></li>
-					</ul>
-				</div>
+			<a class="navbar-brand" href="/zw/">zfswatcher</a>
+			<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#main-nav" aria-controls="main-nav" aria-expanded="false" aria-label="Toggle navigation">
+				<span class="navbar-toggler-icon"></span>
+			</button>
+			<div class="collapse navbar-collapse" id="main-nav">
+				<ul class="navbar-nav me-auto mb-2 mb-md-0">
+					<li class="nav-item">
+						<a class="nav-link" href="/zw/">Dashboard</a></li>
+					<li class="nav-item">
+						<a class="nav-link active" aria-current="page" href="/zw/status/">Pool Status</a></li>
+					<li class="nav-item">
+						<a class="nav-link" href="/zw/enclosure/">Enclosure</a></li>
+					<li class="nav-item">
+						<a class="nav-link" href="/zw/statistics/">Statistics</a></li>
+					<li class="nav-item">
+						<a class="nav-link" href="/zw/logs/">Logs</a></li>
+				</ul>
+				<ul class="navbar-nav">
+					<li class="nav-item">
+						<a class="nav-link" href="/zw/about/">About</a></li>
+				</ul>
 			</div>
 		</div>
-	</div>
+	</nav>
 
-	<div class="container-fluid">
+	<main class="container-fluid">
 		
-		<div class="row-fluid">
 
 
-<ul class="nav nav-tabs">
+<h1 class="h3 mb-3">Pool Status</h1>
 
-	<li>
-		<a href="zfsw_mix">zfsw_mix</a>
+<ul class="nav nav-tabs mb-3">
+
+	<li class="nav-item">
+		<a class="nav-link" href="/zw/status/zfsw_mix">zfsw_mix</a>
 	</li>
 
-	<li>
-		<a href="test">test</a>
+	<li class="nav-item">
+		<a class="nav-link" href="/zw/status/test">test</a>
 	</li>
 
-	<li>
-		<a href="zfsw_mirror">zfsw_mirror</a>
+	<li class="nav-item">
+		<a class="nav-link" href="/zw/status/zfsw_mirror">zfsw_mirror</a>
 	</li>
 
-	<li>
-		<a href="datis">datis</a>
+	<li class="nav-item">
+		<a class="nav-link" href="/zw/status/datis">datis</a>
 	</li>
 
-	<li>
-		<a href="rpool">rpool</a>
+	<li class="nav-item">
+		<a class="nav-link" href="/zw/status/rpool">rpool</a>
 	</li>
 
-	<li class="active">
-		<a href="secundus">secundus</a>
+	<li class="nav-item">
+		<a class="nav-link active" aria-current="page" href="/zw/status/secundus">secundus</a>
 	</li>
 
-	<li>
-		<a href="zfsw_draid">zfsw_draid</a>
+	<li class="nav-item">
+		<a class="nav-link" href="/zw/status/zfsw_draid">zfsw_draid</a>
 	</li>
 
-	<li>
-		<a href="zfsw_susp">zfsw_susp</a>
+	<li class="nav-item">
+		<a class="nav-link" href="/zw/status/zfsw_susp">zfsw_susp</a>
 	</li>
 
-	<li>
-		<a href="zfsw_rz2">zfsw_rz2</a>
+	<li class="nav-item">
+		<a class="nav-link" href="/zw/status/zfsw_rz2">zfsw_rz2</a>
 	</li>
 
-	<li>
-		<a href="zfsw_opt">zfsw_opt</a>
+	<li class="nav-item">
+		<a class="nav-link" href="/zw/status/zfsw_opt">zfsw_opt</a>
 	</li>
 
 </ul>
 
-	<dl class="dl-horizontal">
-		<dt>name:</dt><dd>secundus</dd>
-		<dt>state:</dt><dd class="success">ONLINE</dd>
+<div id="live" hx-get="/zw/status/secundus?fragment=1" hx-trigger="every 10s" hx-swap="innerHTML">
+	<dl class="row">
+		<dt class="col-sm-2">name</dt><dd class="col-sm-10">secundus</dd>
+		<dt class="col-sm-2">state</dt><dd class="col-sm-10 text-success">ONLINE</dd>
 		
 		
 		
 		
-		<dt>scan:</dt><dd>scrub repaired 0B in 00:05:45 with 0 errors on Sun Nov  8 00:29:49 2026</dd>
-		
-	</dl>
-	<table class="table table-condensed table-hover">
-		<thead>
-			<tr>
-				<th style="width: 30%">Name</th>
-				<th style="width: 4%">Loc</th>
-				<th style="width: 15%">State</th>
-				<th style="text-align: right; width: 8%">Read</th>
-				<th style="text-align: right; width: 8%">Write</th>
-				<th style="text-align: right; width: 8%">Cksum</th>
-				<th style="width: 31%"></th>
-			</tr>
-		</thead>
-		<tbody>
-			
-			<tr>
-				<td style="padding-left: 1em">secundus</td>
-				<td>
-				
-				</td>
-				<td class="success">ONLINE</td>
-				<td style="text-align: right">0</td>
-				<td style="text-align: right">0</td>
-				<td style="text-align: right">0</td>
-				<td style=""></td>
-			</tr>
-			
-			<tr>
-				<td style="padding-left: 3em">raidz1-0</td>
-				<td>
-				
-				</td>
-				<td class="success">ONLINE</td>
-				<td style="text-align: right">0</td>
-				<td style="text-align: right">0</td>
-				<td style="text-align: right">0</td>
-				<td style=""></td>
-			</tr>
-			
-			<tr>
-				<td style="padding-left: 5em">WD4TB01</td>
-				<td>
-				
-				</td>
-				<td class="success">ONLINE</td>
-				<td style="text-align: right">0</td>
-				<td style="text-align: right">0</td>
-				<td style="text-align: right">0</td>
-				<td style=""></td>
-			</tr>
-			
-			<tr>
-				<td style="padding-left: 5em">WD4TB02</td>
-				<td>
-				
-				</td>
-				<td class="success">ONLINE</td>
-				<td style="text-align: right">0</td>
-				<td style="text-align: right">0</td>
-				<td style="text-align: right">0</td>
-				<td style=""></td>
-			</tr>
-			
-			<tr>
-				<td style="padding-left: 5em">IW4TB01</td>
-				<td>
-				
-				</td>
-				<td class="success">ONLINE</td>
-				<td style="text-align: right">0</td>
-				<td style="text-align: right">0</td>
-				<td style="text-align: right">0</td>
-				<td style=""></td>
-			</tr>
-			
-			<tr>
-				<td style="padding-left: 5em">IW4TB02</td>
-				<td>
-				
-				</td>
-				<td class="success">ONLINE</td>
-				<td style="text-align: right">0</td>
-				<td style="text-align: right">0</td>
-				<td style="text-align: right">0</td>
-				<td style=""></td>
-			</tr>
-			
-		</tbody>
-	</table>
-
-	<dl class="dl-horizontal">
-		
-		<dt>errors:</dt><dd>No known data errors</dd>
+		<dt class="col-sm-2">scan</dt><dd class="col-sm-10">scrub repaired 0B in 00:05:45 with 0 errors on Sun Nov  8 00:29:49 2026</dd>
 		
 	</dl>
+	<div class="table-responsive card-table">
+		<table class="table table-sm table-hover">
+			<thead>
+				<tr>
+					<th scope="col">Name</th>
+					<th scope="col">Loc</th>
+					<th scope="col">State</th>
+					<th scope="col" class="num">Read</th>
+					<th scope="col" class="num">Write</th>
+					<th scope="col" class="num">Cksum</th>
+					<th scope="col"><span class="visually-hidden">Additional information</span></th>
+				</tr>
+			</thead>
+			<tbody>
+				
+				<tr>
+					<td class="dev-name depth-0">secundus</td>
+					<td>
+					
+					</td>
+					<td class="text-success">ONLINE</td>
+					<td class="num">0</td>
+					<td class="num">0</td>
+					<td class="num">0</td>
+					<td></td>
+				</tr>
+				
+				<tr>
+					<td class="dev-name depth-1">raidz1-0</td>
+					<td>
+					
+					</td>
+					<td class="text-success">ONLINE</td>
+					<td class="num">0</td>
+					<td class="num">0</td>
+					<td class="num">0</td>
+					<td></td>
+				</tr>
+				
+				<tr>
+					<td class="dev-name depth-2">WD4TB01</td>
+					<td>
+					
+					</td>
+					<td class="text-success">ONLINE</td>
+					<td class="num">0</td>
+					<td class="num">0</td>
+					<td class="num">0</td>
+					<td></td>
+				</tr>
+				
+				<tr>
+					<td class="dev-name depth-2">WD4TB02</td>
+					<td>
+					
+					</td>
+					<td class="text-success">ONLINE</td>
+					<td class="num">0</td>
+					<td class="num">0</td>
+					<td class="num">0</td>
+					<td></td>
+				</tr>
+				
+				<tr>
+					<td class="dev-name depth-2">IW4TB01</td>
+					<td>
+					
+					</td>
+					<td class="text-success">ONLINE</td>
+					<td class="num">0</td>
+					<td class="num">0</td>
+					<td class="num">0</td>
+					<td></td>
+				</tr>
+				
+				<tr>
+					<td class="dev-name depth-2">IW4TB02</td>
+					<td>
+					
+					</td>
+					<td class="text-success">ONLINE</td>
+					<td class="num">0</td>
+					<td class="num">0</td>
+					<td class="num">0</td>
+					<td></td>
+				</tr>
+				
+			</tbody>
+		</table>
+	</div>
 
+	
+	<dl class="row mt-3">
+		<dt class="col-sm-2">errors</dt><dd class="col-sm-10">No known data errors</dd>
+	</dl>
+	
 
-			</div> 
-		</div> 
+</div>
 
-		<script src="/zw/resources/bootstrap/js/bootstrap.min.js"></script>
+	</main>
+
+	<script src="/zw/resources/bootstrap/js/bootstrap.bundle.min.js"></script>
 
 	</body>
 </html>
@@ -1475,285 +1439,279 @@ the features. See zpool-features(7) for details.</dd>
 <html lang="en">
 	<head>
 		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
 		<title>zfswatcher</title>
-		<meta name="viewport" content="width=device-width, initial-scale=1.0">
 		<link href="/zw/resources/bootstrap/css/bootstrap.min.css" rel="stylesheet">
-		<link href="/zw/resources/bootstrap/css/bootstrap-theme.min.css" rel="stylesheet">
-		<style type="text/css">
-			body {
-				padding-top: 60px;
-				padding-bottom: 60px;
-			}
-		</style>
 		<link href="/zw/resources/zfswatcher.css" rel="stylesheet">
 		<link href="/zw/resources/favicon.ico" rel="shortcut icon">
-		<script src="/zw/resources/bootstrap/js/jquery.min.js"></script>
+		
+		<meta name="htmx-config" content='{"allowEval":false,"includeIndicatorStyles":false,"selfRequestsOnly":true}'>
+		<script src="/zw/resources/htmx/htmx.min.js" defer></script>
+		
 	</head>
 
 	<body>
 
-	<div class="navbar navbar-inverse navbar-fixed-top">
+	<nav class="navbar navbar-expand-md navbar-dark bg-dark mb-4" data-bs-theme="dark">
 		<div class="container-fluid">
-			<div class="navbar-header">
-				<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
-	        <span class="sr-only">Toggle navigation</span>
-	        <span class="icon-bar"></span>
-	        <span class="icon-bar"></span>
-	        <span class="icon-bar"></span>
-	      </button>
-				<a class="navbar-brand" href="/zw/">zfswatcher</a>
-	    </div>
-				<div class="navbar-collapse collapse" id="bs-example-navbar-collapse-1">
-					<ul class="nav navbar-nav">
-						<li>
-							<a href="/zw/">Dashboard</a></li>
-						<li class="active">
-							<a href="/zw/status/">Pool Status</a></li>
-						<li>
-							<a href="/zw/enclosure/">Enclosure</a></li>
-						<li>
-							<a href="/zw/statistics/">Statistics</a></li>
-						<li>
-							<a href="/zw/logs/">Logs</a></li>
-					</ul>
-					<ul class="nav navbar-nav navbar-right">
-						<li>
-							<a href="/zw/about/" class="pull-right">About</a></li>
-					</ul>
-				</div>
+			<a class="navbar-brand" href="/zw/">zfswatcher</a>
+			<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#main-nav" aria-controls="main-nav" aria-expanded="false" aria-label="Toggle navigation">
+				<span class="navbar-toggler-icon"></span>
+			</button>
+			<div class="collapse navbar-collapse" id="main-nav">
+				<ul class="navbar-nav me-auto mb-2 mb-md-0">
+					<li class="nav-item">
+						<a class="nav-link" href="/zw/">Dashboard</a></li>
+					<li class="nav-item">
+						<a class="nav-link active" aria-current="page" href="/zw/status/">Pool Status</a></li>
+					<li class="nav-item">
+						<a class="nav-link" href="/zw/enclosure/">Enclosure</a></li>
+					<li class="nav-item">
+						<a class="nav-link" href="/zw/statistics/">Statistics</a></li>
+					<li class="nav-item">
+						<a class="nav-link" href="/zw/logs/">Logs</a></li>
+				</ul>
+				<ul class="navbar-nav">
+					<li class="nav-item">
+						<a class="nav-link" href="/zw/about/">About</a></li>
+				</ul>
 			</div>
 		</div>
-	</div>
+	</nav>
 
-	<div class="container-fluid">
+	<main class="container-fluid">
 		
-		<div class="row-fluid">
 
 
-<ul class="nav nav-tabs">
+<h1 class="h3 mb-3">Pool Status</h1>
 
-	<li>
-		<a href="zfsw_mix">zfsw_mix</a>
+<ul class="nav nav-tabs mb-3">
+
+	<li class="nav-item">
+		<a class="nav-link" href="/zw/status/zfsw_mix">zfsw_mix</a>
 	</li>
 
-	<li>
-		<a href="test">test</a>
+	<li class="nav-item">
+		<a class="nav-link" href="/zw/status/test">test</a>
 	</li>
 
-	<li>
-		<a href="zfsw_mirror">zfsw_mirror</a>
+	<li class="nav-item">
+		<a class="nav-link" href="/zw/status/zfsw_mirror">zfsw_mirror</a>
 	</li>
 
-	<li>
-		<a href="datis">datis</a>
+	<li class="nav-item">
+		<a class="nav-link" href="/zw/status/datis">datis</a>
 	</li>
 
-	<li>
-		<a href="rpool">rpool</a>
+	<li class="nav-item">
+		<a class="nav-link" href="/zw/status/rpool">rpool</a>
 	</li>
 
-	<li>
-		<a href="secundus">secundus</a>
+	<li class="nav-item">
+		<a class="nav-link" href="/zw/status/secundus">secundus</a>
 	</li>
 
-	<li class="active">
-		<a href="zfsw_draid">zfsw_draid</a>
+	<li class="nav-item">
+		<a class="nav-link active" aria-current="page" href="/zw/status/zfsw_draid">zfsw_draid</a>
 	</li>
 
-	<li>
-		<a href="zfsw_susp">zfsw_susp</a>
+	<li class="nav-item">
+		<a class="nav-link" href="/zw/status/zfsw_susp">zfsw_susp</a>
 	</li>
 
-	<li>
-		<a href="zfsw_rz2">zfsw_rz2</a>
+	<li class="nav-item">
+		<a class="nav-link" href="/zw/status/zfsw_rz2">zfsw_rz2</a>
 	</li>
 
-	<li>
-		<a href="zfsw_opt">zfsw_opt</a>
+	<li class="nav-item">
+		<a class="nav-link" href="/zw/status/zfsw_opt">zfsw_opt</a>
 	</li>
 
 </ul>
 
-	<dl class="dl-horizontal">
-		<dt>name:</dt><dd>zfsw_draid</dd>
-		<dt>state:</dt><dd class="warning">DEGRADED</dd>
+<div id="live" hx-get="/zw/status/zfsw_draid?fragment=1" hx-trigger="every 10s" hx-swap="innerHTML">
+	<dl class="row">
+		<dt class="col-sm-2">name</dt><dd class="col-sm-10">zfsw_draid</dd>
+		<dt class="col-sm-2">state</dt><dd class="col-sm-10 text-warning">DEGRADED</dd>
 		
-		<dt>status:</dt><dd>One or more devices are faulted in response to persistent errors.
+		<dt class="col-sm-2">status</dt><dd class="col-sm-10">One or more devices are faulted in response to persistent errors.
 Sufficient replicas exist for the pool to continue functioning in a
 degraded state.</dd>
 		
 		
-		<dt>action:</dt><dd>Replace the faulted device, or use &#39;zpool clear&#39; to mark the device
+		<dt class="col-sm-2">action</dt><dd class="col-sm-10">Replace the faulted device, or use &#39;zpool clear&#39; to mark the device
 repaired.</dd>
 		
 		
 		
-		<dt>scan:</dt><dd>scrub in progress since Sat Nov 21 22:14:30 2026
+		<dt class="col-sm-2">scan</dt><dd class="col-sm-10">scrub in progress since Sat Nov 21 22:14:30 2026
 75.3M / 75.5M scanned, 75.2M / 75.4M issued at 6.83M/s
 0B repaired, 99.77% done, no estimated completion time
 resilvered (draid1:2d:5c:1s-0) 16.0M in 00:00:15 with 0 errors on Sat Nov 21 22:14:30 2026</dd>
 		
 	</dl>
-	<table class="table table-condensed table-hover">
-		<thead>
-			<tr>
-				<th style="width: 30%">Name</th>
-				<th style="width: 4%">Loc</th>
-				<th style="width: 15%">State</th>
-				<th style="text-align: right; width: 8%">Read</th>
-				<th style="text-align: right; width: 8%">Write</th>
-				<th style="text-align: right; width: 8%">Cksum</th>
-				<th style="width: 31%"></th>
-			</tr>
-		</thead>
-		<tbody>
-			
-			<tr>
-				<td style="padding-left: 1em">zfsw_draid</td>
-				<td>
+	<div class="table-responsive card-table">
+		<table class="table table-sm table-hover">
+			<thead>
+				<tr>
+					<th scope="col">Name</th>
+					<th scope="col">Loc</th>
+					<th scope="col">State</th>
+					<th scope="col" class="num">Read</th>
+					<th scope="col" class="num">Write</th>
+					<th scope="col" class="num">Cksum</th>
+					<th scope="col"><span class="visually-hidden">Additional information</span></th>
+				</tr>
+			</thead>
+			<tbody>
 				
-				</td>
-				<td class="warning">DEGRADED</td>
-				<td style="text-align: right">0</td>
-				<td style="text-align: right">0</td>
-				<td style="text-align: right">0</td>
-				<td style=""></td>
-			</tr>
-			
-			<tr>
-				<td style="padding-left: 3em">draid1:2d:5c:1s-0</td>
-				<td>
+				<tr>
+					<td class="dev-name depth-0">zfsw_draid</td>
+					<td>
+					
+					</td>
+					<td class="text-warning">DEGRADED</td>
+					<td class="num">0</td>
+					<td class="num">0</td>
+					<td class="num">0</td>
+					<td></td>
+				</tr>
 				
-				</td>
-				<td class="warning">DEGRADED</td>
-				<td style="text-align: right">0</td>
-				<td style="text-align: right">0</td>
-				<td style="text-align: right">0</td>
-				<td style=""></td>
-			</tr>
-			
-			<tr>
-				<td style="padding-left: 5em">/var/tmp/zfsw-collect2/d1</td>
-				<td>
+				<tr>
+					<td class="dev-name depth-1">draid1:2d:5c:1s-0</td>
+					<td>
+					
+					</td>
+					<td class="text-warning">DEGRADED</td>
+					<td class="num">0</td>
+					<td class="num">0</td>
+					<td class="num">0</td>
+					<td></td>
+				</tr>
 				
-				</td>
-				<td class="success">ONLINE</td>
-				<td style="text-align: right">0</td>
-				<td style="text-align: right">0</td>
-				<td style="text-align: right">0</td>
-				<td style=""></td>
-			</tr>
-			
-			<tr>
-				<td style="padding-left: 5em">spare-1</td>
-				<td>
+				<tr>
+					<td class="dev-name depth-2">/var/tmp/zfsw-collect2/d1</td>
+					<td>
+					
+					</td>
+					<td class="text-success">ONLINE</td>
+					<td class="num">0</td>
+					<td class="num">0</td>
+					<td class="num">0</td>
+					<td></td>
+				</tr>
 				
-				</td>
-				<td class="warning">DEGRADED</td>
-				<td style="text-align: right">0</td>
-				<td style="text-align: right">0</td>
-				<td style="text-align: right">0</td>
-				<td style=""></td>
-			</tr>
-			
-			<tr>
-				<td style="padding-left: 7em">/var/tmp/zfsw-collect2/d2</td>
-				<td>
+				<tr>
+					<td class="dev-name depth-2">spare-1</td>
+					<td>
+					
+					</td>
+					<td class="text-warning">DEGRADED</td>
+					<td class="num">0</td>
+					<td class="num">0</td>
+					<td class="num">0</td>
+					<td></td>
+				</tr>
 				
-				</td>
-				<td class="danger">FAULTED</td>
-				<td style="text-align: right">0</td>
-				<td style="text-align: right">0</td>
-				<td style="text-align: right">0</td>
-				<td style="">external device fault</td>
-			</tr>
-			
-			<tr>
-				<td style="padding-left: 7em">draid1-0-0</td>
-				<td>
+				<tr>
+					<td class="dev-name depth-3">/var/tmp/zfsw-collect2/d2</td>
+					<td>
+					
+					</td>
+					<td class="text-danger">FAULTED</td>
+					<td class="num">0</td>
+					<td class="num">0</td>
+					<td class="num">0</td>
+					<td>external device fault</td>
+				</tr>
 				
-				</td>
-				<td class="success">ONLINE</td>
-				<td style="text-align: right">0</td>
-				<td style="text-align: right">0</td>
-				<td style="text-align: right">0</td>
-				<td style=""></td>
-			</tr>
-			
-			<tr>
-				<td style="padding-left: 5em">/var/tmp/zfsw-collect2/d3</td>
-				<td>
+				<tr>
+					<td class="dev-name depth-3">draid1-0-0</td>
+					<td>
+					
+					</td>
+					<td class="text-success">ONLINE</td>
+					<td class="num">0</td>
+					<td class="num">0</td>
+					<td class="num">0</td>
+					<td></td>
+				</tr>
 				
-				</td>
-				<td class="success">ONLINE</td>
-				<td style="text-align: right">0</td>
-				<td style="text-align: right">0</td>
-				<td style="text-align: right">0</td>
-				<td style=""></td>
-			</tr>
-			
-			<tr>
-				<td style="padding-left: 5em">/var/tmp/zfsw-collect2/d4</td>
-				<td>
+				<tr>
+					<td class="dev-name depth-2">/var/tmp/zfsw-collect2/d3</td>
+					<td>
+					
+					</td>
+					<td class="text-success">ONLINE</td>
+					<td class="num">0</td>
+					<td class="num">0</td>
+					<td class="num">0</td>
+					<td></td>
+				</tr>
 				
-				</td>
-				<td class="success">ONLINE</td>
-				<td style="text-align: right">0</td>
-				<td style="text-align: right">0</td>
-				<td style="text-align: right">0</td>
-				<td style=""></td>
-			</tr>
-			
-			<tr>
-				<td style="padding-left: 5em">/var/tmp/zfsw-collect2/d5</td>
-				<td>
+				<tr>
+					<td class="dev-name depth-2">/var/tmp/zfsw-collect2/d4</td>
+					<td>
+					
+					</td>
+					<td class="text-success">ONLINE</td>
+					<td class="num">0</td>
+					<td class="num">0</td>
+					<td class="num">0</td>
+					<td></td>
+				</tr>
 				
-				</td>
-				<td class="success">ONLINE</td>
-				<td style="text-align: right">0</td>
-				<td style="text-align: right">0</td>
-				<td style="text-align: right">0</td>
-				<td style=""></td>
-			</tr>
-			
-			<tr>
-				<td style="padding-left: 1em">spares</td>
-				<td>
+				<tr>
+					<td class="dev-name depth-2">/var/tmp/zfsw-collect2/d5</td>
+					<td>
+					
+					</td>
+					<td class="text-success">ONLINE</td>
+					<td class="num">0</td>
+					<td class="num">0</td>
+					<td class="num">0</td>
+					<td></td>
+				</tr>
 				
-				</td>
-				<td class=""></td>
-				<td style="text-align: right">-</td>
-				<td style="text-align: right">-</td>
-				<td style="text-align: right">-</td>
-				<td style=""></td>
-			</tr>
-			
-			<tr>
-				<td style="padding-left: 3em">draid1-0-0</td>
-				<td>
+				<tr>
+					<td class="dev-name depth-0">spares</td>
+					<td>
+					
+					</td>
+					<td class=""></td>
+					<td class="num">-</td>
+					<td class="num">-</td>
+					<td class="num">-</td>
+					<td></td>
+				</tr>
 				
-				</td>
-				<td class="">INUSE</td>
-				<td style="text-align: right">-</td>
-				<td style="text-align: right">-</td>
-				<td style="text-align: right">-</td>
-				<td style=""></td>
-			</tr>
-			
-		</tbody>
-	</table>
+				<tr>
+					<td class="dev-name depth-1">draid1-0-0</td>
+					<td>
+					
+					</td>
+					<td class="">INUSE</td>
+					<td class="num">-</td>
+					<td class="num">-</td>
+					<td class="num">-</td>
+					<td></td>
+				</tr>
+				
+			</tbody>
+		</table>
+	</div>
 
-	<dl class="dl-horizontal">
-		
-		<dt>errors:</dt><dd>No known data errors</dd>
-		
+	
+	<dl class="row mt-3">
+		<dt class="col-sm-2">errors</dt><dd class="col-sm-10">No known data errors</dd>
 	</dl>
+	
 
+</div>
 
-			</div> 
-		</div> 
+	</main>
 
-		<script src="/zw/resources/bootstrap/js/bootstrap.min.js"></script>
+	<script src="/zw/resources/bootstrap/js/bootstrap.bundle.min.js"></script>
 
 	</body>
 </html>
@@ -1763,173 +1721,167 @@ resilvered (draid1:2d:5c:1s-0) 16.0M in 00:00:15 with 0 errors on Sat Nov 21 22:
 <html lang="en">
 	<head>
 		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
 		<title>zfswatcher</title>
-		<meta name="viewport" content="width=device-width, initial-scale=1.0">
 		<link href="/zw/resources/bootstrap/css/bootstrap.min.css" rel="stylesheet">
-		<link href="/zw/resources/bootstrap/css/bootstrap-theme.min.css" rel="stylesheet">
-		<style type="text/css">
-			body {
-				padding-top: 60px;
-				padding-bottom: 60px;
-			}
-		</style>
 		<link href="/zw/resources/zfswatcher.css" rel="stylesheet">
 		<link href="/zw/resources/favicon.ico" rel="shortcut icon">
-		<script src="/zw/resources/bootstrap/js/jquery.min.js"></script>
+		
+		<meta name="htmx-config" content='{"allowEval":false,"includeIndicatorStyles":false,"selfRequestsOnly":true}'>
+		<script src="/zw/resources/htmx/htmx.min.js" defer></script>
+		
 	</head>
 
 	<body>
 
-	<div class="navbar navbar-inverse navbar-fixed-top">
+	<nav class="navbar navbar-expand-md navbar-dark bg-dark mb-4" data-bs-theme="dark">
 		<div class="container-fluid">
-			<div class="navbar-header">
-				<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
-	        <span class="sr-only">Toggle navigation</span>
-	        <span class="icon-bar"></span>
-	        <span class="icon-bar"></span>
-	        <span class="icon-bar"></span>
-	      </button>
-				<a class="navbar-brand" href="/zw/">zfswatcher</a>
-	    </div>
-				<div class="navbar-collapse collapse" id="bs-example-navbar-collapse-1">
-					<ul class="nav navbar-nav">
-						<li>
-							<a href="/zw/">Dashboard</a></li>
-						<li class="active">
-							<a href="/zw/status/">Pool Status</a></li>
-						<li>
-							<a href="/zw/enclosure/">Enclosure</a></li>
-						<li>
-							<a href="/zw/statistics/">Statistics</a></li>
-						<li>
-							<a href="/zw/logs/">Logs</a></li>
-					</ul>
-					<ul class="nav navbar-nav navbar-right">
-						<li>
-							<a href="/zw/about/" class="pull-right">About</a></li>
-					</ul>
-				</div>
+			<a class="navbar-brand" href="/zw/">zfswatcher</a>
+			<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#main-nav" aria-controls="main-nav" aria-expanded="false" aria-label="Toggle navigation">
+				<span class="navbar-toggler-icon"></span>
+			</button>
+			<div class="collapse navbar-collapse" id="main-nav">
+				<ul class="navbar-nav me-auto mb-2 mb-md-0">
+					<li class="nav-item">
+						<a class="nav-link" href="/zw/">Dashboard</a></li>
+					<li class="nav-item">
+						<a class="nav-link active" aria-current="page" href="/zw/status/">Pool Status</a></li>
+					<li class="nav-item">
+						<a class="nav-link" href="/zw/enclosure/">Enclosure</a></li>
+					<li class="nav-item">
+						<a class="nav-link" href="/zw/statistics/">Statistics</a></li>
+					<li class="nav-item">
+						<a class="nav-link" href="/zw/logs/">Logs</a></li>
+				</ul>
+				<ul class="navbar-nav">
+					<li class="nav-item">
+						<a class="nav-link" href="/zw/about/">About</a></li>
+				</ul>
 			</div>
 		</div>
-	</div>
+	</nav>
 
-	<div class="container-fluid">
+	<main class="container-fluid">
 		
-		<div class="row-fluid">
 
 
-<ul class="nav nav-tabs">
+<h1 class="h3 mb-3">Pool Status</h1>
 
-	<li>
-		<a href="zfsw_mix">zfsw_mix</a>
+<ul class="nav nav-tabs mb-3">
+
+	<li class="nav-item">
+		<a class="nav-link" href="/zw/status/zfsw_mix">zfsw_mix</a>
 	</li>
 
-	<li>
-		<a href="test">test</a>
+	<li class="nav-item">
+		<a class="nav-link" href="/zw/status/test">test</a>
 	</li>
 
-	<li>
-		<a href="zfsw_mirror">zfsw_mirror</a>
+	<li class="nav-item">
+		<a class="nav-link" href="/zw/status/zfsw_mirror">zfsw_mirror</a>
 	</li>
 
-	<li>
-		<a href="datis">datis</a>
+	<li class="nav-item">
+		<a class="nav-link" href="/zw/status/datis">datis</a>
 	</li>
 
-	<li>
-		<a href="rpool">rpool</a>
+	<li class="nav-item">
+		<a class="nav-link" href="/zw/status/rpool">rpool</a>
 	</li>
 
-	<li>
-		<a href="secundus">secundus</a>
+	<li class="nav-item">
+		<a class="nav-link" href="/zw/status/secundus">secundus</a>
 	</li>
 
-	<li>
-		<a href="zfsw_draid">zfsw_draid</a>
+	<li class="nav-item">
+		<a class="nav-link" href="/zw/status/zfsw_draid">zfsw_draid</a>
 	</li>
 
-	<li class="active">
-		<a href="zfsw_susp">zfsw_susp</a>
+	<li class="nav-item">
+		<a class="nav-link active" aria-current="page" href="/zw/status/zfsw_susp">zfsw_susp</a>
 	</li>
 
-	<li>
-		<a href="zfsw_rz2">zfsw_rz2</a>
+	<li class="nav-item">
+		<a class="nav-link" href="/zw/status/zfsw_rz2">zfsw_rz2</a>
 	</li>
 
-	<li>
-		<a href="zfsw_opt">zfsw_opt</a>
+	<li class="nav-item">
+		<a class="nav-link" href="/zw/status/zfsw_opt">zfsw_opt</a>
 	</li>
 
 </ul>
 
-	<dl class="dl-horizontal">
-		<dt>name:</dt><dd>zfsw_susp</dd>
-		<dt>state:</dt><dd class="success">ONLINE</dd>
+<div id="live" hx-get="/zw/status/zfsw_susp?fragment=1" hx-trigger="every 10s" hx-swap="innerHTML">
+	<dl class="row">
+		<dt class="col-sm-2">name</dt><dd class="col-sm-10">zfsw_susp</dd>
+		<dt class="col-sm-2">state</dt><dd class="col-sm-10 text-success">ONLINE</dd>
 		
-		<dt>status:</dt><dd>One or more devices has experienced an error resulting in data
+		<dt class="col-sm-2">status</dt><dd class="col-sm-10">One or more devices has experienced an error resulting in data
 corruption.  Applications may be affected.</dd>
 		
 		
-		<dt>action:</dt><dd>Restore the file in question if possible.  Otherwise restore the
+		<dt class="col-sm-2">action</dt><dd class="col-sm-10">Restore the file in question if possible.  Otherwise restore the
 entire pool from backup.</dd>
 		
 		
-		<dt>see:</dt><dd><a href="https://openzfs.github.io/openzfs-docs/msg/ZFS-8000-8A" target="_blank">https://openzfs.github.io/openzfs-docs/msg/ZFS-8000-8A</a></dd>
+		<dt class="col-sm-2">see</dt><dd class="col-sm-10"><a href="https://openzfs.github.io/openzfs-docs/msg/ZFS-8000-8A" target="_blank" rel="noopener noreferrer">https://openzfs.github.io/openzfs-docs/msg/ZFS-8000-8A</a></dd>
 		
 		
 	</dl>
-	<table class="table table-condensed table-hover">
-		<thead>
-			<tr>
-				<th style="width: 30%">Name</th>
-				<th style="width: 4%">Loc</th>
-				<th style="width: 15%">State</th>
-				<th style="text-align: right; width: 8%">Read</th>
-				<th style="text-align: right; width: 8%">Write</th>
-				<th style="text-align: right; width: 8%">Cksum</th>
-				<th style="width: 31%"></th>
-			</tr>
-		</thead>
-		<tbody>
-			
-			<tr>
-				<td style="padding-left: 1em">zfsw_susp</td>
-				<td>
+	<div class="table-responsive card-table">
+		<table class="table table-sm table-hover">
+			<thead>
+				<tr>
+					<th scope="col">Name</th>
+					<th scope="col">Loc</th>
+					<th scope="col">State</th>
+					<th scope="col" class="num">Read</th>
+					<th scope="col" class="num">Write</th>
+					<th scope="col" class="num">Cksum</th>
+					<th scope="col"><span class="visually-hidden">Additional information</span></th>
+				</tr>
+			</thead>
+			<tbody>
 				
-				</td>
-				<td class="success">ONLINE</td>
-				<td style="text-align: right">0</td>
-				<td style="text-align: right">0</td>
-				<td style="text-align: right">0</td>
-				<td style=""></td>
-			</tr>
-			
-			<tr>
-				<td style="padding-left: 3em">/var/tmp/zfsw-collect/i3</td>
-				<td>
+				<tr>
+					<td class="dev-name depth-0">zfsw_susp</td>
+					<td>
+					
+					</td>
+					<td class="text-success">ONLINE</td>
+					<td class="num">0</td>
+					<td class="num">0</td>
+					<td class="num">0</td>
+					<td></td>
+				</tr>
 				
-				</td>
-				<td class="success">ONLINE</td>
-				<td style="text-align: right">0</td>
-				<td style="text-align: right">1.34K</td>
-				<td style="text-align: right">0</td>
-				<td style=""></td>
-			</tr>
-			
-		</tbody>
-	</table>
+				<tr>
+					<td class="dev-name depth-1">/var/tmp/zfsw-collect/i3</td>
+					<td>
+					
+					</td>
+					<td class="text-success">ONLINE</td>
+					<td class="num">0</td>
+					<td class="num">1.34K</td>
+					<td class="num">0</td>
+					<td></td>
+				</tr>
+				
+			</tbody>
+		</table>
+	</div>
 
-	<dl class="dl-horizontal">
-		
-		<dt>errors:</dt><dd>121 data errors, use &#39;-v&#39; for a list</dd>
-		
+	
+	<dl class="row mt-3">
+		<dt class="col-sm-2">errors</dt><dd class="col-sm-10">121 data errors, use &#39;-v&#39; for a list</dd>
 	</dl>
+	
 
+</div>
 
-			</div> 
-		</div> 
+	</main>
 
-		<script src="/zw/resources/bootstrap/js/bootstrap.min.js"></script>
+	<script src="/zw/resources/bootstrap/js/bootstrap.bundle.min.js"></script>
 
 	</body>
 </html>
@@ -1939,220 +1891,214 @@ entire pool from backup.</dd>
 <html lang="en">
 	<head>
 		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
 		<title>zfswatcher</title>
-		<meta name="viewport" content="width=device-width, initial-scale=1.0">
 		<link href="/zw/resources/bootstrap/css/bootstrap.min.css" rel="stylesheet">
-		<link href="/zw/resources/bootstrap/css/bootstrap-theme.min.css" rel="stylesheet">
-		<style type="text/css">
-			body {
-				padding-top: 60px;
-				padding-bottom: 60px;
-			}
-		</style>
 		<link href="/zw/resources/zfswatcher.css" rel="stylesheet">
 		<link href="/zw/resources/favicon.ico" rel="shortcut icon">
-		<script src="/zw/resources/bootstrap/js/jquery.min.js"></script>
+		
+		<meta name="htmx-config" content='{"allowEval":false,"includeIndicatorStyles":false,"selfRequestsOnly":true}'>
+		<script src="/zw/resources/htmx/htmx.min.js" defer></script>
+		
 	</head>
 
 	<body>
 
-	<div class="navbar navbar-inverse navbar-fixed-top">
+	<nav class="navbar navbar-expand-md navbar-dark bg-dark mb-4" data-bs-theme="dark">
 		<div class="container-fluid">
-			<div class="navbar-header">
-				<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
-	        <span class="sr-only">Toggle navigation</span>
-	        <span class="icon-bar"></span>
-	        <span class="icon-bar"></span>
-	        <span class="icon-bar"></span>
-	      </button>
-				<a class="navbar-brand" href="/zw/">zfswatcher</a>
-	    </div>
-				<div class="navbar-collapse collapse" id="bs-example-navbar-collapse-1">
-					<ul class="nav navbar-nav">
-						<li>
-							<a href="/zw/">Dashboard</a></li>
-						<li class="active">
-							<a href="/zw/status/">Pool Status</a></li>
-						<li>
-							<a href="/zw/enclosure/">Enclosure</a></li>
-						<li>
-							<a href="/zw/statistics/">Statistics</a></li>
-						<li>
-							<a href="/zw/logs/">Logs</a></li>
-					</ul>
-					<ul class="nav navbar-nav navbar-right">
-						<li>
-							<a href="/zw/about/" class="pull-right">About</a></li>
-					</ul>
-				</div>
+			<a class="navbar-brand" href="/zw/">zfswatcher</a>
+			<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#main-nav" aria-controls="main-nav" aria-expanded="false" aria-label="Toggle navigation">
+				<span class="navbar-toggler-icon"></span>
+			</button>
+			<div class="collapse navbar-collapse" id="main-nav">
+				<ul class="navbar-nav me-auto mb-2 mb-md-0">
+					<li class="nav-item">
+						<a class="nav-link" href="/zw/">Dashboard</a></li>
+					<li class="nav-item">
+						<a class="nav-link active" aria-current="page" href="/zw/status/">Pool Status</a></li>
+					<li class="nav-item">
+						<a class="nav-link" href="/zw/enclosure/">Enclosure</a></li>
+					<li class="nav-item">
+						<a class="nav-link" href="/zw/statistics/">Statistics</a></li>
+					<li class="nav-item">
+						<a class="nav-link" href="/zw/logs/">Logs</a></li>
+				</ul>
+				<ul class="navbar-nav">
+					<li class="nav-item">
+						<a class="nav-link" href="/zw/about/">About</a></li>
+				</ul>
 			</div>
 		</div>
-	</div>
+	</nav>
 
-	<div class="container-fluid">
+	<main class="container-fluid">
 		
-		<div class="row-fluid">
 
 
-<ul class="nav nav-tabs">
+<h1 class="h3 mb-3">Pool Status</h1>
 
-	<li>
-		<a href="zfsw_mix">zfsw_mix</a>
+<ul class="nav nav-tabs mb-3">
+
+	<li class="nav-item">
+		<a class="nav-link" href="/zw/status/zfsw_mix">zfsw_mix</a>
 	</li>
 
-	<li>
-		<a href="test">test</a>
+	<li class="nav-item">
+		<a class="nav-link" href="/zw/status/test">test</a>
 	</li>
 
-	<li>
-		<a href="zfsw_mirror">zfsw_mirror</a>
+	<li class="nav-item">
+		<a class="nav-link" href="/zw/status/zfsw_mirror">zfsw_mirror</a>
 	</li>
 
-	<li>
-		<a href="datis">datis</a>
+	<li class="nav-item">
+		<a class="nav-link" href="/zw/status/datis">datis</a>
 	</li>
 
-	<li>
-		<a href="rpool">rpool</a>
+	<li class="nav-item">
+		<a class="nav-link" href="/zw/status/rpool">rpool</a>
 	</li>
 
-	<li>
-		<a href="secundus">secundus</a>
+	<li class="nav-item">
+		<a class="nav-link" href="/zw/status/secundus">secundus</a>
 	</li>
 
-	<li>
-		<a href="zfsw_draid">zfsw_draid</a>
+	<li class="nav-item">
+		<a class="nav-link" href="/zw/status/zfsw_draid">zfsw_draid</a>
 	</li>
 
-	<li>
-		<a href="zfsw_susp">zfsw_susp</a>
+	<li class="nav-item">
+		<a class="nav-link" href="/zw/status/zfsw_susp">zfsw_susp</a>
 	</li>
 
-	<li class="active">
-		<a href="zfsw_rz2">zfsw_rz2</a>
+	<li class="nav-item">
+		<a class="nav-link active" aria-current="page" href="/zw/status/zfsw_rz2">zfsw_rz2</a>
 	</li>
 
-	<li>
-		<a href="zfsw_opt">zfsw_opt</a>
+	<li class="nav-item">
+		<a class="nav-link" href="/zw/status/zfsw_opt">zfsw_opt</a>
 	</li>
 
 </ul>
 
-	<dl class="dl-horizontal">
-		<dt>name:</dt><dd>zfsw_rz2</dd>
-		<dt>state:</dt><dd class="warning">DEGRADED</dd>
+<div id="live" hx-get="/zw/status/zfsw_rz2?fragment=1" hx-trigger="every 10s" hx-swap="innerHTML">
+	<dl class="row">
+		<dt class="col-sm-2">name</dt><dd class="col-sm-10">zfsw_rz2</dd>
+		<dt class="col-sm-2">state</dt><dd class="col-sm-10 text-warning">DEGRADED</dd>
 		
-		<dt>status:</dt><dd>One or more devices are faulted in response to persistent errors.
+		<dt class="col-sm-2">status</dt><dd class="col-sm-10">One or more devices are faulted in response to persistent errors.
 Sufficient replicas exist for the pool to continue functioning in a
 degraded state.</dd>
 		
 		
-		<dt>action:</dt><dd>Replace the faulted device, or use &#39;zpool clear&#39; to mark the device
+		<dt class="col-sm-2">action</dt><dd class="col-sm-10">Replace the faulted device, or use &#39;zpool clear&#39; to mark the device
 repaired.</dd>
 		
 		
 		
 	</dl>
-	<table class="table table-condensed table-hover">
-		<thead>
-			<tr>
-				<th style="width: 30%">Name</th>
-				<th style="width: 4%">Loc</th>
-				<th style="width: 15%">State</th>
-				<th style="text-align: right; width: 8%">Read</th>
-				<th style="text-align: right; width: 8%">Write</th>
-				<th style="text-align: right; width: 8%">Cksum</th>
-				<th style="width: 31%"></th>
-			</tr>
-		</thead>
-		<tbody>
-			
-			<tr>
-				<td style="padding-left: 1em">zfsw_rz2</td>
-				<td>
+	<div class="table-responsive card-table">
+		<table class="table table-sm table-hover">
+			<thead>
+				<tr>
+					<th scope="col">Name</th>
+					<th scope="col">Loc</th>
+					<th scope="col">State</th>
+					<th scope="col" class="num">Read</th>
+					<th scope="col" class="num">Write</th>
+					<th scope="col" class="num">Cksum</th>
+					<th scope="col"><span class="visually-hidden">Additional information</span></th>
+				</tr>
+			</thead>
+			<tbody>
 				
-				</td>
-				<td class="warning">DEGRADED</td>
-				<td style="text-align: right">0</td>
-				<td style="text-align: right">0</td>
-				<td style="text-align: right">0</td>
-				<td style=""></td>
-			</tr>
-			
-			<tr>
-				<td style="padding-left: 3em">raidz2-0</td>
-				<td>
+				<tr>
+					<td class="dev-name depth-0">zfsw_rz2</td>
+					<td>
+					
+					</td>
+					<td class="text-warning">DEGRADED</td>
+					<td class="num">0</td>
+					<td class="num">0</td>
+					<td class="num">0</td>
+					<td></td>
+				</tr>
 				
-				</td>
-				<td class="warning">DEGRADED</td>
-				<td style="text-align: right">0</td>
-				<td style="text-align: right">0</td>
-				<td style="text-align: right">0</td>
-				<td style=""></td>
-			</tr>
-			
-			<tr>
-				<td style="padding-left: 5em">/var/tmp/zfsw-collect2/z1</td>
-				<td>
+				<tr>
+					<td class="dev-name depth-1">raidz2-0</td>
+					<td>
+					
+					</td>
+					<td class="text-warning">DEGRADED</td>
+					<td class="num">0</td>
+					<td class="num">0</td>
+					<td class="num">0</td>
+					<td></td>
+				</tr>
 				
-				</td>
-				<td class="danger">FAULTED</td>
-				<td style="text-align: right">0</td>
-				<td style="text-align: right">0</td>
-				<td style="text-align: right">0</td>
-				<td style="">external device fault</td>
-			</tr>
-			
-			<tr>
-				<td style="padding-left: 5em">/var/tmp/zfsw-collect2/z2</td>
-				<td>
+				<tr>
+					<td class="dev-name depth-2">/var/tmp/zfsw-collect2/z1</td>
+					<td>
+					
+					</td>
+					<td class="text-danger">FAULTED</td>
+					<td class="num">0</td>
+					<td class="num">0</td>
+					<td class="num">0</td>
+					<td>external device fault</td>
+				</tr>
 				
-				</td>
-				<td class="danger">FAULTED</td>
-				<td style="text-align: right">0</td>
-				<td style="text-align: right">0</td>
-				<td style="text-align: right">0</td>
-				<td style="">external device fault</td>
-			</tr>
-			
-			<tr>
-				<td style="padding-left: 5em">/var/tmp/zfsw-collect2/z3</td>
-				<td>
+				<tr>
+					<td class="dev-name depth-2">/var/tmp/zfsw-collect2/z2</td>
+					<td>
+					
+					</td>
+					<td class="text-danger">FAULTED</td>
+					<td class="num">0</td>
+					<td class="num">0</td>
+					<td class="num">0</td>
+					<td>external device fault</td>
+				</tr>
 				
-				</td>
-				<td class="success">ONLINE</td>
-				<td style="text-align: right">0</td>
-				<td style="text-align: right">0</td>
-				<td style="text-align: right">0</td>
-				<td style=""></td>
-			</tr>
-			
-			<tr>
-				<td style="padding-left: 5em">/var/tmp/zfsw-collect2/z4</td>
-				<td>
+				<tr>
+					<td class="dev-name depth-2">/var/tmp/zfsw-collect2/z3</td>
+					<td>
+					
+					</td>
+					<td class="text-success">ONLINE</td>
+					<td class="num">0</td>
+					<td class="num">0</td>
+					<td class="num">0</td>
+					<td></td>
+				</tr>
 				
-				</td>
-				<td class="success">ONLINE</td>
-				<td style="text-align: right">0</td>
-				<td style="text-align: right">0</td>
-				<td style="text-align: right">0</td>
-				<td style=""></td>
-			</tr>
-			
-		</tbody>
-	</table>
+				<tr>
+					<td class="dev-name depth-2">/var/tmp/zfsw-collect2/z4</td>
+					<td>
+					
+					</td>
+					<td class="text-success">ONLINE</td>
+					<td class="num">0</td>
+					<td class="num">0</td>
+					<td class="num">0</td>
+					<td></td>
+				</tr>
+				
+			</tbody>
+		</table>
+	</div>
 
-	<dl class="dl-horizontal">
-		
-		<dt>errors:</dt><dd>No known data errors</dd>
-		
+	
+	<dl class="row mt-3">
+		<dt class="col-sm-2">errors</dt><dd class="col-sm-10">No known data errors</dd>
 	</dl>
+	
 
+</div>
 
-			</div> 
-		</div> 
+	</main>
 
-		<script src="/zw/resources/bootstrap/js/bootstrap.min.js"></script>
+	<script src="/zw/resources/bootstrap/js/bootstrap.bundle.min.js"></script>
 
 	</body>
 </html>
@@ -2162,189 +2108,183 @@ repaired.</dd>
 <html lang="en">
 	<head>
 		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
 		<title>zfswatcher</title>
-		<meta name="viewport" content="width=device-width, initial-scale=1.0">
 		<link href="/zw/resources/bootstrap/css/bootstrap.min.css" rel="stylesheet">
-		<link href="/zw/resources/bootstrap/css/bootstrap-theme.min.css" rel="stylesheet">
-		<style type="text/css">
-			body {
-				padding-top: 60px;
-				padding-bottom: 60px;
-			}
-		</style>
 		<link href="/zw/resources/zfswatcher.css" rel="stylesheet">
 		<link href="/zw/resources/favicon.ico" rel="shortcut icon">
-		<script src="/zw/resources/bootstrap/js/jquery.min.js"></script>
+		
+		<meta name="htmx-config" content='{"allowEval":false,"includeIndicatorStyles":false,"selfRequestsOnly":true}'>
+		<script src="/zw/resources/htmx/htmx.min.js" defer></script>
+		
 	</head>
 
 	<body>
 
-	<div class="navbar navbar-inverse navbar-fixed-top">
+	<nav class="navbar navbar-expand-md navbar-dark bg-dark mb-4" data-bs-theme="dark">
 		<div class="container-fluid">
-			<div class="navbar-header">
-				<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
-	        <span class="sr-only">Toggle navigation</span>
-	        <span class="icon-bar"></span>
-	        <span class="icon-bar"></span>
-	        <span class="icon-bar"></span>
-	      </button>
-				<a class="navbar-brand" href="/zw/">zfswatcher</a>
-	    </div>
-				<div class="navbar-collapse collapse" id="bs-example-navbar-collapse-1">
-					<ul class="nav navbar-nav">
-						<li>
-							<a href="/zw/">Dashboard</a></li>
-						<li class="active">
-							<a href="/zw/status/">Pool Status</a></li>
-						<li>
-							<a href="/zw/enclosure/">Enclosure</a></li>
-						<li>
-							<a href="/zw/statistics/">Statistics</a></li>
-						<li>
-							<a href="/zw/logs/">Logs</a></li>
-					</ul>
-					<ul class="nav navbar-nav navbar-right">
-						<li>
-							<a href="/zw/about/" class="pull-right">About</a></li>
-					</ul>
-				</div>
+			<a class="navbar-brand" href="/zw/">zfswatcher</a>
+			<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#main-nav" aria-controls="main-nav" aria-expanded="false" aria-label="Toggle navigation">
+				<span class="navbar-toggler-icon"></span>
+			</button>
+			<div class="collapse navbar-collapse" id="main-nav">
+				<ul class="navbar-nav me-auto mb-2 mb-md-0">
+					<li class="nav-item">
+						<a class="nav-link" href="/zw/">Dashboard</a></li>
+					<li class="nav-item">
+						<a class="nav-link active" aria-current="page" href="/zw/status/">Pool Status</a></li>
+					<li class="nav-item">
+						<a class="nav-link" href="/zw/enclosure/">Enclosure</a></li>
+					<li class="nav-item">
+						<a class="nav-link" href="/zw/statistics/">Statistics</a></li>
+					<li class="nav-item">
+						<a class="nav-link" href="/zw/logs/">Logs</a></li>
+				</ul>
+				<ul class="navbar-nav">
+					<li class="nav-item">
+						<a class="nav-link" href="/zw/about/">About</a></li>
+				</ul>
 			</div>
 		</div>
-	</div>
+	</nav>
 
-	<div class="container-fluid">
+	<main class="container-fluid">
 		
-		<div class="row-fluid">
 
 
-<ul class="nav nav-tabs">
+<h1 class="h3 mb-3">Pool Status</h1>
 
-	<li>
-		<a href="zfsw_mix">zfsw_mix</a>
+<ul class="nav nav-tabs mb-3">
+
+	<li class="nav-item">
+		<a class="nav-link" href="/zw/status/zfsw_mix">zfsw_mix</a>
 	</li>
 
-	<li>
-		<a href="test">test</a>
+	<li class="nav-item">
+		<a class="nav-link" href="/zw/status/test">test</a>
 	</li>
 
-	<li>
-		<a href="zfsw_mirror">zfsw_mirror</a>
+	<li class="nav-item">
+		<a class="nav-link" href="/zw/status/zfsw_mirror">zfsw_mirror</a>
 	</li>
 
-	<li>
-		<a href="datis">datis</a>
+	<li class="nav-item">
+		<a class="nav-link" href="/zw/status/datis">datis</a>
 	</li>
 
-	<li>
-		<a href="rpool">rpool</a>
+	<li class="nav-item">
+		<a class="nav-link" href="/zw/status/rpool">rpool</a>
 	</li>
 
-	<li>
-		<a href="secundus">secundus</a>
+	<li class="nav-item">
+		<a class="nav-link" href="/zw/status/secundus">secundus</a>
 	</li>
 
-	<li>
-		<a href="zfsw_draid">zfsw_draid</a>
+	<li class="nav-item">
+		<a class="nav-link" href="/zw/status/zfsw_draid">zfsw_draid</a>
 	</li>
 
-	<li>
-		<a href="zfsw_susp">zfsw_susp</a>
+	<li class="nav-item">
+		<a class="nav-link" href="/zw/status/zfsw_susp">zfsw_susp</a>
 	</li>
 
-	<li>
-		<a href="zfsw_rz2">zfsw_rz2</a>
+	<li class="nav-item">
+		<a class="nav-link" href="/zw/status/zfsw_rz2">zfsw_rz2</a>
 	</li>
 
-	<li class="active">
-		<a href="zfsw_opt">zfsw_opt</a>
+	<li class="nav-item">
+		<a class="nav-link active" aria-current="page" href="/zw/status/zfsw_opt">zfsw_opt</a>
 	</li>
 
 </ul>
 
-	<dl class="dl-horizontal">
-		<dt>name:</dt><dd>zfsw_opt</dd>
-		<dt>state:</dt><dd class="success">ONLINE</dd>
+<div id="live" hx-get="/zw/status/zfsw_opt?fragment=1" hx-trigger="every 10s" hx-swap="innerHTML">
+	<dl class="row">
+		<dt class="col-sm-2">name</dt><dd class="col-sm-10">zfsw_opt</dd>
+		<dt class="col-sm-2">state</dt><dd class="col-sm-10 text-success">ONLINE</dd>
 		
 		
 		
 		
 	</dl>
-	<table class="table table-condensed table-hover">
-		<thead>
-			<tr>
-				<th style="width: 30%">Name</th>
-				<th style="width: 4%">Loc</th>
-				<th style="width: 15%">State</th>
-				<th style="text-align: right; width: 8%">Read</th>
-				<th style="text-align: right; width: 8%">Write</th>
-				<th style="text-align: right; width: 8%">Cksum</th>
-				<th style="width: 31%"></th>
-			</tr>
-		</thead>
-		<tbody>
-			
-			<tr>
-				<td style="padding-left: 1em">zfsw_opt</td>
-				<td>
+	<div class="table-responsive card-table">
+		<table class="table table-sm table-hover">
+			<thead>
+				<tr>
+					<th scope="col">Name</th>
+					<th scope="col">Loc</th>
+					<th scope="col">State</th>
+					<th scope="col" class="num">Read</th>
+					<th scope="col" class="num">Write</th>
+					<th scope="col" class="num">Cksum</th>
+					<th scope="col"><span class="visually-hidden">Additional information</span></th>
+				</tr>
+			</thead>
+			<tbody>
 				
-				</td>
-				<td class="success">ONLINE</td>
-				<td style="text-align: right">0</td>
-				<td style="text-align: right">0</td>
-				<td style="text-align: right">0</td>
-				<td style=""></td>
-			</tr>
-			
-			<tr>
-				<td style="padding-left: 3em">13093892248541598013</td>
-				<td>
+				<tr>
+					<td class="dev-name depth-0">zfsw_opt</td>
+					<td>
+					
+					</td>
+					<td class="text-success">ONLINE</td>
+					<td class="num">0</td>
+					<td class="num">0</td>
+					<td class="num">0</td>
+					<td></td>
+				</tr>
 				
-				</td>
-				<td class="success">ONLINE</td>
-				<td style="text-align: right">0</td>
-				<td style="text-align: right">0</td>
-				<td style="text-align: right">0</td>
-				<td style=""></td>
-			</tr>
-			
-			<tr>
-				<td style="padding-left: 5em">14472808773214427843</td>
-				<td>
+				<tr>
+					<td class="dev-name depth-1">13093892248541598013</td>
+					<td>
+					
+					</td>
+					<td class="text-success">ONLINE</td>
+					<td class="num">0</td>
+					<td class="num">0</td>
+					<td class="num">0</td>
+					<td></td>
+				</tr>
 				
-				</td>
-				<td class="success">ONLINE</td>
-				<td style="text-align: right">0</td>
-				<td style="text-align: right">0</td>
-				<td style="text-align: right">0</td>
-				<td style=""></td>
-			</tr>
-			
-			<tr>
-				<td style="padding-left: 5em">5026051920062145897</td>
-				<td>
+				<tr>
+					<td class="dev-name depth-2">14472808773214427843</td>
+					<td>
+					
+					</td>
+					<td class="text-success">ONLINE</td>
+					<td class="num">0</td>
+					<td class="num">0</td>
+					<td class="num">0</td>
+					<td></td>
+				</tr>
 				
-				</td>
-				<td class="success">ONLINE</td>
-				<td style="text-align: right">0</td>
-				<td style="text-align: right">0</td>
-				<td style="text-align: right">0</td>
-				<td style=""></td>
-			</tr>
-			
-		</tbody>
-	</table>
+				<tr>
+					<td class="dev-name depth-2">5026051920062145897</td>
+					<td>
+					
+					</td>
+					<td class="text-success">ONLINE</td>
+					<td class="num">0</td>
+					<td class="num">0</td>
+					<td class="num">0</td>
+					<td></td>
+				</tr>
+				
+			</tbody>
+		</table>
+	</div>
 
-	<dl class="dl-horizontal">
-		
-		<dt>errors:</dt><dd>No known data errors</dd>
-		
+	
+	<dl class="row mt-3">
+		<dt class="col-sm-2">errors</dt><dd class="col-sm-10">No known data errors</dd>
 	</dl>
+	
 
+</div>
 
-			</div> 
-		</div> 
+	</main>
 
-		<script src="/zw/resources/bootstrap/js/bootstrap.min.js"></script>
+	<script src="/zw/resources/bootstrap/js/bootstrap.bundle.min.js"></script>
 
 	</body>
 </html>

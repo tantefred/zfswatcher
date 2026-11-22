@@ -1,7 +1,22 @@
 {{ template "header.html" .Nav }}
 
-<div class="alert alert-info">
-	There are no pools.
-</div>
+<h1 class="h3 mb-3">Pool Status</h1>
+
+{{ template "no-pools" }}
 
 {{ template "footer.html" .Nav }}
+
+{{ define "no-pools" }}
+<div class="alert alert-info" role="alert">
+	There are no pools.
+</div>
+{{ end }}
+
+{{ define "pool-gone" }}
+<div id="live">
+	<div class="alert alert-warning" role="alert">
+		Pool <strong>{{ .Name }}</strong> is no longer present.
+		<a href="{{ .Root }}/status/" class="alert-link">Back to the pool status</a>
+	</div>
+</div>
+{{ end }}
