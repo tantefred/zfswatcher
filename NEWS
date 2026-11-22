@@ -29,7 +29,7 @@ New features
  - API tokens: new sections [apitoken "name"] with "enable", "hash"
    ("sha256:" and 64 hex digits) and "role". A token is sent as
    "Authorization: Bearer <token>" and is accepted only for paths below
-   "<rootdir>/api/" (the API itself follows in a later version). Password
+   "<rootdir>/api/". Password
    login works for the API as well.
  - "zfswatcher -T" (--generate-token) creates a new API token, prints it
    once and shows the matching "hash = sha256:..." line for the
