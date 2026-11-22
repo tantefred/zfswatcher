@@ -60,6 +60,10 @@ type stateFile struct {
 	Version int                   `json:"version"`
 	Pools   []statePool           `json:"pools"`
 	Usage   map[string]stateUsage `json:"usage,omitempty"`
+	// Events is the log buffer of the logs page (oldest first). The field
+	// was added later; files without it are valid, and older versions of
+	// the daemon ignore it.
+	Events []Event `json:"events,omitempty"`
 }
 
 // newStateFile builds the persistent snapshot from the parsed state.
@@ -127,10 +131,26 @@ func (sf *stateFile) usagePercents() map[string]int {
 	return m
 }
 
+// eventsEqual compares event lists; times are compared as instants because
+// a time read from the file has no monotonic clock reading.
+func eventsEqual(a, b []Event) bool {
+	if len(a) != len(b) {
+		return false
+	}
+	for i := range a {
+		if !a[i].Time.Equal(b[i].Time) || a[i].Severity != b[i].Severity ||
+			a[i].Text != b[i].Text || a[i].Attachment != b[i].Attachment {
+			return false
+		}
+	}
+	return true
+}
+
 // sameAs reports whether writing other would not tell anything new.
 func (sf *stateFile) sameAs(other *stateFile) bool {
 	return reflect.DeepEqual(sf.Pools, other.Pools) &&
-		reflect.DeepEqual(sf.usagePercents(), other.usagePercents())
+		reflect.DeepEqual(sf.usagePercents(), other.usagePercents()) &&
+		eventsEqual(sf.Events, other.Events)
 }
 
 // loadStateFile reads a state file. A missing file is reported with an error
@@ -253,13 +273,15 @@ func (sp *statePersister) loadPrevious() *stateFile {
 	return nil
 }
 
-// update writes the state file if the state differs from what was written
-// (or loaded) last.
+// update writes the state file if the state or the event buffer differs from
+// what was written (or loaded) last. It is called after every check, so new
+// events reach the disk with the next check, not with every single message.
 func (sp *statePersister) update(pools []*PoolType, usage map[string]*PoolUsageType) {
 	if sp == nil {
 		return
 	}
 	sf := newStateFile(pools, usage)
+	sf.Events = snapshotEvents()
 	if sp.last != nil && sf.sameAs(sp.last) {
 		return
 	}

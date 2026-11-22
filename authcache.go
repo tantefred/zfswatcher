@@ -60,7 +60,7 @@ func newAuthCache() *authCache {
 }
 
 // cacheKey derives the key. The kind of path is part of it, because tokens
-// are only valid under the API path.
+// are only valid under the token paths (API, metrics).
 func (c *authCache) cacheKey(r *http.Request) ([sha256.Size]byte, bool) {
 	var k [sha256.Size]byte
 	h := r.Header.Get("Authorization")
@@ -68,7 +68,7 @@ func (c *authCache) cacheKey(r *http.Request) ([sha256.Size]byte, bool) {
 		return k, false
 	}
 	m := hmac.New(sha256.New, c.key[:])
-	if isAPIPath(r.URL.Path) {
+	if isTokenPath(r.URL.Path) {
 		m.Write([]byte{1})
 	} else {
 		m.Write([]byte{0})

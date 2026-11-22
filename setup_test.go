@@ -1,12 +1,17 @@
 package main
 
 import (
+	"bytes"
+	"io"
 	"net"
+	"net/http"
+	"net/http/httptest"
 	"os"
 	"path/filepath"
 	"regexp"
 	"strconv"
 	"strings"
+	"sync"
 	"testing"
 	"time"
 
@@ -102,5 +107,107 @@ func TestWarnObsoleteOptions(t *testing.T) {
 	warnObsoleteOptions(cfgWithMain(t, ""))
 	if got := msgs(); len(got) != 0 {
 		t.Errorf("no warning expected without the option, got %q", got)
+	}
+}
+
+// cfgFromText writes a complete configuration file and loads it.
+func cfgFromText(t *testing.T, text string) *cfgType {
+	t.Helper()
+	old := cfgFile
+	t.Cleanup(func() { cfgFile = old })
+	cfgFile = filepath.Join(t.TempDir(), "z.conf")
+	if err := os.WriteFile(cfgFile, []byte(text), 0o600); err != nil {
+		t.Fatal(err)
+	}
+	return getCfg()
+}
+
+func TestGetCfgWebhook(t *testing.T) {
+	ok := "[webhook \"a\"]\nenable = true\nlevel = warning\nurl = https://ntfy.example.org/zfs\npreset = ntfy\ntoken = tk\nthrottle = 30\n"
+	c := cfgFromText(t, ok)
+	if c == nil {
+		t.Fatal("valid webhook rejected")
+	}
+	w := c.Webhook["a"]
+	if w == nil || !w.Enable || w.Level != notifier.WARNING || w.Preset != "ntfy" || w.Token != "tk" || w.Throttle != 30 {
+		t.Errorf("bad webhook config %+v", w)
+	}
+	// preset is optional
+	if cfgFromText(t, "[webhook \"a\"]\nenable = true\nlevel = err\nurl = http://localhost/x\n") == nil {
+		t.Error("webhook without preset rejected")
+	}
+	for name, body := range map[string]string{
+		"no url":        "enable = true\nlevel = err\n",
+		"ftp":           "enable = true\nlevel = err\nurl = ftp://h/x\n",
+		"unknown":       "enable = true\nlevel = err\nurl = https://h/x\npreset = teams\n",
+		"neg throttle":  "enable = true\nlevel = err\nurl = https://h/x\nthrottle = -1\n",
+		"unknown field": "enable = true\nurl = https://h/x\nfoo = 1\n",
+	} {
+		if cfgFromText(t, "[webhook \"a\"]\n"+body) != nil {
+			t.Errorf("%s: invalid webhook accepted", name)
+		}
+	}
+	// disabled sections are not validated
+	if cfgFromText(t, "[webhook \"a\"]\nenable = false\nurl = nonsense\n") == nil {
+		t.Error("disabled webhook was validated")
+	}
+}
+
+func TestRunTestNotify(t *testing.T) {
+	var mu sync.Mutex
+	var bodies []string
+	status := 200
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		b, _ := io.ReadAll(r.Body)
+		mu.Lock()
+		bodies = append(bodies, string(b))
+		code := status
+		mu.Unlock()
+		w.WriteHeader(code)
+	}))
+	defer srv.Close()
+
+	oldHost := hostname
+	hostname = "testhost"
+	defer func() { hostname = oldHost }()
+
+	text := "[webhook \"a\"]\nenable = true\nlevel = warning\nurl = " + srv.URL + "/h\n"
+	text += "[logfile \"l\"]\nenable = true\nlevel = info\nfile = " + filepath.Join(t.TempDir(), "l.log") + "\n"
+	c := cfgFromText(t, text)
+	if c == nil {
+		t.Fatal("config rejected")
+	}
+	var out bytes.Buffer
+	if code := runTestNotify(c, &out); code != 0 {
+		t.Fatalf("exit code %d: %s", code, out.String())
+	}
+	mu.Lock()
+	if len(bodies) != 1 || !strings.Contains(bodies[0], "test notification") || !strings.Contains(bodies[0], "[warning]") {
+		t.Errorf("bodies %q", bodies)
+	}
+	status = 400
+	mu.Unlock()
+
+	out.Reset()
+	if code := runTestNotify(c, &out); code == 0 || !strings.Contains(out.String(), "failed") {
+		t.Errorf("failing webhook: exit code %d, output %q", code, out.String())
+	}
+
+	out.Reset()
+	if code := runTestNotify(&cfgType{}, &out); code != 1 || !strings.Contains(out.String(), "no enabled outputs") {
+		t.Errorf("empty config: exit code %d, output %q", code, out.String())
+	}
+}
+
+func TestTestNotifySeverity(t *testing.T) {
+	c := cfgFromText(t, "[webhook \"a\"]\nenable = true\nlevel = info\nurl = http://h/x\n"+
+		"[webhook \"b\"]\nenable = true\nlevel = err\nurl = http://h/x\n"+
+		"[webhook \"c\"]\nenable = false\nlevel = emerg\nurl = http://h/x\n"+
+		"[email \"m\"]\nenable = true\nlevel = warning\n")
+	if sev, ok := testNotifySeverity(c); !ok || sev != notifier.ERR {
+		t.Errorf("got %v %v, want err", sev, ok)
+	}
+	if _, ok := testNotifySeverity(&cfgType{}); ok {
+		t.Error("severity for empty config")
 	}
 }

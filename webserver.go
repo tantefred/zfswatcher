@@ -148,6 +148,7 @@ func newWebHandler(tlsEnabled bool) http.Handler {
 	mux.HandleFunc(cfg.Www.Rootdir+"/enclosure/", requireRole(RoleViewer, enclosureHandler))
 
 	registerAPI(mux)
+	registerMetrics(mux)
 
 	// Reject cross-origin state changing requests (CSRF) for all paths.
 	// The proxy handling runs first so that everything below sees the
