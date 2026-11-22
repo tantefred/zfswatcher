@@ -1,0 +1,14 @@
+  pool: zfsw_susp
+ state: ONLINE
+status: One or more devices has experienced an error resulting in data
+	corruption.  Applications may be affected.
+action: Restore the file in question if possible.  Otherwise restore the
+	entire pool from backup.
+   see: https://openzfs.github.io/openzfs-docs/msg/ZFS-8000-8A
+config:
+
+	NAME                                STATE     READ WRITE CKSUM
+	zfsw_susp                           ONLINE       0     0     0
+	  /var/tmp/zfsw-collect/i3  ONLINE       0 1.34K     0
+
+errors: 121 data errors, use '-v' for a list

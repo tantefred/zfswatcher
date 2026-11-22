@@ -1,0 +1,16 @@
+  pool: zfsw_inj
+ state: DEGRADED
+status: One or more devices has experienced an unrecoverable error.  An
+	attempt was made to correct the error.  Applications are unaffected.
+action: Determine if the device needs to be replaced, and clear the errors
+	using 'zpool clear' or replace the device with 'zpool replace'.
+   see: https://openzfs.github.io/openzfs-docs/msg/ZFS-8000-9P
+config:
+
+	NAME                                  STATE     READ WRITE CKSUM
+	zfsw_inj                              DEGRADED     0     0     0
+	  mirror-0                            DEGRADED     0     0     0
+	    /var/tmp/zfsw-collect/i1  ONLINE       0     0     0
+	    /var/tmp/zfsw-collect/i2  DEGRADED     0     0     0  too many errors
+
+errors: No known data errors

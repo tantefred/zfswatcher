@@ -2,7 +2,10 @@ package main
 
 import (
 	"strings"
+	"sync"
 	"testing"
+
+	"github.com/tantefred/zfswatcher/notifier"
 )
 
 // Fixtures in test/ named *-vdev-classes, *-spare-resilver etc. were captured
@@ -220,6 +223,106 @@ func TestZpoolIostatParserMultiPool(t *testing.T) {
 	for pool, rows := range map[string]int{"zfsw_draid": 9, "zfsw_rz2": 6, "zfsw_rz3": 7} {
 		if got := len((*table)[pool]); got != rows {
 			t.Errorf("%s: %d rows, want %d", pool, got, rows)
+		}
+	}
+}
+
+// Scenario F (zinject): a device degraded with "too many errors" and a pool
+// with write errors printed with an SI-style suffix ("1.34K").
+func TestParseZpoolStatusInjected(t *testing.T) {
+	pools, err := parseZpoolStatus(readFixture(t, "zpool-status-inject-degrade.txt"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(pools) != 1 {
+		t.Fatalf("got %d pools, want 1", len(pools))
+	}
+	p := pools[0]
+	if p.name != "zfsw_inj" || p.state != "DEGRADED" {
+		t.Errorf("pool %q state %q", p.name, p.state)
+	}
+	if !strings.Contains(p.status, "unrecoverable error") {
+		t.Errorf("status = %q", p.status)
+	}
+	if p.errors != "No known data errors" {
+		t.Errorf("errors = %q", p.errors)
+	}
+	if len(p.devs) != 4 {
+		t.Fatalf("got %d devices, want 4", len(p.devs))
+	}
+	d := p.devs[3]
+	if d.name != "/var/tmp/zfsw-collect/i2" || d.state != "DEGRADED" ||
+		d.rest != "too many errors" || d.read != 0 || d.write != 0 || d.cksum != 0 {
+		t.Errorf("unexpected device %+v", *d)
+	}
+}
+
+func TestParseZpoolStatusDataCorruption(t *testing.T) {
+	pools, err := parseZpoolStatus(readFixture(t, "zpool-status-data-corruption.txt"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(pools) != 1 {
+		t.Fatalf("got %d pools, want 1", len(pools))
+	}
+	p := pools[0]
+	if p.state != "ONLINE" || !strings.Contains(p.status, "error resulting in data") {
+		t.Errorf("state %q status %q", p.state, p.status)
+	}
+	if want := "121 data errors, use '-v' for a list"; p.errors != want {
+		t.Errorf("errors = %q, want %q", p.errors, want)
+	}
+	if len(p.devs) != 2 {
+		t.Fatalf("got %d devices, want 2", len(p.devs))
+	}
+	d := p.devs[1]
+	// 1.34K = 1.34 * 1024 = 1372.16, truncated.
+	if d.read != 0 || d.write != 1372 || d.cksum != 0 || d.state != "ONLINE" || d.rest != "" {
+		t.Errorf("unexpected device %+v", *d)
+	}
+}
+
+// The daemon must report the new errors line and the increased write errors.
+func TestCheckZpoolStatusDataCorruption(t *testing.T) {
+	healthy := strings.Replace(readFixture(t, "zpool-status-data-corruption.txt"), "1.34K", "0", 1)
+	healthy = strings.Replace(healthy, "121 data errors, use '-v' for a list",
+		"No known data errors", 1)
+	oldPools, err := parseZpoolStatus(healthy)
+	if err != nil {
+		t.Fatal(err)
+	}
+	newPools, err := parseZpoolStatus(readFixture(t, "zpool-status-data-corruption.txt"))
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	oldCfg, oldNotify := cfg, notify
+	t.Cleanup(func() { cfg, notify = oldCfg, oldNotify })
+	cfg = &cfgType{}
+	cfg.Severity.Poolerrorschanged = notifier.WARNING
+	cfg.Severity.Devwriteerrorsincreased = notifier.ERR
+	var mu sync.Mutex
+	var msgs []string
+	notify = notifier.New()
+	if err := notify.AddLoggerCallback(notifier.DEBUG, func(m *notifier.Msg) {
+		mu.Lock()
+		defer mu.Unlock()
+		msgs = append(msgs, m.Text)
+	}); err != nil {
+		t.Fatal(err)
+	}
+	checkZpoolStatus(oldPools, newPools)
+	<-notify.Close()
+
+	mu.Lock()
+	defer mu.Unlock()
+	all := strings.Join(msgs, "\n")
+	for _, want := range []string{
+		`new errors: 121 data errors, use '-v' for a list`,
+		`write errors increased: 0 -> 1372`,
+	} {
+		if !strings.Contains(all, want) {
+			t.Errorf("missing notification %q in:\n%s", want, all)
 		}
 	}
 }
