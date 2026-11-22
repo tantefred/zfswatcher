@@ -3,7 +3,7 @@
                            version history
 
 
-version 0.8.0 (unreleased)
+version 0.8.0 released 2026-11-22
 
 Upgrade notes
 
@@ -45,8 +45,8 @@ New features
  - API tokens: new sections [apitoken "name"] with "enable", "hash"
    ("sha256:" and 64 hex digits) and "role". A token is sent as
    "Authorization: Bearer <token>" and is accepted only for paths below
-   "<rootdir>/api/". Password
-   login works for the API as well.
+   "<rootdir>/api/". Password login
+   works for the API as well.
  - "zfswatcher -T" (--generate-token) creates a new API token, prints it
    once and shows the matching "hash = sha256:..." line for the
    configuration.
@@ -67,11 +67,22 @@ Changes
    ("journalctl -u zfswatcher"). The debug level is enabled with -d.
    Messages a human has to act on still go to the configured log files,
    syslog and mail.
+ - A successful reload (SIGHUP, also sent by logrotate after rotating the
+   log files) is logged as "configuration reloaded" at level info. Before,
+   only a debug message "reconfiguring, reopening logs" was written.
 
 Fixes
 
  - zfswatcher no longer starts a background "zpool iostat" process that
    only printed its output to stdout.
+
+Packaging and CI
+
+ - Bootstrap 5.3.9 and htmx 2.0.11 are bundled; jQuery and Bootstrap 3
+   were removed from the source tree (debian/copyright is updated).
+ - The .deb is built with xz compression. The CI runner defaulted to zstd,
+   which lintian rejects.
+ - The CI minimum test coverage was raised to 68 %.
 
 Internal changes
 
