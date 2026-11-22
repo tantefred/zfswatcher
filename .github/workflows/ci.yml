@@ -46,9 +46,9 @@ jobs:
     name: Test (race detector, coverage)
     runs-on: ubuntu-latest
     env:
-      # Minimum total statement coverage in percent (measured 45.6 in Linux CI when set,
+      # Minimum total statement coverage in percent (measured 70.2 in Linux CI when set,
       # minus a 2 point margin, rounded down). Raise it when coverage grows.
-      COVERAGE_MIN: 43
+      COVERAGE_MIN: 68
     steps:
       - uses: actions/checkout@v7
 
