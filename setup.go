@@ -24,6 +24,7 @@ package main
 import (
 	"errors"
 	"fmt"
+	"io"
 	"os"
 	"sort"
 	"strings"
@@ -100,6 +101,14 @@ type cfgType struct {
 		From     string
 		To       string
 		Subject  string
+		Throttle int64
+	}
+	Webhook map[string]*struct {
+		Enable   bool
+		Level    notifier.Severity
+		Url      string
+		Preset   string
+		Token    string
 		Throttle int64
 	}
 	Www struct {
@@ -301,6 +310,22 @@ func checkRefresh(sec int) error {
 	return nil
 }
 
+// checkWebhookCfg validates the enabled [webhook] sections: the URL must be
+// an http or https URL and the preset must be known.
+func checkWebhookCfg(c *cfgType, errorSeen *bool) {
+	for _, name := range sortedKeys(c.Webhook) {
+		w := c.Webhook[name]
+		if !w.Enable {
+			continue
+		}
+		_, err := notifier.ValidateWebhook(w.Url, w.Preset)
+		checkCfgErr(cfgFile, "webhook", name, "", err, errorSeen)
+		if w.Throttle < 0 {
+			checkCfgErr(cfgFile, "webhook", name, "throttle", errors.New("must not be negative"), errorSeen)
+		}
+	}
+}
+
 // checkAuthCfg validates the roles of the web users and the roles and hashes
 // of the API tokens.
 func checkAuthCfg(c *cfgType, errorSeen *bool) {
@@ -367,6 +392,7 @@ func getCfg() *cfgType {
 	checkCfgErr(cfgFile, "main", "", "commandtimeout", checkCommandTimeout(c.Main.Commandtimeout), &errorSeen)
 	checkCfgErr(cfgFile, "www", "", "refresh", checkWwwRefresh(c.Www.Refresh), &errorSeen)
 	checkAuthCfg(&c, &errorSeen)
+	checkWebhookCfg(&c, &errorSeen)
 	translateLegacyCSSClasses(&c)
 
 	if errorSeen {
@@ -377,7 +403,16 @@ func getCfg() *cfgType {
 
 // Setup logging.
 func setupLog(c *cfgType) *notifier.Notifier {
+	n, _, _ := setupOutputs(c)
+	return n
+}
+
+// setupOutputs creates the notifier with all enabled outputs. It also
+// returns the webhook outputs (to look at their delivery errors) and
+// whether an output could not be set up.
+func setupOutputs(c *cfgType) (*notifier.Notifier, []*notifier.WebhookOutput, bool) {
 	var errorSeen bool
+	var hooks []*notifier.WebhookOutput
 
 	n := notifier.New()
 	if optDebug {
@@ -404,11 +439,54 @@ func setupLog(c *cfgType) *notifier.Notifier {
 			checkCfgErr(cfgFile, "email", prof, "", err, &errorSeen)
 		}
 	}
+	for _, prof := range sortedKeys(c.Webhook) {
+		s := c.Webhook[prof]
+		if s.Enable {
+			o, err := n.AddLoggerWebhook(s.Level, s.Url, s.Preset, s.Token,
+				time.Second*time.Duration(s.Throttle))
+			checkCfgErr(cfgFile, "webhook", prof, "", err, &errorSeen)
+			if o != nil {
+				hooks = append(hooks, o)
+			}
+		}
+	}
 	if c.Www.Enable && c.Www.Logbuffer > 0 {
 		err := n.AddLoggerCallback(c.Www.Level, wwwLogReceiver)
 		checkCfgErr(cfgFile, "www", "", "", err, &errorSeen)
 	}
-	return n
+	return n, hooks, errorSeen
+}
+
+// testNotifyWait is how long --test-notify waits for the deliveries.
+var testNotifyWait = 60 * time.Second
+
+// runTestNotify sends one test message to all enabled outputs (the normal
+// daemon does not start) and returns the exit code: 0 if all webhooks
+// accepted the message, 1 if a webhook delivery or output setup failed.
+// The message has severity "emerg", which passes every level filter, so
+// each configured channel is really tested. Other channels (mail, syslog,
+// log file) are best effort: failures only show in the diagnostics on stderr.
+func runTestNotify(c *cfgType, out io.Writer) int {
+	n, hooks, failed := setupOutputs(c)
+	n.Printf(notifier.EMERG, "zfswatcher test notification from %s (sent by --test-notify)", hostname)
+	n.Flush()
+	select {
+	case <-n.Close():
+	case <-time.After(testNotifyWait):
+		_, _ = fmt.Fprintln(out, "timeout waiting for the notification outputs")
+		failed = true
+	}
+	for _, h := range hooks {
+		if err := h.LastError(); err != nil {
+			_, _ = fmt.Fprintf(out, "webhook delivery failed: %s\n", err)
+			failed = true
+		}
+	}
+	if failed {
+		return 1
+	}
+	_, _ = fmt.Fprintf(out, "test notification sent (%d webhook(s) delivered)\n", len(hooks))
+	return 0
 }
 
 // Initial setup when the program starts.
@@ -423,6 +501,7 @@ func setup() {
 	pflag.BoolVarP(&optDebug, "debug", "d", false, "debug mode: messages also to stdout, diagnostics at debug level to stderr")
 	optHashPassword := pflag.BoolP("passwordhash", "P", false, "read a password and print its bcrypt hash")
 	optGenerateToken := pflag.BoolP("generate-token", "T", false, "generate an API token and print it with its hash")
+	optTestNotify := pflag.Bool("test-notify", false, "send a test notification to all enabled outputs and exit")
 	optTest := pflag.BoolP("test", "t", false, "test configuration and exit")
 	optVersion := pflag.BoolP("version", "v", false, "print version information and exit")
 
@@ -458,6 +537,9 @@ func setup() {
 	}
 	// Applied at startup only: running goroutines read the value.
 	commandTimeout = time.Duration(cfg.Main.Commandtimeout) * time.Second
+	if *optTestNotify {
+		os.Exit(runTestNotify(cfg, os.Stderr))
+	}
 	notify = setupLog(cfg)
 	warnObsoleteOptions(cfg)
 
