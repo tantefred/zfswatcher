@@ -320,7 +320,9 @@ func main() {
 		defer setupPidFile(cfg.Main.Pidfile)()
 	}
 
-	notify.Print(notifier.INFO, "zfswatcher starting")
+	// the first message of this run; configuration warnings follow it
+	notify.Printf(notifier.INFO, "zfswatcher %s starting", buildVersion)
+	warnObsoleteOptions(cfg)
 
 	var statusTicker, zfslistTicker *time.Ticker
 	var webSrv *http.Server
@@ -355,6 +357,9 @@ func main() {
 	// during the downtime are reported (and nothing else):
 	persister = newStatePersister(cfg.Main.Statefile)
 	if prev := persister.loadPrevious(); prev != nil {
+		if cfg.Www.Enable {
+			restoreEvents(prev.Events, cfg.Www.Logbuffer)
+		}
 		checkZpoolStatus(prev.poolTypes(), currentState.state)
 		checkZfsUsage(prev.usageTypes(), currentState.usage)
 	}
@@ -446,8 +451,6 @@ EXIT:
 		}
 	}
 
-	// XXX persist data?
-
 	// ask logger to stop:
 	notifyCloseC := notify.Close()
 
@@ -460,6 +463,10 @@ EXIT:
 	case <-time.After(time.Second * 10):
 		slog.Debug("exiting now", "reason", "timer elapsed")
 	}
+
+	// save the last state and the events including "stopping", which only
+	// reached the buffer now
+	persister.update(currentState.state, currentState.usage)
 }
 
 // eof

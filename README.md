@@ -168,6 +168,9 @@ Some notes:
   example a pool which became DEGRADED while the daemon was down. A missing,
   unreadable or incompatible file is logged and everything is reported as new,
   as before. Write errors are logged once and do not stop the daemon.
+  The file also keeps the last `logbuffer` messages of the logs page, so the
+  history survives restarts; they are written after a check when new messages
+  appeared and at shutdown.
 
 - Logging to file `/var/log/zfswatcher/zfswatcher.log` and local syslog
   daemon is enabled by default.

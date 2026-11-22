@@ -231,6 +231,24 @@ func eventsAppend(buf []Event, m *notifier.Msg, limit int) []Event {
 	return buf
 }
 
+// restoreEvents puts events saved by a previous run in front of the event
+// buffer (they are older than everything logged since the start), keeping at
+// most limit entries. Nothing is sent to the notifier channels.
+func restoreEvents(saved []Event, limit int) {
+	if limit <= 0 || len(saved) == 0 {
+		return
+	}
+	wwwLogMutex.Lock()
+	defer wwwLogMutex.Unlock()
+	buf := make([]Event, 0, limit+1)
+	buf = append(buf, saved...)
+	buf = append(buf, wwwLogBuffer...)
+	if len(buf) > limit {
+		buf = buf[len(buf)-limit:]
+	}
+	wwwLogBuffer = buf
+}
+
 // severityFromName is the inverse of notifier.Severity.String().
 func severityFromName(name string) (notifier.Severity, bool) {
 	var s notifier.Severity

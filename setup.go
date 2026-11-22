@@ -579,9 +579,9 @@ func setup() {
 		os.Exit(runTestNotify(cfg, os.Stderr))
 	}
 	notify = setupLog(cfg)
-	warnObsoleteOptions(cfg)
 
 	if *optTest {
+		warnObsoleteOptions(cfg)
 		notifyCloseC := notify.Close()
 		select { // wait max 1 second for loggers to finish
 		case <-notifyCloseC:
