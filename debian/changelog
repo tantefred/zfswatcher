@@ -1,3 +1,26 @@
+zfswatcher (0.7.0-1) unstable; urgency=medium
+
+  * Save the pool state to a state file (default
+    /var/lib/zfswatcher/state.json, created via StateDirectory=) and report
+    only the changes since the last run after a restart.
+  * Add a health check at <rootdir>/healthz which needs no login, for
+    monitoring tools.
+  * Add the option "commandtimeout" for hanging zpool and zfs commands.
+  * Add the option "trustedproxies" for X-Forwarded-For and
+    X-Forwarded-Proto behind a reverse proxy; log failed web logins as
+    warnings with the client address. Document nginx ($http_host) and Caddy
+    setups in the README.
+  * Shut down the web server gracefully on SIGTERM and SIGINT.
+  * Fix parser bugs: a pool without determinable configuration showed a
+    bogus device "The"; the iostat stream reader lost entries arriving in a
+    single read; a malformed iostat read crashed the daemon.
+  * Remove etc/gccgo-build.sh, point the homepage and the RPM spec to the
+    maintained fork and relax the Go version check in the RPM spec.
+  * Add parser tests with real output of degraded pools and data corruption
+    (scenario F).
+
+ -- tantefred <147740857+tantefred@users.noreply.github.com>  Sun, 22 Nov 2026 14:00:00 +0100
+
 zfswatcher (0.6.0-1) unstable; urgency=medium
 
   * Harden the web interface: server timeouts and header size limit,
