@@ -107,7 +107,9 @@ header for
 .B loginlockout
 seconds (default 60), without checking any credentials. A successful login
 does not reset the counter (failures only expire with the window), IPv6
-clients are counted per /64 prefix, and
+clients are counted per /64 prefix, unknown clients are checked at a limited
+rate (5 per second) if the table of 10000 tracked clients is full of locked
+out ones, and
 .B /healthz
 is not affected. Successful credential checks are cached in memory for
 5 minutes (a keyed hash, not the credentials) and forgotten on reload. One message per lockout is sent with the severity

@@ -37,6 +37,11 @@ const (
 
 	// maxLoginEntries bounds the memory used for the per-client counters.
 	maxLoginEntries = 10000
+
+	// Checks of clients which cannot be tracked (table full of locked
+	// clients) share one token bucket: this many per second, in bursts.
+	untrackedRate  = 5
+	untrackedBurst = 10
 )
 
 // checkLoginBackoff validates the three login backoff settings.
@@ -83,7 +88,9 @@ type loginGuard struct {
 	now        func() time.Time
 	maxEntries int
 	entries    map[string]*loginEntry
-	overflow   bool // the table is full of locked clients, reported once
+	overflow   bool      // the table is full of locked clients, reported once
+	tokens     float64   // bucket for checks of untracked clients
+	bucketAt   time.Time // last refill
 }
 
 func newLoginGuard() *loginGuard {
@@ -121,9 +128,8 @@ type loginVerdict int
 
 const (
 	loginAllow     loginVerdict = iota
-	loginDeny                   // locked out or no attempts left
-	loginOverflow               // table full of locked clients, unknown client refused
-	loginOverflow1              // like loginOverflow, first time (to be reported)
+	loginDeny                   // locked out, no attempts left or untracked rate limit hit
+	loginUntracked              // table full of locked clients: checked, but not tracked
 )
 
 // lockedFor reports whether the client is locked out and for how many more
@@ -145,7 +151,11 @@ func (g *loginGuard) lockedFor(ip string) (int, bool) {
 
 // begin reserves an attempt slot for the client. With loginAllow the caller
 // must call end exactly once. Otherwise it returns the seconds to wait.
-func (g *loginGuard) begin(ip string, failures int, window time.Duration) (key string, v loginVerdict, retry int) {
+// If the table is full of locked clients, an unknown client is not
+// tracked (loginUntracked, no end call, key empty) but limited by a global
+// token bucket (loginDeny when it is empty); first is true the first time
+// this happens, to be reported once.
+func (g *loginGuard) begin(ip string, failures int, window time.Duration) (key string, v loginVerdict, retry int, first bool) {
 	key = loginKey(ip)
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -161,23 +171,40 @@ func (g *loginGuard) begin(ip string, failures int, window time.Duration) (key s
 	}
 	if !ok {
 		if !g.makeRoom(now, window) {
-			if g.overflow {
-				return key, loginOverflow, ceilSeconds(window)
-			}
+			first = !g.overflow
 			g.overflow = true
-			return key, loginOverflow1, ceilSeconds(window)
+			if !g.takeUntracked(now) {
+				return key, loginDeny, 1, first
+			}
+			return "", loginUntracked, 0, first
 		}
 		e = &loginEntry{start: now}
 		g.entries[key] = e
 	}
 	if e.locked() {
-		return key, loginDeny, ceilSeconds(e.lockedUntil.Sub(now))
+		return key, loginDeny, ceilSeconds(e.lockedUntil.Sub(now)), false
 	}
 	if e.count+e.pending >= failures {
-		return key, loginDeny, ceilSeconds(e.start.Add(window).Sub(now))
+		return key, loginDeny, ceilSeconds(e.start.Add(window).Sub(now)), false
 	}
 	e.pending++
-	return key, loginAllow, 0
+	return key, loginAllow, 0, false
+}
+
+// takeUntracked takes a token of the bucket for checks of untracked
+// clients.
+func (g *loginGuard) takeUntracked(now time.Time) bool {
+	if g.bucketAt.IsZero() {
+		g.tokens = untrackedBurst
+	} else if d := now.Sub(g.bucketAt).Seconds(); d > 0 {
+		g.tokens = min(untrackedBurst, g.tokens+d*untrackedRate)
+	}
+	g.bucketAt = now
+	if g.tokens < 1 {
+		return false
+	}
+	g.tokens--
+	return true
 }
 
 func ceilSeconds(d time.Duration) int {

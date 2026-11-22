@@ -184,7 +184,7 @@ func guardWithClock(max int) (*loginGuard, *fakeClock) {
 
 // attempt runs one failed login through the guard.
 func attempt(g *loginGuard, ip string, failed bool) (loginVerdict, bool) {
-	key, v, _ := g.begin(ip, 5, time.Minute)
+	key, v, _, _ := g.begin(ip, 5, time.Minute)
 	if v != loginAllow {
 		return v, false
 	}
@@ -212,33 +212,50 @@ func TestLoginGuardLockedEntriesSurvive(t *testing.T) {
 	for i := 0; i < 5; i++ { // lock out one client
 		attempt(g, "192.0.2.1", true)
 	}
-	if _, _, secs := g.begin("192.0.2.1", 5, time.Minute); secs != 60 {
+	if _, _, secs, _ := g.begin("192.0.2.1", 5, time.Minute); secs != 60 {
 		t.Fatalf("not locked: %d", secs)
 	}
 	for i := 0; i < 100; i++ { // flood with single failures from other clients
 		attempt(g, "10.0.0."+strconv.Itoa(i), true)
 		clk.advance(time.Millisecond)
 	}
-	if _, v, _ := g.begin("192.0.2.1", 5, time.Minute); v != loginDeny {
+	if _, v, _, _ := g.begin("192.0.2.1", 5, time.Minute); v != loginDeny {
 		t.Errorf("locked client was evicted: %v", v)
 	}
 }
 
-func TestLoginGuardOverflowEmergency(t *testing.T) {
+func TestLoginGuardOverflowRateLimit(t *testing.T) {
 	g, clk := guardWithClock(3)
 	for i := 0; i < 3; i++ {
 		for j := 0; j < 5; j++ {
 			attempt(g, "10.0.0."+strconv.Itoa(i), true)
 		}
 	}
-	if v, _ := attempt(g, "10.9.9.9", false); v != loginOverflow1 {
-		t.Errorf("first refusal: %v", v)
+	// unknown clients are checked untracked, up to the burst
+	_, v, _, first := g.begin("10.9.9.9", 5, time.Minute)
+	if v != loginUntracked || !first {
+		t.Fatalf("first: %v, first %v", v, first)
 	}
-	if v, _ := attempt(g, "10.9.9.8", false); v != loginOverflow {
-		t.Errorf("second refusal: %v", v)
+	for i := 1; i < untrackedBurst; i++ {
+		if _, v, _, first := g.begin("10.9.9."+strconv.Itoa(i), 5, time.Minute); v != loginUntracked || first {
+			t.Fatalf("request %d: %v, first %v", i, v, first)
+		}
+	}
+	if _, v, secs, _ := g.begin("10.9.9.100", 5, time.Minute); v != loginDeny || secs != 1 {
+		t.Errorf("bucket empty: %v, %d", v, secs)
+	}
+	clk.advance(time.Second) // refills untrackedRate tokens
+	n := 0
+	for i := 0; i < 20; i++ {
+		if _, v, _, _ := g.begin("10.9.8."+strconv.Itoa(i), 5, time.Minute); v == loginUntracked {
+			n++
+		}
+	}
+	if n != untrackedRate {
+		t.Errorf("%d checks after one second, want %d", n, untrackedRate)
 	}
 	// known locked client is still reported as locked
-	if _, v, _ := g.begin("10.0.0.0", 5, time.Minute); v != loginDeny {
+	if _, v, _, _ := g.begin("10.0.0.0", 5, time.Minute); v != loginDeny {
 		t.Errorf("known client: %v", v)
 	}
 	clk.advance(2 * time.Minute) // lockouts expired: normal again
@@ -265,21 +282,36 @@ func TestLoginKeyIPv6Prefix(t *testing.T) {
 	}
 }
 
-func TestLoginOverflowNotifiesOnce(t *testing.T) {
-	_, _, h := backoffSetup(t)
+func TestLoginOverflowUntrackedPasses(t *testing.T) {
+	_, _, h := cacheSetup(t)
 	webLoginGuard.maxEntries = 2
 	cfg.Www.Loginfailures = 1
 	msgs := captureNotify(t)
 	loginReq(h, "192.0.2.1", "bad")
 	loginReq(h, "192.0.2.2", "bad")
-	for i := 0; i < 3; i++ {
-		if w := loginReq(h, "192.0.2.3", "good"); w.Code != 429 {
-			t.Fatalf("got %d", w.Code)
+	// full table: an unknown client with a valid password gets in, once
+	// cached it does not touch the bucket at all
+	if w := loginReq(h, "192.0.2.3", "good"); w.Code != 200 {
+		t.Fatalf("got %d", w.Code)
+	}
+	for i := 0; i < 50; i++ {
+		if w := loginReq(h, "192.0.2.3", "good"); w.Code != 200 {
+			t.Fatalf("cached request %d: %d", i, w.Code)
 		}
+	}
+	// bad passwords of untracked clients are limited by the bucket
+	limited := 0
+	for i := 0; i < 30; i++ {
+		if w := loginReq(h, "198.51.100."+strconv.Itoa(i), "bad"); w.Code == 429 {
+			limited++
+		}
+	}
+	if limited == 0 {
+		t.Error("bucket never limited")
 	}
 	n := 0
 	for _, m := range msgs() {
-		if strings.Contains(m, "too many clients") {
+		if strings.Contains(m, "table full") {
 			n++
 		}
 	}
@@ -296,7 +328,7 @@ func TestLoginGuardConcurrent(t *testing.T) {
 		wg.Add(1)
 		go func() {
 			defer wg.Done()
-			key, v, _ := g.begin("192.0.2.1", 5, time.Minute)
+			key, v, _, _ := g.begin("192.0.2.1", 5, time.Minute)
 			if v != loginAllow {
 				return
 			}

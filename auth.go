@@ -337,6 +337,9 @@ func loginWindow() time.Duration { return time.Duration(cfg.Www.Loginwindow) * t
 // recordLoginResult releases the attempt slot and counts a failed login. It
 // reports the lockout, once per lockout.
 func recordLoginResult(key, ip string, failed bool) {
+	if key == "" {
+		return // untracked client
+	}
 	lockout := time.Duration(cfg.Www.Loginlockout) * time.Second
 	if webLoginGuard.end(key, failed, cfg.Www.Loginfailures, loginWindow(), lockout) && notify != nil {
 		notify.Printf(cfg.Severity.Loginlockout,
@@ -373,12 +376,13 @@ func requireRoleWith(a Authenticator, render errorRenderer, min Role, h http.Han
 				// parallel requests cannot exceed the limit.
 				var v loginVerdict
 				var secs int
-				key, v, secs = webLoginGuard.begin(ip, failures, loginWindow())
-				if v != loginAllow {
-					if v == loginOverflow1 && notify != nil {
-						notify.Printf(cfg.Severity.Loginlockout,
-							"web login: too many clients are locked out, refusing all unknown clients until some lockouts expire")
-					}
+				var first bool
+				key, v, secs, first = webLoginGuard.begin(ip, failures, loginWindow())
+				if first && notify != nil {
+					notify.Printf(cfg.Severity.Loginlockout,
+						"web login: login backoff table full, untracked clients are rate limited")
+				}
+				if v == loginDeny {
 					tooManyRequests(w, r, render, secs)
 					return
 				}
