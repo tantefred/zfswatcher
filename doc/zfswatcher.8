@@ -91,6 +91,37 @@ is 10,
 switches the refresh off. The pages work without JavaScript, they just do
 not update. Any other value is a configuration error.
 .TP
+.BR loginfailures ", " loginwindow ", " loginlockout
+In section
+.BR [www] :
+protection against password guessing. After
+.B loginfailures
+failed logins (wrong password, unknown user or invalid API token; default 5)
+from one client address within
+.B loginwindow
+seconds (default 60) the address is answered with
+.B 429 Too Many Requests
+and a
+.B Retry-After
+header for
+.B loginlockout
+seconds (default 60), without checking any credentials. A successful login
+resets the counter,
+.B /healthz
+is not affected. One message per lockout is sent with the severity
+.B loginlockout
+of the
+.B [severity]
+section (default warning). 0 for
+.B loginfailures
+switches the protection off. The window and lockout must be 1 to 86400
+seconds. Behind a reverse proxy set
+.B trustedproxies
+in
+.BR [www] ,
+otherwise all clients have the address of the proxy and one attacker locks
+everybody out.
+.TP
 .BR severitycssclassmap ", " poolstatecssclassmap ", " devstatecssclassmap ", " usedstatecssclassmap
 In section
 .BR [www] :

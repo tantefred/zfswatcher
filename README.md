@@ -317,6 +317,15 @@ bind = 127.0.0.1:8081
 trustedproxies = 127.0.0.1 ::1
 ```
 
+Failed logins are counted per client address. After `loginfailures` failures
+(default 5) within `loginwindow` seconds (default 60) the address gets
+`429 Too Many Requests` with a `Retry-After` header for `loginlockout` seconds
+(default 60), without any password or token check, and one message with the
+severity `[severity] loginlockout` (default warning) is sent. `loginfailures = 0`
+switches this off. **Behind a reverse proxy `trustedproxies` must be set**:
+otherwise every request comes from the address of the proxy, and one attacker
+locks out all users.
+
 ## Support
 
 If you encounter a bug, please open an issue at the GitHub issue tracker:

@@ -3,6 +3,21 @@
                            version history
 
 
+version 0.9.0 (unreleased)
+
+Upgrade notes
+
+ - Failed web logins are now limited per client address (new options
+   "loginfailures", "loginwindow" and "loginlockout" in [www], defaults 5
+   failures within 60 seconds, lockout 60 seconds). A locked out client gets
+   "429 Too Many Requests" with a Retry-After header, without any password
+   or token check, and one message with the severity of the new option
+   "loginlockout" in [severity] (default warning) is sent. A successful login
+   resets the counter, "loginfailures = 0" switches the limit off. Behind a
+   reverse proxy set "trustedproxies" in [www], otherwise all clients share
+   the address of the proxy and one attacker locks out everybody.
+
+
 version 0.8.0 released 2026-11-22
 
 Upgrade notes
