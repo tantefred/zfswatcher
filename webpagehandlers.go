@@ -24,6 +24,7 @@ package main
 import (
 	"fmt"
 	"html/template"
+	"log/slog"
 	"net/http"
 	"net/url"
 	"regexp"
@@ -247,7 +248,7 @@ func makePoolStatusWeb(pool *PoolType, usage map[string]*PoolUsageType) *poolSta
 		if cfg.Leds.Enable && len(dev.subDevs) == 0 {
 			loc, err := locateQuery(dev.name)
 			if err == nil {
-				fmt.Printf("Locate query %s success\n", dev.name)
+				slog.Debug("locate query succeeded", "device", dev.name)
 				devw.EnableLed = true
 				devw.Locate = loc
 			}
