@@ -1,12 +1,6 @@
 # Built with CGO_ENABLED=0 on purpose: a cgo build crashed with "Illegal
 # instruction" on CPUs without AVX.
 zfswatcher: statically-linked-binary [usr/sbin/zfswatcher]
-# The web assets are bundled in the exact versions the templates and the
-# Content-Security-Policy are tested with (Bootstrap 5 including Popper, and
-# htmx). Debian has libjs-bootstrap5, but it is not guaranteed to be the same
-# version as the one the pages are tested with and the daemon must keep
-# working when it is installed alone (also on Proxmox).
-zfswatcher: embedded-javascript-library * [usr/share/zfswatcher/www/resources/bootstrap/js/bootstrap.bundle.min.js]
 # The licenses must stay next to the bundled Bootstrap and htmx files.
 zfswatcher: extra-license-file [usr/share/zfswatcher/www/resources/bootstrap/LICENSE]
 zfswatcher: extra-license-file [usr/share/zfswatcher/www/resources/htmx/LICENSE]
