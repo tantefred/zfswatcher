@@ -33,6 +33,7 @@ import (
 	"net/smtp"
 	"os"
 	"strings"
+	"sync"
 	"time"
 )
 
@@ -139,8 +140,8 @@ func localHostname() string {
 	return "localhost"
 }
 
-func (n *Notifier) sendEmailSMTP(server, username, password, from, to, subject, text string) {
-	defer n.wg.Done()
+func (o *SMTPOutput) sendEmailSMTP(server, username, password, from, to, subject, text string) {
+	defer o.wg.Done()
 
 	msg, err := buildEmailMessage(from, to, subject, text, time.Now())
 	if err != nil {
@@ -174,8 +175,31 @@ func makeEmailText(mbuf, abuf []string) (text string) {
 	return text
 }
 
-func (n *Notifier) loggerEmailSMTP(ch chan *Msg, server, username, password, from, to, subject string, throttle time.Duration) {
-	defer n.wg.Done()
+// SMTPOutput collects messages and sends them as one e-mail on
+// MSGTYPE_FLUSH (and when the output is closed), optionally throttled.
+type SMTPOutput struct {
+	acceptTypes
+	server, username, password string
+	from, to, subject          string
+	throttle                   time.Duration
+	wg                         sync.WaitGroup // pending mail deliveries
+}
+
+// NewSMTPOutput returns an Output which sends e-mail through the SMTP
+// server "host:port", with PLAIN authentication if username is not empty.
+func NewSMTPOutput(server, username, password, from, to, subject string, throttle time.Duration) *SMTPOutput {
+	return &SMTPOutput{
+		acceptTypes: acceptTypes{attachment: true, flush: true},
+		server:      server, username: username, password: password,
+		from: from, to: to, subject: subject, throttle: throttle,
+	}
+}
+
+// Run implements Output. It returns after all mails have been delivered.
+func (o *SMTPOutput) Run(ch <-chan *Msg) {
+	defer o.wg.Wait()
+	server, username, password := o.server, o.username, o.password
+	from, to, subject, throttle := o.from, o.to, o.subject, o.throttle
 	var mbuf []string
 	var abuf []string
 	var lastFlush time.Time
@@ -235,8 +259,8 @@ func (n *Notifier) loggerEmailSMTP(ch chan *Msg, server, username, password, fro
 				throttleTimer.Stop()
 				throttleTimer = nil
 			}
-			n.wg.Add(1)
-			go n.sendEmailSMTP(server, username, password, from, to, sevsubject, text)
+			o.wg.Add(1)
+			go o.sendEmailSMTP(server, username, password, from, to, sevsubject, text)
 		}
 	}
 	// exiting
@@ -246,8 +270,8 @@ func (n *Notifier) loggerEmailSMTP(ch chan *Msg, server, username, password, fro
 	// send the last entries:
 	if text := makeEmailText(mbuf, abuf); text != "" {
 		sevsubject := subject + " [" + hostname + "] [" + severityTrack.String() + "]"
-		n.wg.Add(1)
-		go n.sendEmailSMTP(server, username, password, from, to, sevsubject, text)
+		o.wg.Add(1)
+		go o.sendEmailSMTP(server, username, password, from, to, sevsubject, text)
 	}
 }
 
@@ -266,11 +290,7 @@ func (n *Notifier) AddLoggerEmailSMTP(s Severity, server, user, pass, from, to, 
 	case subject == "":
 		return errors.New(`"subject" not defined`)
 	}
-	ch := make(chan *Msg, chan_SIZE)
-	n.wg.Add(1)
-	go n.loggerEmailSMTP(ch, server, user, pass, from, to, subject, throttle)
-	n.out = append(n.out, notifyOutput{severity: s, ch: ch, attachment: true, flush: true})
-	return nil
+	return n.AddOutput(s, NewSMTPOutput(server, user, pass, from, to, subject, throttle))
 }
 
 // eof

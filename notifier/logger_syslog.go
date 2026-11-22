@@ -59,8 +59,22 @@ func connectSyslog(address string) (net.Conn, bool, error) {
 	return c, sep, err
 }
 
-func (n *Notifier) loggerSyslog(ch chan *Msg, address string, facility SyslogFacility) {
-	defer n.wg.Done()
+// SyslogOutput sends messages to a BSD syslog server (UDP or Unix socket).
+// Attachments are not sent.
+type SyslogOutput struct {
+	acceptTypes
+	address  string
+	facility SyslogFacility
+}
+
+// NewSyslogOutput returns an Output which logs to the syslog at address.
+func NewSyslogOutput(address string, facility SyslogFacility) *SyslogOutput {
+	return &SyslogOutput{address: address, facility: facility}
+}
+
+// Run implements Output.
+func (o *SyslogOutput) Run(ch <-chan *Msg) {
+	address, facility := o.address, o.facility
 	tag := fmt.Sprintf("%s[%d]", path.Base(os.Args[0]), os.Getpid())
 
 	var c net.Conn
@@ -130,11 +144,7 @@ func (n *Notifier) AddLoggerSyslog(s Severity, address string, facility SyslogFa
 	case facility < syslog_FACILITY_MIN || facility > syslog_FACILITY_MAX:
 		return errors.New(`invalid "facility"`)
 	}
-	ch := make(chan *Msg, chan_SIZE)
-	n.wg.Add(1)
-	go n.loggerSyslog(ch, address, facility)
-	n.out = append(n.out, notifyOutput{severity: s, ch: ch})
-	return nil
+	return n.AddOutput(s, NewSyslogOutput(address, facility))
 }
 
 // eof
