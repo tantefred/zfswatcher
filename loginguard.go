@@ -122,7 +122,7 @@ type loginVerdict int
 
 const (
 	loginAllow loginVerdict = iota
-	loginDeny               // locked out, no attempts left or untracked rate limit hit
+	loginDeny               // locked out, no attempts left
 )
 
 // lockedFor reports whether the client is locked out and for how many more

@@ -385,7 +385,7 @@ func requireRoleWith(a Authenticator, render errorRenderer, min Role, h http.Han
 				key, v, secs, first = webLoginGuard.begin(ip, failures, loginWindow())
 				if first && notify != nil {
 					notify.Printf(cfg.Severity.Loginlockout,
-						"web login: login backoff table full, untracked clients are rate limited")
+						"web login: login backoff table full, unknown clients now share one failure counter")
 				}
 				if v == loginDeny {
 					tooManyRequests(w, r, render, secs)
