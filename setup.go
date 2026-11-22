@@ -114,6 +114,7 @@ type cfgType struct {
 		Resourcedir          string
 		Rootdir              string
 		Trustedproxies       string
+		Metrics              bool
 		Severitycssclassmap  severityToWwwClassMap
 		Poolstatecssclassmap stringToStringMap
 		Devstatecssclassmap  stringToStringMap
