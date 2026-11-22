@@ -224,43 +224,46 @@ func TestLoginGuardLockedEntriesSurvive(t *testing.T) {
 	}
 }
 
-func TestLoginGuardOverflowRateLimit(t *testing.T) {
+func TestLoginGuardOverflowSharedEntry(t *testing.T) {
 	g, clk := guardWithClock(3)
 	for i := 0; i < 3; i++ {
 		for j := 0; j < 5; j++ {
 			attempt(g, "10.0.0."+strconv.Itoa(i), true)
 		}
 	}
-	// unknown clients are checked untracked, up to the burst
-	_, v, _, first := g.begin("10.9.9.9", 5, time.Minute)
-	if v != loginUntracked || !first {
-		t.Fatalf("first: %v, first %v", v, first)
+	// unknown clients are checked, sharing one entry outside the table
+	key, v, _, first := g.begin("10.9.9.9", 5, time.Minute)
+	if v != loginAllow || key != sharedLoginKey || !first {
+		t.Fatalf("first: %v %q first %v", v, key, first)
 	}
-	for i := 1; i < untrackedBurst; i++ {
-		if _, v, _, first := g.begin("10.9.9."+strconv.Itoa(i), 5, time.Minute); v != loginUntracked || first {
-			t.Fatalf("request %d: %v, first %v", i, v, first)
+	g.end(key, false, 5, time.Minute, time.Minute)
+	if g.size() != 3 {
+		t.Errorf("table size %d, the shared entry must not count", g.size())
+	}
+	// failures of different unknown clients add up and lock all of them
+	locked := 0
+	for i := 0; i < 5; i++ {
+		_, l := attempt(g, "10.9.8."+strconv.Itoa(i), true)
+		if l {
+			locked++
 		}
 	}
-	if _, v, secs, _ := g.begin("10.9.9.100", 5, time.Minute); v != loginDeny || secs != 1 {
-		t.Errorf("bucket empty: %v, %d", v, secs)
+	if locked != 1 {
+		t.Errorf("%d lockouts, want 1", locked)
 	}
-	clk.advance(time.Second) // refills untrackedRate tokens
-	n := 0
-	for i := 0; i < 20; i++ {
-		if _, v, _, _ := g.begin("10.9.8."+strconv.Itoa(i), 5, time.Minute); v == loginUntracked {
-			n++
-		}
+	if _, v, secs, first := g.begin("10.9.7.1", 5, time.Minute); v != loginDeny || secs != 60 || first {
+		t.Errorf("shared entry locked: %v, %d, first %v", v, secs, first)
 	}
-	if n != untrackedRate {
-		t.Errorf("%d checks after one second, want %d", n, untrackedRate)
+	// known locked clients stay locked and nothing was evicted
+	if _, v, _, _ := g.begin("10.0.0.0", 5, time.Minute); v != loginDeny || g.size() != 3 {
+		t.Errorf("known client: %v, size %d", v, g.size())
 	}
-	// known locked client is still reported as locked
-	if _, v, _, _ := g.begin("10.0.0.0", 5, time.Minute); v != loginDeny {
-		t.Errorf("known client: %v", v)
-	}
-	clk.advance(2 * time.Minute) // lockouts expired: normal again
+	clk.advance(2 * time.Minute) // everything expired: normal again
 	if v, _ := attempt(g, "10.9.9.9", false); v != loginAllow {
 		t.Errorf("after expiry: %v", v)
+	}
+	if k, _, _, _ := g.begin("10.9.9.10", 5, time.Minute); k == sharedLoginKey {
+		t.Error("still using the shared entry although there is room")
 	}
 }
 
@@ -282,41 +285,48 @@ func TestLoginKeyIPv6Prefix(t *testing.T) {
 	}
 }
 
-func TestLoginOverflowUntrackedPasses(t *testing.T) {
+func TestLoginOverflowSharedEntryHTTP(t *testing.T) {
 	_, _, h := cacheSetup(t)
 	webLoginGuard.maxEntries = 2
-	cfg.Www.Loginfailures = 1
+	cfg.Www.Loginfailures = 3
 	msgs := captureNotify(t)
-	loginReq(h, "192.0.2.1", "bad")
-	loginReq(h, "192.0.2.2", "bad")
-	// full table: an unknown client with a valid password gets in, once
-	// cached it does not touch the bucket at all
+	for _, ip := range []string{"192.0.2.1", "192.0.2.2"} { // fill the table with locked clients
+		for i := 0; i < 3; i++ {
+			loginReq(h, ip, "bad")
+		}
+	}
+	// a valid unknown client gets in and is cached
 	if w := loginReq(h, "192.0.2.3", "good"); w.Code != 200 {
 		t.Fatalf("got %d", w.Code)
 	}
-	for i := 0; i < 50; i++ {
-		if w := loginReq(h, "192.0.2.3", "good"); w.Code != 200 {
-			t.Fatalf("cached request %d: %d", i, w.Code)
+	// failures of unknown clients lock out all unknown clients
+	for i := 0; i < 3; i++ {
+		if w := loginReq(h, "198.51.100."+strconv.Itoa(i), "bad"); w.Code != 401 {
+			t.Fatalf("failure %d: %d", i, w.Code)
 		}
 	}
-	// bad passwords of untracked clients are limited by the bucket
-	limited := 0
-	for i := 0; i < 30; i++ {
-		if w := loginReq(h, "198.51.100."+strconv.Itoa(i), "bad"); w.Code == 429 {
-			limited++
-		}
+	if w := loginReq(h, "198.51.100.50", "bad"); w.Code != 429 || w.Header().Get("Retry-After") != "120" {
+		t.Errorf("got %d, Retry-After %q", w.Code, w.Header().Get("Retry-After"))
 	}
-	if limited == 0 {
-		t.Error("bucket never limited")
+	// the cached credential still works (cache hit, no slot)
+	if w := loginReq(h, "192.0.2.3", "good"); w.Code != 200 {
+		t.Errorf("cache hit: %d", w.Code)
 	}
-	n := 0
+	webAuthCache.flush()
+	if w := loginReq(h, "198.51.100.51", "good"); w.Code != 429 {
+		t.Errorf("valid new client: %d, want 429", w.Code)
+	}
+	full, shared := 0, 0
 	for _, m := range msgs() {
 		if strings.Contains(m, "table full") {
-			n++
+			full++
+		}
+		if strings.Contains(m, "untracked clients locked out for 120s after 3") {
+			shared++
 		}
 	}
-	if n != 1 {
-		t.Errorf("%d overflow messages, want 1", n)
+	if full != 1 || shared != 1 {
+		t.Errorf("messages: table full %d, shared lockout %d, want 1 and 1", full, shared)
 	}
 }
 

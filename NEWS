@@ -15,8 +15,8 @@ Upgrade notes
    "loginlockout" in [severity] (default warning) is sent. A successful login
    does not reset the counter, failures only expire with the window. IPv6
    clients are counted per /64 prefix. If the table of tracked clients is full
-   of locked out clients, unknown clients are checked at a limited rate
-   (5 per second) without being tracked. Successful credential checks are cached for 5 minutes
+   of locked out clients, all further unknown clients share one counter with
+   the same limits. Successful credential checks are cached for 5 minutes
    to save CPU. "loginfailures = 0" switches the limit
    off. Behind a
    reverse proxy set "trustedproxies" in [www], otherwise all clients share

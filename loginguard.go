@@ -37,11 +37,6 @@ const (
 
 	// maxLoginEntries bounds the memory used for the per-client counters.
 	maxLoginEntries = 10000
-
-	// Checks of clients which cannot be tracked (table full of locked
-	// clients) share one token bucket: this many per second, in bursts.
-	untrackedRate  = 5
-	untrackedBurst = 10
 )
 
 // checkLoginBackoff validates the three login backoff settings.
@@ -88,9 +83,8 @@ type loginGuard struct {
 	now        func() time.Time
 	maxEntries int
 	entries    map[string]*loginEntry
-	overflow   bool      // the table is full of locked clients, reported once
-	tokens     float64   // bucket for checks of untracked clients
-	bucketAt   time.Time // last refill
+	overflow   bool       // the table is full of locked clients, reported once
+	shared     loginEntry // all clients that do not fit into the table
 }
 
 func newLoginGuard() *loginGuard {
@@ -127,9 +121,8 @@ func loginKey(ip string) string {
 type loginVerdict int
 
 const (
-	loginAllow     loginVerdict = iota
-	loginDeny                   // locked out, no attempts left or untracked rate limit hit
-	loginUntracked              // table full of locked clients: checked, but not tracked
+	loginAllow loginVerdict = iota
+	loginDeny               // locked out, no attempts left or untracked rate limit hit
 )
 
 // lockedFor reports whether the client is locked out and for how many more
@@ -149,12 +142,15 @@ func (g *loginGuard) lockedFor(ip string) (int, bool) {
 	return ceilSeconds(e.lockedUntil.Sub(now)), true
 }
 
+// sharedLoginKey is the key of the entry shared by all clients which do not
+// fit into the table (not a valid address, so it cannot collide).
+const sharedLoginKey = "shared"
+
 // begin reserves an attempt slot for the client. With loginAllow the caller
 // must call end exactly once. Otherwise it returns the seconds to wait.
-// If the table is full of locked clients, an unknown client is not
-// tracked (loginUntracked, no end call, key empty) but limited by a global
-// token bucket (loginDeny when it is empty); first is true the first time
-// this happens, to be reported once.
+// If the table is full of locked clients, an unknown client counts against
+// the shared entry sharedLoginKey instead (same rules as for one client);
+// first is true the first time this happens, to be reported once.
 func (g *loginGuard) begin(ip string, failures int, window time.Duration) (key string, v loginVerdict, retry int, first bool) {
 	key = loginKey(ip)
 	g.mu.Lock()
@@ -170,16 +166,20 @@ func (g *loginGuard) begin(ip string, failures int, window time.Duration) (key s
 		}
 	}
 	if !ok {
-		if !g.makeRoom(now, window) {
+		if g.makeRoom(now, window) {
+			e = &loginEntry{start: now}
+			g.entries[key] = e
+		} else {
+			// Table full of locked clients: all unknown clients share
+			// one entry outside of the table, which is never evicted.
 			first = !g.overflow
 			g.overflow = true
-			if !g.takeUntracked(now) {
-				return key, loginDeny, 1, first
+			key = sharedLoginKey
+			e = &g.shared
+			if e.expired(now, window) && e.pending == 0 {
+				*e = loginEntry{start: now}
 			}
-			return "", loginUntracked, 0, first
 		}
-		e = &loginEntry{start: now}
-		g.entries[key] = e
 	}
 	if e.locked() {
 		return key, loginDeny, ceilSeconds(e.lockedUntil.Sub(now)), false
@@ -188,23 +188,7 @@ func (g *loginGuard) begin(ip string, failures int, window time.Duration) (key s
 		return key, loginDeny, ceilSeconds(e.start.Add(window).Sub(now)), false
 	}
 	e.pending++
-	return key, loginAllow, 0, false
-}
-
-// takeUntracked takes a token of the bucket for checks of untracked
-// clients.
-func (g *loginGuard) takeUntracked(now time.Time) bool {
-	if g.bucketAt.IsZero() {
-		g.tokens = untrackedBurst
-	} else if d := now.Sub(g.bucketAt).Seconds(); d > 0 {
-		g.tokens = min(untrackedBurst, g.tokens+d*untrackedRate)
-	}
-	g.bucketAt = now
-	if g.tokens < 1 {
-		return false
-	}
-	g.tokens--
-	return true
+	return key, loginAllow, 0, first
 }
 
 func ceilSeconds(d time.Duration) int {
@@ -222,6 +206,9 @@ func (g *loginGuard) end(key string, failed bool, failures int, window, lockout 
 	defer g.mu.Unlock()
 	now := g.now()
 	e, ok := g.entries[key]
+	if key == sharedLoginKey {
+		e, ok = &g.shared, true
+	}
 	if !ok {
 		// evicted while in flight
 		if !failed || !g.makeRoom(now, window) {
@@ -243,7 +230,7 @@ func (g *loginGuard) end(key string, failed bool, failures int, window, lockout 
 			locked = true
 		}
 	}
-	if e.count == 0 && e.pending == 0 && !e.locked() {
+	if key != sharedLoginKey && e.count == 0 && e.pending == 0 && !e.locked() {
 		delete(g.entries, key)
 	}
 	return locked

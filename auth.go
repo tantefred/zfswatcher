@@ -337,15 +337,19 @@ func loginWindow() time.Duration { return time.Duration(cfg.Www.Loginwindow) * t
 // recordLoginResult releases the attempt slot and counts a failed login. It
 // reports the lockout, once per lockout.
 func recordLoginResult(key, ip string, failed bool) {
-	if key == "" {
-		return // untracked client
-	}
 	lockout := time.Duration(cfg.Www.Loginlockout) * time.Second
-	if webLoginGuard.end(key, failed, cfg.Www.Loginfailures, loginWindow(), lockout) && notify != nil {
-		notify.Printf(cfg.Severity.Loginlockout,
-			"web login: client %s locked out for %ds after %d failed attempts",
-			ip, cfg.Www.Loginlockout, cfg.Www.Loginfailures)
+	if !webLoginGuard.end(key, failed, cfg.Www.Loginfailures, loginWindow(), lockout) || notify == nil {
+		return
 	}
+	if key == sharedLoginKey {
+		notify.Printf(cfg.Severity.Loginlockout,
+			"web login: untracked clients locked out for %ds after %d failed attempts",
+			cfg.Www.Loginlockout, cfg.Www.Loginfailures)
+		return
+	}
+	notify.Printf(cfg.Severity.Loginlockout,
+		"web login: client %s locked out for %ds after %d failed attempts",
+		ip, cfg.Www.Loginlockout, cfg.Www.Loginfailures)
 }
 
 // requireRole wraps the handler: the request needs valid credentials and at

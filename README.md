@@ -324,8 +324,9 @@ Failed logins are counted per client address. After `loginfailures` failures
 severity `[severity] loginlockout` (default warning) is sent. A successful
 login does not reset the counter, failures only expire with the window. IPv6
 clients are counted per /64 prefix. If the table of tracked clients (10000) is
-full of locked out clients, unknown clients are not refused but checked at a
-limited rate (5 per second, burst 10) without being tracked. Successful credential checks are cached
+full of locked out clients, all further unknown clients share one counter with
+the same limits (they can still log in, but a few failures lock out all of
+them for a while; clients with a cached login are not affected). Successful credential checks are cached
 for 5 minutes (as a keyed hash in memory, cleared on reload), which saves CPU
 when a browser sends the password with every request. `loginfailures = 0`
 switches this off. **Behind a reverse proxy `trustedproxies` must be set**:
