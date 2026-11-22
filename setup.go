@@ -396,6 +396,8 @@ func setup() {
 		optDebug = true
 	}
 
+	setupSlog(optDebug)
+
 	cfg = getCfg()
 	if cfg == nil {
 		os.Exit(2)
