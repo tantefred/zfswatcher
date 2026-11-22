@@ -68,16 +68,33 @@ func TestFragmentRoutes(t *testing.T) {
 		}
 	}
 
-	// errors stay errors
-	if w := roleReq(h, "GET", "/zw/status/nonexistent?fragment=1", "o"); w.Code != http.StatusBadRequest {
-		t.Errorf("unknown pool: got %d", w.Code)
+	// a vanished pool: 200 with a notice which replaces the polling
+	// container; the page itself and illegal names stay errors
+	w := roleReq(h, "GET", "/zw/status/nonexistent?fragment=1", "o")
+	body := w.Body.String()
+	if w.Code != 200 || w.Header().Get("HX-Retarget") != "#live" || w.Header().Get("HX-Reswap") != "outerHTML" ||
+		!strings.Contains(body, "<strong>nonexistent</strong> is no longer present") ||
+		!strings.Contains(body, `href="/zw/status/"`) || !strings.Contains(body, `id="live"`) ||
+		strings.Contains(body, "hx-") || strings.Contains(body, "<html") {
+		t.Errorf("unknown pool fragment: %d %v %q", w.Code, w.Header(), body)
+	}
+	checkGolden(t, "status-pool-gone.html", body)
+	if w := roleReq(h, "GET", "/zw/status/nonexistent", "o"); w.Code != http.StatusBadRequest {
+		t.Errorf("unknown pool page: got %d", w.Code)
+	}
+	if w := roleReq(h, "GET", "/zw/status/bad$name?fragment=1", "o"); w.Code != http.StatusBadRequest {
+		t.Errorf("illegal pool name: got %d", w.Code)
 	}
 
-	// no pools: the fragment shows the notice
+	// no pools at all: the dashboard shows the notice, a pool page the
+	// notice that the pool is gone
 	goldenSetState(t, nil, nil)
-	for _, path := range []string{"/zw/?fragment=1", "/zw/status/x?fragment=1"} {
+	for path, want := range map[string]string{
+		"/zw/?fragment=1":         "There are no pools.",
+		"/zw/status/x?fragment=1": "is no longer present",
+	} {
 		w := roleReq(h, "GET", path, "o")
-		if w.Code != 200 || !strings.Contains(w.Body.String(), "There are no pools.") || strings.Contains(w.Body.String(), "<html") {
+		if w.Code != 200 || !strings.Contains(w.Body.String(), want) || strings.Contains(w.Body.String(), "<html") {
 			t.Errorf("%s without pools: %d %q", path, w.Code, w.Body.String())
 		}
 	}

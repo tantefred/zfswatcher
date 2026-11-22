@@ -116,6 +116,22 @@ func executeFragment(w http.ResponseWriter, name string, data any) {
 	}
 }
 
+// executePoolGone answers the refresh of a pool page whose pool has
+// vanished. A 4xx answer would not be swapped by htmx and the page would
+// stay stale, so the answer is 200 with a notice. The HX-Retarget and
+// HX-Reswap headers make htmx replace the whole live container, including
+// its hx-get and hx-trigger attributes, so the polling stops. This needs no
+// script and nothing the CSP forbids, and keeps the notice on the page
+// (HX-Redirect would load another page without telling why).
+func executePoolGone(w http.ResponseWriter, pool string) {
+	w.Header().Set("HX-Retarget", "#live")
+	w.Header().Set("HX-Reswap", "outerHTML")
+	executeFragment(w, "pool-gone", map[string]string{
+		"Name": pool,
+		"Root": cfg.Www.Rootdir,
+	})
+}
+
 // DefaultPasswordWarning tells the header template whether to show the
 // warning about the example password.
 func (webNav) DefaultPasswordWarning() bool {
@@ -315,7 +331,11 @@ func statusHandler(w http.ResponseWriter, r *http.Request) {
 
 	if len(state) == 0 {
 		if isFragment(r) {
-			executeFragment(w, "no-pools", nil)
+			if pool != "" {
+				executePoolGone(w, pool)
+			} else {
+				executeFragment(w, "no-pools", nil)
+			}
 			return
 		}
 		err := templates.ExecuteTemplate(w, "status-none.html", &webData{Nav: wn})
@@ -341,6 +361,10 @@ func statusHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if match == -1 {
+		if isFragment(r) {
+			executePoolGone(w, pool)
+			return
+		}
 		http.Error(w, "Bad Request", http.StatusBadRequest)
 		return
 	}
