@@ -459,9 +459,9 @@ func setup() {
 	// Applied at startup only: running goroutines read the value.
 	commandTimeout = time.Duration(cfg.Main.Commandtimeout) * time.Second
 	notify = setupLog(cfg)
-	warnObsoleteOptions(cfg)
 
 	if *optTest {
+		warnObsoleteOptions(cfg)
 		notifyCloseC := notify.Close()
 		select { // wait max 1 second for loggers to finish
 		case <-notifyCloseC:
