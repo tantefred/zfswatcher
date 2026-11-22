@@ -1,3 +1,20 @@
+zfswatcher (0.9.0-1) unstable; urgency=medium
+
+  * Add webhook notifications ([webhook "name"]) with the presets generic,
+    ntfy, gotify, discord and slack; the messages of one check run are sent
+    as one request. "zfswatcher --test-notify" sends a test message to all
+    enabled outputs.
+  * Add an opt-in Prometheus endpoint <rootdir>/metrics ("metrics = true" in
+    [www]); API tokens are accepted for it as well.
+  * Keep the event history of the logs page and /api/v1/events across
+    restarts in the state file.
+  * Limit failed web logins per client address with 429 and Retry-After
+    (new options "loginfailures", "loginwindow" and "loginlockout" in [www]
+    and "loginlockout" in [severity]).
+  * Log "zfswatcher <version> starting" as the first message of a run.
+
+ -- tantefred <147740857+tantefred@users.noreply.github.com>  Mon, 23 Nov 2026 00:05:00 +0100
+
 zfswatcher (0.8.0-1) unstable; urgency=medium
 
   * Replace the web interface with Bootstrap 5.3.9 and htmx 2.0.11 (no
