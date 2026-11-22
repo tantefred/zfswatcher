@@ -29,3 +29,8 @@ override_dh_clean:
 # Go binaries carry compressed DWARF sections, which dwz cannot process
 # ("Found compressed .debug_abbrev section"). Skip dwz, as Go packages do.
 override_dh_dwz:
+
+# The CI runner (Ubuntu) defaults dpkg-deb to zstd, which Debian's lintian
+# rejects as malformed-deb-archive. Debian itself uses xz.
+override_dh_builddeb:
+	dh_builddeb -- -Zxz
