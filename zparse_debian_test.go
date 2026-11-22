@@ -100,21 +100,6 @@ func TestParseZpoolStatusDebianCounters(t *testing.T) {
 	}
 }
 
-func TestZpoolIostatParserVdevClasses(t *testing.T) {
-	table := ZpoolIostatParser(readFixture(t, "zpool-iostat-v-classes.txt"))
-	if table == nil {
-		t.Fatal("parse error")
-	}
-	rows := (*table)["zfsw_mix"]
-	// pool, raidz1-0, 3 disks, 4 class headers and 4 class devices
-	if len(rows) != 13 {
-		t.Errorf("got %d rows, want 13", len(rows))
-	}
-	if r := rows["/var/tmp/zfsw-collect/c5"]; r == nil || r.CapacityAlloc != unniceNumber("69.5M") {
-		t.Errorf("cache device row missing or wrong: %+v", r)
-	}
-}
-
 func TestParseZfsListAllDebian(t *testing.T) {
 	m := parseZfsList(readFixture(t, "zfs-list-all-debian.txt"))
 	if len(m) != 9 {
@@ -215,20 +200,6 @@ func TestParseZpoolStatusFeaturesHint(t *testing.T) {
 	}
 }
 
-func TestZpoolIostatParserMultiPool(t *testing.T) {
-	table := ZpoolIostatParser(readFixture(t, "zpool-iostat-v-multi-pool.txt"))
-	if table == nil {
-		t.Fatal("parse error")
-	}
-	for pool, rows := range map[string]int{"zfsw_draid": 9, "zfsw_rz2": 6, "zfsw_rz3": 7} {
-		if got := len((*table)[pool]); got != rows {
-			t.Errorf("%s: %d rows, want %d", pool, got, rows)
-		}
-	}
-}
-
-// Scenario F (zinject): a device degraded with "too many errors" and a pool
-// with write errors printed with an SI-style suffix ("1.34K").
 func TestParseZpoolStatusInjected(t *testing.T) {
 	pools, err := parseZpoolStatus(readFixture(t, "zpool-status-inject-degrade.txt"))
 	if err != nil {

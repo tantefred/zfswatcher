@@ -51,10 +51,6 @@ var currentState struct {
 	usage map[string]*PoolUsageType
 	mutex sync.RWMutex
 }
-var iostat struct {
-	process *BackgroundProcess
-	ch      chan *ZpoolIostatTable
-}
 
 // zpoolHealth remembers the outcome of the most recent zpool status query
 // for the /healthz endpoint of the web interface.
@@ -368,27 +364,6 @@ func main() {
 		setupLeds(currentState.state)
 	}
 
-	// start iostat goroutine:
-	if cfg.Main.Zpooliostatcmd != "" {
-		iostat.process, err = NewBackgroundProcess(cfg.Main.Zpooliostatcmd)
-		if err != nil {
-			notify.Print(notifier.ERR, "failed to start iostat command")
-		} else {
-			iostat.ch = make(chan *ZpoolIostatTable)
-			go ZpoolIostatStreamReader(iostat.ch, iostat.process.Out)
-			// for now just print the output to stdout: XXX
-			go func() {
-				for i := range iostat.ch {
-					if i == nil {
-						// failed read or malformed entry; keep reading
-						continue
-					}
-					fmt.Printf("iostat output: %+v\n", *i)
-				}
-			}()
-		}
-	}
-
 	// start a web server goroutine:
 	if cfg.Www.Enable {
 		webSrv = webServer()
@@ -465,11 +440,6 @@ EXIT:
 		if err := shutdownWebServer(webSrv, webShutdownTimeout); err != nil {
 			notify.Printf(notifier.ERR, "error stopping web server: %s", err)
 		}
-	}
-
-	if iostat.process != nil {
-		// Stop returns the "killed" error by design, see its comment.
-		_ = iostat.process.Stop()
 	}
 
 	// XXX persist data?
