@@ -424,3 +424,78 @@ func TestHostInfo(t *testing.T) {
 		}
 	}
 }
+
+func TestSeverityNamesRoundTrip(t *testing.T) {
+	for s := notifier.EMERG; s <= notifier.DEBUG; s++ {
+		got, ok := severityFromName(s.String())
+		if !ok || got != s {
+			t.Errorf("severity %d: name %q parsed as %d, %v", s, s.String(), got, ok)
+		}
+	}
+}
+
+func TestWwwLogReceiverAndSnapshotEvents(t *testing.T) {
+	goldenSetup(t) // sets cfg and clears the buffer
+	cfg.Www.Logbuffer = 2
+	ts := time.Date(2026, 5, 6, 7, 8, 9, 0, time.UTC)
+	for i, text := range []string{"a", "b", "c"} {
+		wwwLogReceiver(&notifier.Msg{Time: ts.Add(time.Duration(i) * time.Second), MsgType: notifier.MSGTYPE_MESSAGE, Severity: notifier.WARNING, Text: text})
+	}
+	wwwLogReceiver(&notifier.Msg{Time: ts, MsgType: notifier.MSGTYPE_ATTACHMENT, Severity: notifier.WARNING, Text: "att"})
+
+	ev := snapshotEvents()
+	if len(ev) != 2 || ev[0].Text != "b" || ev[1].Text != "c" || ev[1].Attachment != "att" || ev[1].Severity != "warning" {
+		t.Fatalf("events: %+v", ev)
+	}
+	if !ev[1].Time.Equal(ts.Add(2 * time.Second)) {
+		t.Errorf("time %v", ev[1].Time)
+	}
+	ev[0].Text = "changed"
+	ev[1].Attachment = "changed"
+	_ = append(ev[:0], Event{Text: "x"})
+	again := snapshotEvents()
+	if again[0].Text != "b" || again[1].Attachment != "att" {
+		t.Errorf("buffer changed through the snapshot: %+v", again)
+	}
+	b, _ := json.Marshal(again[0])
+	if !strings.Contains(string(b), `"severity":"warning"`) || !strings.Contains(string(b), `"time":"2026-05-06T07:08:10Z"`) {
+		t.Errorf("json %s", b)
+	}
+}
+
+func TestSnapshotEventsEmpty(t *testing.T) {
+	goldenSetup(t)
+	if ev := snapshotEvents(); ev == nil || len(ev) != 0 {
+		t.Errorf("got %#v, want empty non-nil", ev)
+	}
+}
+
+func TestWwwLogRace(t *testing.T) {
+	goldenSetup(t)
+	cfg.Www.Logbuffer = 10
+	done := make(chan struct{})
+	go func() {
+		defer close(done)
+		for i := 0; i < 300; i++ {
+			wwwLogReceiver(&notifier.Msg{MsgType: notifier.MSGTYPE_MESSAGE, Severity: notifier.INFO, Text: "x"})
+			wwwLogReceiver(&notifier.Msg{MsgType: notifier.MSGTYPE_ATTACHMENT, Severity: notifier.INFO, Text: "y"})
+		}
+	}()
+	for i := 0; i < 300; i++ {
+		_ = snapshotEvents()
+	}
+	<-done
+}
+
+func TestMakeLogMsgWeb(t *testing.T) {
+	goldenSetup(t)
+	ts := time.Date(2026, 5, 6, 7, 8, 9, 0, time.UTC)
+	w := makeLogMsgWeb(Event{Time: ts, Severity: "crit", Text: "t", Attachment: "a"})
+	want := logMsgWeb{Time: "2026-05-06 07:08:09", Severity: "crit", Class: "danger", Text: "t", Attachment: "a"}
+	if w != want {
+		t.Errorf("got %+v", w)
+	}
+	if w := makeLogMsgWeb(Event{Severity: "bogus"}); w.Class != "" {
+		t.Errorf("unknown severity got class %q", w.Class)
+	}
+}

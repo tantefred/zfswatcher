@@ -283,6 +283,13 @@ func snapshotUsage() map[string]Usage {
 	return usageMapFromParsed(currentState.usage)
 }
 
+// snapshotEvents returns a copy of the log buffer, oldest event first.
+func snapshotEvents() []Event {
+	wwwLogMutex.RLock()
+	defer wwwLogMutex.RUnlock()
+	return append([]Event{}, wwwLogBuffer...)
+}
+
 // snapshotZpoolQuery returns what recordZpoolQuery stored.
 func snapshotZpoolQuery() ZpoolQuery {
 	zpoolHealth.mutex.Lock()

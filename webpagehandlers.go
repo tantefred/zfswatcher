@@ -144,14 +144,6 @@ type dashboardWeb struct {
 	Pools            []*poolStatusWeb
 }
 
-type logMsgWeb struct {
-	Time       string
-	Severity   string
-	Class      string
-	Text       string
-	Attachment string
-}
-
 type enclosureWeb struct {
 	ChassisEnable      bool
 	Chassis45drives15  bool
@@ -164,39 +156,46 @@ type enclosureWeb struct {
 	EnclosureData      map[string][]*devChassisStatusWeb
 }
 
+// wwwLogBuffer keeps the most recent log messages for the logs page and the
+// API; wwwLogMutex protects it.
 var (
-	wwwLogBuffer []*logMsgWeb
+	wwwLogBuffer []Event
 	wwwLogMutex  sync.RWMutex
 )
 
 func wwwLogReceiver(m *notifier.Msg) {
 	wwwLogMutex.Lock()
 	if wwwLogBuffer == nil {
-		wwwLogBuffer = make([]*logMsgWeb, 0, cfg.Www.Logbuffer+1)
+		wwwLogBuffer = make([]Event, 0, cfg.Www.Logbuffer+1)
 	}
-	switch m.MsgType {
-	case notifier.MSGTYPE_MESSAGE:
-		nm := &logMsgWeb{}
-		nm.Time, nm.Severity, nm.Text = m.Strings()
-		nm.Class = cfg.Www.Severitycssclassmap[m.Severity]
-		wwwLogBuffer = append(wwwLogBuffer, nm)
-	case notifier.MSGTYPE_ATTACHMENT:
-		prev := len(wwwLogBuffer) - 1
-		if len(wwwLogBuffer) > 0 && wwwLogBuffer[prev].Attachment == "" {
-			// add the attachment to the previous message
-			wwwLogBuffer[prev].Attachment = m.Text
-		} else {
-			// make a new entry only with the attachment
-			nm := &logMsgWeb{}
-			nm.Time, nm.Severity, nm.Attachment = m.Strings()
-			nm.Class = cfg.Www.Severitycssclassmap[m.Severity]
-			wwwLogBuffer = append(wwwLogBuffer, nm)
-		}
-	}
-	if len(wwwLogBuffer) > cfg.Www.Logbuffer {
-		wwwLogBuffer = wwwLogBuffer[len(wwwLogBuffer)-cfg.Www.Logbuffer:]
-	}
+	wwwLogBuffer = eventsAppend(wwwLogBuffer, m, cfg.Www.Logbuffer)
 	wwwLogMutex.Unlock()
+}
+
+// logTimeFormat is the format of the time column of the logs page (the same
+// as in the log files).
+const logTimeFormat = "2006-01-02 15:04:05"
+
+// logMsgWeb is a row of the logs page.
+type logMsgWeb struct {
+	Time       string
+	Severity   string
+	Class      string
+	Text       string
+	Attachment string
+}
+
+func makeLogMsgWeb(e Event) logMsgWeb {
+	w := logMsgWeb{
+		Time:       e.Time.Format(logTimeFormat),
+		Severity:   e.Severity,
+		Text:       e.Text,
+		Attachment: e.Attachment,
+	}
+	if sev, ok := severityFromName(e.Severity); ok {
+		w.Class = cfg.Www.Severitycssclassmap[sev]
+	}
+	return w
 }
 
 // The functions below form the presentation layer: they turn the data of the
@@ -396,9 +395,12 @@ func statisticsHandler(w http.ResponseWriter, r *http.Request) {
 
 func logsHandler(w http.ResponseWriter, r *http.Request) {
 	wn := webNav{Logs: true, Root: cfg.Www.Rootdir}
-	wwwLogMutex.RLock()
-	err := templates.ExecuteTemplate(w, "logs.html", &webData{Nav: wn, Data: wwwLogBuffer})
-	wwwLogMutex.RUnlock()
+	events := snapshotEvents()
+	rows := make([]logMsgWeb, 0, len(events))
+	for _, e := range events {
+		rows = append(rows, makeLogMsgWeb(e))
+	}
+	err := templates.ExecuteTemplate(w, "logs.html", &webData{Nav: wn, Data: rows})
 	if err != nil {
 		notify.Printf(notifier.ERR, "error executing template: %s", err)
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
