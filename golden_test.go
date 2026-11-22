@@ -144,10 +144,18 @@ func checkGolden(t *testing.T, name, got string) {
 	}
 }
 
-func render(h http.HandlerFunc, path string) (int, string) {
+// render runs the handler as the given role.
+func renderAs(role Role, h http.HandlerFunc, path string) (int, string) {
 	w := httptest.NewRecorder()
-	h(w, httptest.NewRequest("GET", path, nil))
+	r := httptest.NewRequest("GET", path, nil)
+	r = r.WithContext(withPrincipal(r.Context(), &Principal{Name: "test", Role: role, Method: methodBasic}))
+	h(w, r)
 	return w.Code, w.Body.String()
+}
+
+// render runs the handler as admin, the role of the golden files.
+func render(h http.HandlerFunc, path string) (int, string) {
+	return renderAs(RoleAdmin, h, path)
 }
 
 func TestGoldenStatus(t *testing.T) {
@@ -179,7 +187,8 @@ func TestGoldenStatusRedirectAndErrors(t *testing.T) {
 	goldenSetup(t)
 	goldenSetState(t, goldenPools(t), nil)
 	w := httptest.NewRecorder()
-	statusHandler(w, httptest.NewRequest("GET", "/zw/status/", nil))
+	r := httptest.NewRequest("GET", "/zw/status/", nil)
+	statusHandler(w, r.WithContext(withPrincipal(r.Context(), &Principal{Role: RoleAdmin})))
 	if w.Code != http.StatusSeeOther || w.Header().Get("Location") != "/zw/status/zfsw_mix" {
 		t.Errorf("redirect: %d %q", w.Code, w.Header().Get("Location"))
 	}
@@ -191,7 +200,8 @@ func TestGoldenStatusRedirectAndErrors(t *testing.T) {
 	}
 }
 
-func TestGoldenStatusLeds(t *testing.T) {
+func goldenLedSetup(t *testing.T) []*PoolType {
+	t.Helper()
 	goldenSetup(t)
 	cfg.Leds.Enable = true
 	devLedsMutex.Lock()
@@ -212,8 +222,37 @@ func TestGoldenStatusLeds(t *testing.T) {
 		t.Fatal(err)
 	}
 	goldenSetState(t, pools, goldenUsageMap())
+	return pools
+}
+
+func TestGoldenStatusLeds(t *testing.T) {
+	goldenLedSetup(t)
 	_, body := render(statusHandler, "/zw/status/zfsw_mix")
 	checkGolden(t, "status-leds.html", body)
+}
+
+// A viewer sees neither the Logs menu entry nor the locate buttons.
+func TestGoldenViewer(t *testing.T) {
+	goldenLedSetup(t)
+	code, body := renderAs(RoleViewer, statusHandler, "/zw/status/zfsw_mix")
+	if code != 200 {
+		t.Fatalf("status %d", code)
+	}
+	checkGolden(t, "status-leds-viewer.html", body)
+	if strings.Contains(body, "/zw/locate/") || strings.Contains(body, "/zw/logs/") {
+		t.Error("viewer page contains locate or logs")
+	}
+	_, body = renderAs(RoleViewer, dashboardHandler, "/zw/")
+	checkGolden(t, "dashboard-viewer.html", volatileRE.ReplaceAllString(body, "$1:</dt><dd>VOLATILE"))
+	if strings.Contains(body, "/zw/logs/") {
+		t.Error("viewer dashboard links the logs")
+	}
+
+	// the operator gets both
+	_, body = renderAs(RoleOperator, statusHandler, "/zw/status/zfsw_mix")
+	if !strings.Contains(body, "/zw/locate/") || !strings.Contains(body, "/zw/logs/") {
+		t.Error("operator page lacks locate or logs")
+	}
 }
 
 // volatileRE matches the values of the dashboard which change on every run.

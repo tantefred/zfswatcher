@@ -138,14 +138,16 @@ func newWebHandler(tlsEnabled bool) http.Handler {
 	// Health check for monitoring tools: deliberately without authentication.
 	mux.HandleFunc(cfg.Www.Rootdir+"/healthz", healthzHandler)
 
-	mux.HandleFunc(cfg.Www.Rootdir+"/", basicAuth(dashboardHandler))
-	mux.HandleFunc(cfg.Www.Rootdir+"/status/", basicAuth(statusHandler))
-	mux.HandleFunc(cfg.Www.Rootdir+"/usage/", basicAuth(usageHandler))
-	mux.HandleFunc(cfg.Www.Rootdir+"/statistics/", basicAuth(statisticsHandler))
-	mux.HandleFunc(cfg.Www.Rootdir+"/logs/", basicAuth(logsHandler))
-	mux.HandleFunc(cfg.Www.Rootdir+"/about/", basicAuth(aboutHandler))
-	mux.HandleFunc(cfg.Www.Rootdir+"/locate/", basicAuth(locateHandler))
-	mux.HandleFunc(cfg.Www.Rootdir+"/enclosure/", basicAuth(enclosureHandler))
+	mux.HandleFunc(cfg.Www.Rootdir+"/", requireRole(RoleViewer, dashboardHandler))
+	mux.HandleFunc(cfg.Www.Rootdir+"/status/", requireRole(RoleViewer, statusHandler))
+	mux.HandleFunc(cfg.Www.Rootdir+"/usage/", requireRole(RoleViewer, usageHandler))
+	mux.HandleFunc(cfg.Www.Rootdir+"/statistics/", requireRole(RoleViewer, statisticsHandler))
+	mux.HandleFunc(cfg.Www.Rootdir+"/logs/", requireRole(RoleOperator, logsHandler))
+	mux.HandleFunc(cfg.Www.Rootdir+"/about/", requireRole(RoleViewer, aboutHandler))
+	mux.HandleFunc(cfg.Www.Rootdir+"/locate/", requireRole(RoleOperator, locateHandler))
+	mux.HandleFunc(cfg.Www.Rootdir+"/enclosure/", requireRole(RoleViewer, enclosureHandler))
+
+	registerAPI(mux)
 
 	// Reject cross-origin state changing requests (CSRF) for all paths.
 	// The proxy handling runs first so that everything below sees the

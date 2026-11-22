@@ -189,6 +189,24 @@ Some notes:
   Only GET and HEAD are allowed. Since it is unauthenticated, expose it only
   where that is acceptable.
 
+- Web users and roles: every `[wwwuser "name"]` has a `role`: `viewer`
+  (dashboard, pool status, usage, statistics, enclosure, about), `operator`
+  (additionally the logs and the locate LEDs) or `admin` (everything; for now
+  the same as operator). Without `role` a user is an admin, as before. An
+  invalid role is a configuration error: zfswatcher does not start, and on a
+  reload the old configuration stays active. Create a read-only user for
+  people who only watch the pools, since the logs may contain details of your
+  system.
+
+- API tokens: an `[apitoken "name"]` section (`enable`, `hash`, `role`) lets
+  scripts and monitoring tools call the API below `<rootdir>/api/` with
+  `Authorization: Bearer <token>`. Tokens work **only** for paths under
+  `/api/`; the web pages accept the password login only, and the password
+  login also works for the API. `zfswatcher -T` (`--generate-token`) creates
+  a token and prints it once together with the line `hash = sha256:...` for
+  the configuration; only the hash is stored, so save the token right away.
+  Treat a token like a password and prefer the role `viewer`.
+
 - If you change the default web interface templates, it is best to copy them
   from `/usr/share/zfswatcher/www` to another location and change the
   `templatedir` and `resourcedir` settings in the configuration accordingly.
