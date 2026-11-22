@@ -11,7 +11,7 @@
 ZFS pool monitoring and notification daemon.
 
 Zfswatcher watches the state of your ZFS pools and notifies you about
-problems by e-mail, syslog or log file. It can also manage enclosure LEDs
+problems by e-mail, webhook (ntfy, Gotify, Discord, Slack), syslog or log file. It can also manage enclosure LEDs
 and provides an optional embedded web interface.
 
 Supported operating systems: Linux, FreeBSD and Solaris/Illumos
@@ -173,6 +173,24 @@ Some notes:
   daemon is enabled by default.
 
 - E-mail notifications are disabled by default.
+
+- Webhooks (section `[webhook "name"]`) send the messages of one check run
+  as a single HTTP POST request. `preset` selects the format: `generic`
+  (JSON with `host`, `severity`, `title` and a `messages` list, the
+  default), `ntfy` (text body, headers `Title`, `Priority`, `Tags`),
+  `gotify`, `discord` or `slack`. `token` becomes
+  `Authorization: Bearer` (ntfy, generic) or `X-Gotify-Key` (gotify);
+  `throttle` limits the requests per time (seconds) like for e-mail.
+  Attachments are not sent. A request times out after 10 s and is repeated
+  once after a network error or an HTTP 5xx; failures are logged to the
+  diagnostics (journal), without the token and without the query string of
+  the URL. Commented examples are in the configuration file.
+
+- `zfswatcher --test-notify` sends one test message to all enabled outputs
+  and exits without starting the daemon. The message has the severity
+  `emerg`, so it passes every `level`. The exit code is 1 if a webhook
+  delivery fails (other channels are best effort), which also makes it
+  usable in scripts.
 
 - The embedded web server is disabled by default. When enabled it listens on
   `127.0.0.1:8081` (`bind` in the `[www]` section), meant for a reverse proxy

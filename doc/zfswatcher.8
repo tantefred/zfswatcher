@@ -28,6 +28,7 @@ zfswatcher \- ZFS pool monitoring and notification daemon
 .RB [\| \-d \|]
 .RB [\| \-P \|]
 .RB [\| \-T \|]
+.RB [\| \-\-test\-notify \|]
 .RB [\| \-t \|]
 .RB [\| \-v \|]
 .SH DESCRIPTION
@@ -71,6 +72,15 @@ section of the configuration file. Only the hash is stored in the
 configuration, so the token must be saved immediately. See
 .B CONFIGURATION
 below.
+.TP
+.B \-\-test\-notify
+Send one test message to all enabled outputs (log files, syslog, e-mail,
+webhooks) and exit; the daemon is not started. The message has the severity
+.BR emerg ,
+so it passes every
+.B level
+setting. The exit status is 1 if a webhook delivery fails (the other outputs
+are best effort) or an output cannot be set up.
 .TP
 .BR \-t ", " \-\-test
 Test the configuration file syntax and exit.
@@ -141,6 +151,47 @@ Tokens are accepted only for paths below
 for all other pages only HTTP Basic authentication of a
 .B wwwuser
 works. Basic authentication is accepted for the API as well.
+.TP
+.B webhook
+Section
+.RB [ webhook
+.IR \(dqname\(dq ]
+with
+.BR enable ,
+.BR level ,
+.BR url ,
+.BR preset ,
+.B token
+and
+.BR throttle .
+All messages of one check run are sent in one HTTP POST request to
+.BR url ,
+which must start with http:// or https://. The
+.B preset
+is
+.B generic
+(JSON with host, severity, title and a list of messages; the default),
+.BR ntfy ,
+.BR gotify ,
+.B discord
+or
+.BR slack .
+The
+.B token
+is sent as
+.B Authorization: Bearer
+(generic, ntfy) or as
+.B X-Gotify-Key
+(gotify).
+.B throttle
+is the minimum number of seconds between two requests. Attachments are not
+sent. A request times out after 10 seconds and is repeated once after a
+network error or an HTTP 5xx status. Errors are written to the diagnostics
+(stderr, journal), never the token or the query string of the URL. An invalid
+.B url
+or
+.B preset
+is a configuration error.
 .SH JSON API
 A read only JSON API is available below
 .IR <rootdir>/api/v1/ :
