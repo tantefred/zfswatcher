@@ -21,6 +21,11 @@ Upgrade notes
 
 New features
 
+ - JSON API (read only, GET): "<rootdir>/api/v1/info", "pools",
+   "pools/{name}", "usage" (viewer) and "events" (operator, optional
+   "?limit=N"). Errors are JSON {"error": "..."}. Basic login and API
+   tokens work. The API may still change until version 1.0; see the
+   section "JSON API" in README.md.
  - API tokens: new sections [apitoken "name"] with "enable", "hash"
    ("sha256:" and 64 hex digits) and "role". A token is sent as
    "Authorization: Bearer <token>" and is accepted only for paths below

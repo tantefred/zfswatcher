@@ -119,6 +119,14 @@ Tokens are accepted only for paths below
 for all other pages only HTTP Basic authentication of a
 .B wwwuser
 works. Basic authentication is accepted for the API as well.
+.SH JSON API
+A read only JSON API is available below
+.IR <rootdir>/api/v1/ :
+.BR info ", " pools ", " pools/ \fIname\fR ", " usage
+(role viewer) and
+.B events
+(role operator). Only GET and HEAD are supported. See the section "JSON API"
+in README.md; the API may change until version 1.0.
 .SH SIGNALS
 .TP
 .B SIGHUP

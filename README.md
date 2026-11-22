@@ -214,6 +214,36 @@ Some notes:
   package at a later time.
 
 
+## JSON API
+
+zfswatcher has a read only JSON API below `<rootdir>/api/v1/` (for example
+`https://host:8990/api/v1/pools`). It uses the same logins as the web pages
+(HTTP Basic) and also accepts API tokens (`Authorization: Bearer <token>`,
+see the `[apitoken]` section above). Only `GET` (and `HEAD`) is supported;
+other methods are answered with `405`.
+
+| Endpoint | Role | Answer |
+|----------|------|--------|
+| `GET /api/v1/info` | viewer | version, host name, uptimes, load average, last `zpool` query |
+| `GET /api/v1/pools` | viewer | `{"pools": [...]}`, every pool with its device tree |
+| `GET /api/v1/pools/{name}` | viewer | one pool, `404` if it does not exist |
+| `GET /api/v1/usage` | viewer | `{"usage": [...]}`, pools and datasets sorted by name |
+| `GET /api/v1/events?limit=N` | operator | `{"events": [...]}`, the log buffer, oldest first; `limit` (positive number) returns only the last N events |
+
+Names are snake_case, sizes are plain bytes (`-1` means "not available"),
+times are RFC 3339, and empty lists are `[]`. Errors have the form
+`{"error": "..."}` with the matching HTTP status (`400`, `401`, `403`, `404`,
+`405`); a `401` carries a `WWW-Authenticate` header. Responses are sent with
+`Cache-Control: no-store`. Any other path below `/api/` gives `404`.
+
+```
+curl -u viewer:secret https://host:8990/api/v1/pools
+curl -H "Authorization: Bearer zfsw_..." https://host:8990/api/v1/usage
+curl -H "Authorization: Bearer zfsw_..." "https://host:8990/api/v1/events?limit=20"
+```
+
+The API is new and may still change incompatibly until version 1.0.
+
 ## Reverse proxy
 
 Run zfswatcher with `bind = 127.0.0.1:8081` and let a proxy on the same host
