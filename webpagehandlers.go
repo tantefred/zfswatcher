@@ -68,6 +68,20 @@ type webNav struct {
 	About      bool
 	Enclosure  bool
 	Root       string
+	// what the role of the user allows
+	CanLogs   bool
+	CanLocate bool
+}
+
+// newWebNav returns the navigation for the user of the request. The
+// handlers set the active menu entry.
+func newWebNav(r *http.Request) webNav {
+	role := roleOf(r)
+	return webNav{
+		Root:      cfg.Www.Rootdir,
+		CanLogs:   role >= RoleOperator,
+		CanLocate: role >= RoleOperator,
+	}
 }
 
 // DefaultPasswordWarning tells the header template whether to show the
@@ -207,7 +221,7 @@ func devIndent(depth int) int {
 	return 1 + 2*depth
 }
 
-func makePoolStatusWeb(pool Pool, usage map[string]Usage) *poolStatusWeb {
+func makePoolStatusWeb(pool Pool, usage map[string]Usage, canLocate bool) *poolStatusWeb {
 	statusWeb := &poolStatusWeb{
 		Name:       pool.Name,
 		State:      pool.State,
@@ -248,7 +262,7 @@ func makePoolStatusWeb(pool Pool, usage map[string]Usage) *poolStatusWeb {
 			Root:       cfg.Www.Rootdir,
 			Return:     cfg.Www.Rootdir + "/status/" + url.PathEscape(pool.Name),
 		}
-		if cfg.Leds.Enable && len(dev.Children) == 0 {
+		if canLocate && cfg.Leds.Enable && len(dev.Children) == 0 {
 			loc, err := locateQuery(dev.Name)
 			if err == nil {
 				slog.Debug("locate query succeeded", "device", dev.Name)
@@ -276,7 +290,8 @@ func makeChassisStatusWeb(pool Pool) *chassisStatusWeb {
 }
 
 func statusHandler(w http.ResponseWriter, r *http.Request) {
-	wn := webNav{PoolStatus: true, Root: cfg.Www.Rootdir}
+	wn := newWebNav(r)
+	wn.PoolStatus = true
 
 	pool := r.URL.Path[len(cfg.Www.Rootdir+"/status/"):]
 
@@ -315,7 +330,7 @@ func statusHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	ws := makePoolStatusWeb(state[match], usage)
+	ws := makePoolStatusWeb(state[match], usage, wn.CanLocate)
 
 	var err error
 
@@ -334,7 +349,7 @@ func statusHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func usageHandler(w http.ResponseWriter, r *http.Request) {
-	wn := webNav{Root: cfg.Www.Rootdir} // not available in menu
+	wn := newWebNav(r) // not available in menu
 
 	pool := r.URL.Path[len(cfg.Www.Rootdir+"/usage/"):]
 
@@ -358,7 +373,8 @@ func usageHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func dashboardHandler(w http.ResponseWriter, r *http.Request) {
-	wn := webNav{Dashboard: true, Root: cfg.Www.Rootdir}
+	wn := newWebNav(r)
+	wn.Dashboard = true
 
 	host := hostInfo()
 	state, usage := snapshotState()
@@ -366,7 +382,7 @@ func dashboardHandler(w http.ResponseWriter, r *http.Request) {
 	var ws []*poolStatusWeb
 
 	for n, s := range state {
-		ws = append(ws, makePoolStatusWeb(s, usage))
+		ws = append(ws, makePoolStatusWeb(s, usage, wn.CanLocate))
 		ws[n].N = n
 	}
 
@@ -385,7 +401,8 @@ func dashboardHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func statisticsHandler(w http.ResponseWriter, r *http.Request) {
-	wn := webNav{Statistics: true, Root: cfg.Www.Rootdir}
+	wn := newWebNav(r)
+	wn.Statistics = true
 	err := templates.ExecuteTemplate(w, "statistics.html", &webData{Nav: wn})
 	if err != nil {
 		notify.Printf(notifier.ERR, "error executing template: %s", err)
@@ -394,7 +411,8 @@ func statisticsHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func logsHandler(w http.ResponseWriter, r *http.Request) {
-	wn := webNav{Logs: true, Root: cfg.Www.Rootdir}
+	wn := newWebNav(r)
+	wn.Logs = true
 	events := snapshotEvents()
 	rows := make([]logMsgWeb, 0, len(events))
 	for _, e := range events {
@@ -408,7 +426,8 @@ func logsHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func aboutHandler(w http.ResponseWriter, r *http.Request) {
-	wn := webNav{About: true, Root: cfg.Www.Rootdir}
+	wn := newWebNav(r)
+	wn.About = true
 	err := templates.ExecuteTemplate(w, "about.html",
 		&webData{Nav: wn,
 			Data: map[string]string{
@@ -471,7 +490,8 @@ func locateRedirectTarget(ret string) string {
 }
 
 func enclosureHandler(w http.ResponseWriter, r *http.Request) {
-	wn := webNav{Enclosure: true, Root: cfg.Www.Rootdir}
+	wn := newWebNav(r)
+	wn.Enclosure = true
 
 	state := snapshotPools()
 

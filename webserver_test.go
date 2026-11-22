@@ -24,10 +24,7 @@ func setupWebTest(t *testing.T, tls bool) http.Handler {
 	t.Cleanup(func() { cfg = old })
 	cfg.Www.Rootdir = "/zw"
 	cfg.Www.Resourcedir = t.TempDir()
-	cfg.Wwwuser = map[string]*struct {
-		Enable   bool
-		Password string
-	}{"root": {Enable: true, Password: testToorHash}}
+	cfg.Wwwuser = map[string]*wwwUserCfg{"root": {Enable: true, Password: testToorHash}}
 	devLedsMutex.Lock()
 	devLeds = map[string]*devLed{"1-1": {}}
 	devLedsMutex.Unlock()

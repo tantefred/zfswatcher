@@ -25,6 +25,7 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"sort"
 	"strings"
 	"time"
 
@@ -117,11 +118,9 @@ type cfgType struct {
 		Devstatecssclassmap  stringToStringMap
 		Usedstatecssclassmap severityToWwwClassMap
 	}
-	Wwwuser map[string]*struct {
-		Enable   bool
-		Password string
-	}
-	Chassis struct {
+	Wwwuser  map[string]*wwwUserCfg
+	Apitoken map[string]*apiTokenCfg
+	Chassis  struct {
 		Enable             bool
 		Chassis45drives15  bool
 		Chassis45drives30  bool
@@ -283,6 +282,33 @@ func checkRefresh(sec int) error {
 	return nil
 }
 
+// checkAuthCfg validates the roles of the web users and the roles and hashes
+// of the API tokens.
+func checkAuthCfg(c *cfgType, errorSeen *bool) {
+	for _, name := range sortedKeys(c.Wwwuser) {
+		_, err := configRole(c.Wwwuser[name].Role)
+		checkCfgErr(cfgFile, "wwwuser", name, "role", err, errorSeen)
+	}
+	for _, name := range sortedKeys(c.Apitoken) {
+		t := c.Apitoken[name]
+		_, err := configRole(t.Role)
+		checkCfgErr(cfgFile, "apitoken", name, "role", err, errorSeen)
+		if t.Enable || t.Hash != "" {
+			_, err = parseTokenHash(t.Hash)
+			checkCfgErr(cfgFile, "apitoken", name, "hash", err, errorSeen)
+		}
+	}
+}
+
+func sortedKeys[V any](m map[string]V) []string {
+	keys := make([]string, 0, len(m))
+	for k := range m {
+		keys = append(keys, k)
+	}
+	sort.Strings(keys)
+	return keys
+}
+
 func getCfg() *cfgType {
 	var c cfgType
 	var errorSeen bool
@@ -319,6 +345,7 @@ func getCfg() *cfgType {
 	_, err = parseTrustedProxies(c.Www.Trustedproxies)
 	checkCfgErr(cfgFile, "www", "", "trustedproxies", err, &errorSeen)
 	checkCfgErr(cfgFile, "main", "", "commandtimeout", checkCommandTimeout(c.Main.Commandtimeout), &errorSeen)
+	checkAuthCfg(&c, &errorSeen)
 
 	if errorSeen {
 		return nil
@@ -373,6 +400,7 @@ func setup() {
 	pflag.StringVarP(&cfgFile, "conf", "c", CFGFILE, "configuration file path")
 	pflag.BoolVarP(&optDebug, "debug", "d", false, "debug mode: messages also to stdout, diagnostics at debug level to stderr")
 	optHashPassword := pflag.BoolP("passwordhash", "P", false, "read a password and print its bcrypt hash")
+	optGenerateToken := pflag.BoolP("generate-token", "T", false, "generate an API token and print it with its hash")
 	optTest := pflag.BoolP("test", "t", false, "test configuration and exit")
 	optVersion := pflag.BoolP("version", "v", false, "print version information and exit")
 
@@ -388,6 +416,10 @@ func setup() {
 	}
 	if *optHashPassword {
 		os.Exit(wwwHashPassword(os.Stdin, os.Stdout, os.Stderr))
+	}
+
+	if *optGenerateToken {
+		os.Exit(wwwGenerateToken(os.Stdout, os.Stderr))
 	}
 
 	// initialize logging & notification:

@@ -39,9 +39,9 @@
 						<li{{ if .Enclosure }} class="active"{{ end }}>
 							<a href="{{ .Root }}/enclosure/">Enclosure</a></li>
 						<li{{ if .Statistics }} class="active"{{ end }}>
-							<a href="{{ .Root }}/statistics/">Statistics</a></li>
+							<a href="{{ .Root }}/statistics/">Statistics</a></li>{{ if .CanLogs }}
 						<li{{ if .Logs }} class="active"{{ end }}>
-							<a href="{{ .Root }}/logs/">Logs</a></li>
+							<a href="{{ .Root }}/logs/">Logs</a></li>{{ end }}
 					</ul>
 					<ul class="nav navbar-nav navbar-right">
 						<li{{ if .About }} class="active"{{ end }}>

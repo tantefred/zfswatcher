@@ -62,17 +62,14 @@ func TestBasicAuth(t *testing.T) {
 	old := cfg
 	cfg = &cfgType{}
 	t.Cleanup(func() { cfg = old })
-	cfg.Wwwuser = map[string]*struct {
-		Enable   bool
-		Password string
-	}{
+	cfg.Wwwuser = map[string]*wwwUserCfg{
 		"md5":      {Enable: true, Password: testToorHash},
 		"bcrypt":   {Enable: true, Password: testToorBcryptHash},
 		"disabled": {Enable: false, Password: testToorBcryptHash},
 		"nohash":   {Enable: true, Password: ""},
 		"plain":    {Enable: true, Password: "toor"},
 	}
-	h := basicAuth(func(w http.ResponseWriter, r *http.Request) { w.WriteHeader(http.StatusOK) })
+	h := requireRole(RoleViewer, func(w http.ResponseWriter, r *http.Request) { w.WriteHeader(http.StatusOK) })
 
 	cases := []struct {
 		name, user, pass string
