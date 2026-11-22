@@ -27,7 +27,9 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"strconv"
 	"strings"
+	"time"
 
 	"golang.org/x/crypto/bcrypt"
 
@@ -325,6 +327,18 @@ func plainError(w http.ResponseWriter, _ *http.Request, code int, msg string) {
 	http.Error(w, msg, code)
 }
 
+// recordLoginFailure counts a failed login of the client and reports the
+// lockout, once per lockout.
+func recordLoginFailure(ip string) {
+	window := time.Duration(cfg.Www.Loginwindow) * time.Second
+	lockout := time.Duration(cfg.Www.Loginlockout) * time.Second
+	if webLoginGuard.fail(ip, cfg.Www.Loginfailures, window, lockout) && notify != nil {
+		notify.Printf(cfg.Severity.Loginlockout,
+			"web login: client %s locked out for %ds after %d failed attempts",
+			ip, cfg.Www.Loginlockout, cfg.Www.Loginfailures)
+	}
+}
+
 // requireRole wraps the handler: the request needs valid credentials and at
 // least the given role. Errors are plain text.
 func requireRole(min Role, h http.HandlerFunc) http.HandlerFunc {
@@ -335,14 +349,33 @@ func requireRole(min Role, h http.HandlerFunc) http.HandlerFunc {
 // renderer.
 func requireRoleWith(a Authenticator, render errorRenderer, min Role, h http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		ip := clientIP(r)
+		failures := cfg.Www.Loginfailures
+		if failures > 0 {
+			// Locked out clients are rejected before any (expensive)
+			// credential check.
+			if secs, locked := webLoginGuard.blocked(ip); locked {
+				w.Header().Set("Retry-After", strconv.Itoa(secs))
+				render(w, r, http.StatusTooManyRequests, "429 Too Many Requests")
+				return
+			}
+		}
 		p, err := a.Authenticate(r)
 		if p == nil {
-			if err != nil && notify != nil {
-				notify.Printf(notifier.WARNING, "web login failed for %s from %s", err, clientIP(r))
+			if err != nil {
+				if notify != nil {
+					notify.Printf(notifier.WARNING, "web login failed for %s from %s", err, ip)
+				}
+				if failures > 0 {
+					recordLoginFailure(ip)
+				}
 			}
 			w.Header().Set("WWW-Authenticate", `Basic realm="`+authRealm+`", charset="UTF-8"`)
 			render(w, r, http.StatusUnauthorized, "401 Unauthorized")
 			return
+		}
+		if failures > 0 {
+			webLoginGuard.success(ip)
 		}
 		if p.Role < min {
 			render(w, r, http.StatusForbidden, "403 Forbidden")
