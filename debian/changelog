@@ -1,3 +1,23 @@
+zfswatcher (0.8.0-1) unstable; urgency=medium
+
+  * Replace the web interface with Bootstrap 5.3.9 and htmx 2.0.11 (no
+    jQuery); automatic refresh of the dashboard and pool status with the new
+    option "refresh" in [www]; the enclosure page is rendered on the server.
+    Old Bootstrap 3 CSS class names in the configuration are translated.
+  * Add roles for web users (viewer, operator, admin; default admin) and a
+    read only JSON API v1 under <rootdir>/api/v1/ with API tokens
+    ("zfswatcher -T" creates one).
+  * Write internal diagnostics with log/slog to stderr (the journal) and
+    add the plug-in interface notifier.Output for output channels.
+  * Add a data layer with presentation free model types and snapshots.
+  * Remove the unfinished iostat stream; the option "zpooliostatcmd" is
+    obsolete and only logs a warning.
+  * Log successful configuration reloads at info level.
+  * Build the .deb with xz compression, update debian/copyright for the
+    bundled assets and raise the CI coverage minimum to 68 %.
+
+ -- tantefred <147740857+tantefred@users.noreply.github.com>  Sun, 22 Nov 2026 20:00:00 +0100
+
 zfswatcher (0.7.0-1) unstable; urgency=medium
 
   * Save the pool state to a state file (default
