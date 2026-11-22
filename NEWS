@@ -3,6 +3,22 @@
                            version history
 
 
+version 0.9.0 (unreleased)
+
+New features
+
+ - The logs page and /api/v1/events keep their history across restarts and
+   updates: the events of the log buffer ("logbuffer" in [www]) are saved in
+   the state file ("statefile") and loaded again at startup. They are
+   written after a check if new events appeared (not on every message) and
+   once more at shutdown. Restored events are only displayed, they are not
+   sent to log files, syslog or mail again. Older state files without
+   events are still read; with "statefile =" the history is lost on restart
+   as before.
+ - "zfswatcher starting" now includes the version and is the first message
+   of a run; warnings about the configuration follow it.
+
+
 version 0.8.0 released 2026-11-22
 
 Upgrade notes
