@@ -1,0 +1,2351 @@
+<!-- ===== zfsw_mix ===== -->
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<title>zfswatcher</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<link href="/zw/resources/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+		<link href="/zw/resources/bootstrap/css/bootstrap-theme.min.css" rel="stylesheet">
+		<style type="text/css">
+			body {
+				padding-top: 60px;
+				padding-bottom: 60px;
+			}
+		</style>
+		<link href="/zw/resources/zfswatcher.css" rel="stylesheet">
+		<link href="/zw/resources/favicon.ico" rel="shortcut icon">
+		<script src="/zw/resources/bootstrap/js/jquery.min.js"></script>
+	</head>
+
+	<body>
+
+	<div class="navbar navbar-inverse navbar-fixed-top">
+		<div class="container-fluid">
+			<div class="navbar-header">
+				<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+	        <span class="sr-only">Toggle navigation</span>
+	        <span class="icon-bar"></span>
+	        <span class="icon-bar"></span>
+	        <span class="icon-bar"></span>
+	      </button>
+				<a class="navbar-brand" href="/zw/">zfswatcher</a>
+	    </div>
+				<div class="navbar-collapse collapse" id="bs-example-navbar-collapse-1">
+					<ul class="nav navbar-nav">
+						<li>
+							<a href="/zw/">Dashboard</a></li>
+						<li class="active">
+							<a href="/zw/status/">Pool Status</a></li>
+						<li>
+							<a href="/zw/enclosure/">Enclosure</a></li>
+						<li>
+							<a href="/zw/statistics/">Statistics</a></li>
+						<li>
+							<a href="/zw/logs/">Logs</a></li>
+					</ul>
+					<ul class="nav navbar-nav navbar-right">
+						<li>
+							<a href="/zw/about/" class="pull-right">About</a></li>
+					</ul>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="container-fluid">
+		
+		<div class="row-fluid">
+
+
+<ul class="nav nav-tabs">
+
+	<li class="active">
+		<a href="zfsw_mix">zfsw_mix</a>
+	</li>
+
+	<li>
+		<a href="test">test</a>
+	</li>
+
+	<li>
+		<a href="zfsw_mirror">zfsw_mirror</a>
+	</li>
+
+	<li>
+		<a href="datis">datis</a>
+	</li>
+
+	<li>
+		<a href="rpool">rpool</a>
+	</li>
+
+	<li>
+		<a href="secundus">secundus</a>
+	</li>
+
+	<li>
+		<a href="zfsw_draid">zfsw_draid</a>
+	</li>
+
+	<li>
+		<a href="zfsw_susp">zfsw_susp</a>
+	</li>
+
+	<li>
+		<a href="zfsw_rz2">zfsw_rz2</a>
+	</li>
+
+	<li>
+		<a href="zfsw_opt">zfsw_opt</a>
+	</li>
+
+</ul>
+
+	<dl class="dl-horizontal">
+		<dt>name:</dt><dd>zfsw_mix</dd>
+		<dt>state:</dt><dd class="success">ONLINE</dd>
+		
+		
+		
+		
+	</dl>
+	<table class="table table-condensed table-hover">
+		<thead>
+			<tr>
+				<th style="width: 30%">Name</th>
+				<th style="width: 4%">Loc</th>
+				<th style="width: 15%">State</th>
+				<th style="text-align: right; width: 8%">Read</th>
+				<th style="text-align: right; width: 8%">Write</th>
+				<th style="text-align: right; width: 8%">Cksum</th>
+				<th style="width: 31%"></th>
+			</tr>
+		</thead>
+		<tbody>
+			
+			<tr>
+				<td style="padding-left: 1em">zfsw_mix</td>
+				<td>
+				
+				</td>
+				<td class="success">ONLINE</td>
+				<td style="text-align: right">0</td>
+				<td style="text-align: right">0</td>
+				<td style="text-align: right">0</td>
+				<td style=""></td>
+			</tr>
+			
+			<tr>
+				<td style="padding-left: 3em">raidz1-0</td>
+				<td>
+				
+				</td>
+				<td class="success">ONLINE</td>
+				<td style="text-align: right">0</td>
+				<td style="text-align: right">0</td>
+				<td style="text-align: right">0</td>
+				<td style=""></td>
+			</tr>
+			
+			<tr>
+				<td style="padding-left: 5em">/var/tmp/zfsw-collect/c1</td>
+				<td>
+				
+				</td>
+				<td class="success">ONLINE</td>
+				<td style="text-align: right">0</td>
+				<td style="text-align: right">0</td>
+				<td style="text-align: right">0</td>
+				<td style=""></td>
+			</tr>
+			
+			<tr>
+				<td style="padding-left: 5em">/var/tmp/zfsw-collect/c2</td>
+				<td>
+				
+				</td>
+				<td class="success">ONLINE</td>
+				<td style="text-align: right">0</td>
+				<td style="text-align: right">0</td>
+				<td style="text-align: right">0</td>
+				<td style=""></td>
+			</tr>
+			
+			<tr>
+				<td style="padding-left: 5em">/var/tmp/zfsw-collect/c3</td>
+				<td>
+				
+				</td>
+				<td class="success">ONLINE</td>
+				<td style="text-align: right">0</td>
+				<td style="text-align: right">0</td>
+				<td style="text-align: right">0</td>
+				<td style=""></td>
+			</tr>
+			
+			<tr>
+				<td style="padding-left: 1em">dedup</td>
+				<td>
+				
+				</td>
+				<td class=""></td>
+				<td style="text-align: right">-</td>
+				<td style="text-align: right">-</td>
+				<td style="text-align: right">-</td>
+				<td style=""></td>
+			</tr>
+			
+			<tr>
+				<td style="padding-left: 3em">/var/tmp/zfsw-collect/c8</td>
+				<td>
+				
+				</td>
+				<td class="success">ONLINE</td>
+				<td style="text-align: right">0</td>
+				<td style="text-align: right">0</td>
+				<td style="text-align: right">0</td>
+				<td style=""></td>
+			</tr>
+			
+			<tr>
+				<td style="padding-left: 1em">special</td>
+				<td>
+				
+				</td>
+				<td class=""></td>
+				<td style="text-align: right">-</td>
+				<td style="text-align: right">-</td>
+				<td style="text-align: right">-</td>
+				<td style=""></td>
+			</tr>
+			
+			<tr>
+				<td style="padding-left: 3em">/var/tmp/zfsw-collect/c7</td>
+				<td>
+				
+				</td>
+				<td class="success">ONLINE</td>
+				<td style="text-align: right">0</td>
+				<td style="text-align: right">0</td>
+				<td style="text-align: right">0</td>
+				<td style=""></td>
+			</tr>
+			
+			<tr>
+				<td style="padding-left: 1em">logs</td>
+				<td>
+				
+				</td>
+				<td class=""></td>
+				<td style="text-align: right">-</td>
+				<td style="text-align: right">-</td>
+				<td style="text-align: right">-</td>
+				<td style=""></td>
+			</tr>
+			
+			<tr>
+				<td style="padding-left: 3em">/var/tmp/zfsw-collect/c4</td>
+				<td>
+				
+				</td>
+				<td class="success">ONLINE</td>
+				<td style="text-align: right">0</td>
+				<td style="text-align: right">0</td>
+				<td style="text-align: right">0</td>
+				<td style=""></td>
+			</tr>
+			
+			<tr>
+				<td style="padding-left: 1em">cache</td>
+				<td>
+				
+				</td>
+				<td class=""></td>
+				<td style="text-align: right">-</td>
+				<td style="text-align: right">-</td>
+				<td style="text-align: right">-</td>
+				<td style=""></td>
+			</tr>
+			
+			<tr>
+				<td style="padding-left: 3em">/var/tmp/zfsw-collect/c5</td>
+				<td>
+				
+				</td>
+				<td class="success">ONLINE</td>
+				<td style="text-align: right">0</td>
+				<td style="text-align: right">0</td>
+				<td style="text-align: right">0</td>
+				<td style=""></td>
+			</tr>
+			
+			<tr>
+				<td style="padding-left: 1em">spares</td>
+				<td>
+				
+				</td>
+				<td class=""></td>
+				<td style="text-align: right">-</td>
+				<td style="text-align: right">-</td>
+				<td style="text-align: right">-</td>
+				<td style=""></td>
+			</tr>
+			
+			<tr>
+				<td style="padding-left: 3em">/var/tmp/zfsw-collect/c6</td>
+				<td>
+				
+				</td>
+				<td class="info">AVAIL</td>
+				<td style="text-align: right">-</td>
+				<td style="text-align: right">-</td>
+				<td style="text-align: right">-</td>
+				<td style=""></td>
+			</tr>
+			
+		</tbody>
+	</table>
+
+	<dl class="dl-horizontal">
+		
+		<dt>errors:</dt><dd>No known data errors</dd>
+		
+	</dl>
+
+
+			</div> 
+		</div> 
+
+		<script src="/zw/resources/bootstrap/js/bootstrap.min.js"></script>
+
+	</body>
+</html>
+
+<!-- ===== test ===== -->
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<title>zfswatcher</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<link href="/zw/resources/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+		<link href="/zw/resources/bootstrap/css/bootstrap-theme.min.css" rel="stylesheet">
+		<style type="text/css">
+			body {
+				padding-top: 60px;
+				padding-bottom: 60px;
+			}
+		</style>
+		<link href="/zw/resources/zfswatcher.css" rel="stylesheet">
+		<link href="/zw/resources/favicon.ico" rel="shortcut icon">
+		<script src="/zw/resources/bootstrap/js/jquery.min.js"></script>
+	</head>
+
+	<body>
+
+	<div class="navbar navbar-inverse navbar-fixed-top">
+		<div class="container-fluid">
+			<div class="navbar-header">
+				<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+	        <span class="sr-only">Toggle navigation</span>
+	        <span class="icon-bar"></span>
+	        <span class="icon-bar"></span>
+	        <span class="icon-bar"></span>
+	      </button>
+				<a class="navbar-brand" href="/zw/">zfswatcher</a>
+	    </div>
+				<div class="navbar-collapse collapse" id="bs-example-navbar-collapse-1">
+					<ul class="nav navbar-nav">
+						<li>
+							<a href="/zw/">Dashboard</a></li>
+						<li class="active">
+							<a href="/zw/status/">Pool Status</a></li>
+						<li>
+							<a href="/zw/enclosure/">Enclosure</a></li>
+						<li>
+							<a href="/zw/statistics/">Statistics</a></li>
+						<li>
+							<a href="/zw/logs/">Logs</a></li>
+					</ul>
+					<ul class="nav navbar-nav navbar-right">
+						<li>
+							<a href="/zw/about/" class="pull-right">About</a></li>
+					</ul>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="container-fluid">
+		
+		<div class="row-fluid">
+
+
+<ul class="nav nav-tabs">
+
+	<li>
+		<a href="zfsw_mix">zfsw_mix</a>
+	</li>
+
+	<li class="active">
+		<a href="test">test</a>
+	</li>
+
+	<li>
+		<a href="zfsw_mirror">zfsw_mirror</a>
+	</li>
+
+	<li>
+		<a href="datis">datis</a>
+	</li>
+
+	<li>
+		<a href="rpool">rpool</a>
+	</li>
+
+	<li>
+		<a href="secundus">secundus</a>
+	</li>
+
+	<li>
+		<a href="zfsw_draid">zfsw_draid</a>
+	</li>
+
+	<li>
+		<a href="zfsw_susp">zfsw_susp</a>
+	</li>
+
+	<li>
+		<a href="zfsw_rz2">zfsw_rz2</a>
+	</li>
+
+	<li>
+		<a href="zfsw_opt">zfsw_opt</a>
+	</li>
+
+</ul>
+
+	<dl class="dl-horizontal">
+		<dt>name:</dt><dd>test</dd>
+		<dt>state:</dt><dd class="warning">DEGRADED</dd>
+		
+		<dt>status:</dt><dd>One or more devices could not be used because the label is missing or
+invalid.  Sufficient replicas exist for the pool to continue
+functioning in a degraded state.</dd>
+		
+		
+		<dt>action:</dt><dd>Replace the device using &#39;zpool replace&#39;.</dd>
+		
+		
+		<dt>see:</dt><dd><a href="http://zfsonlinux.org/msg/ZFS-8000-4J" target="_blank">http://zfsonlinux.org/msg/ZFS-8000-4J</a></dd>
+		
+		
+		<dt>scan:</dt><dd>resilvered 674M in 0h3m with 0 errors on Tue Dec 18 00:19:59 2012</dd>
+		
+	</dl>
+	<table class="table table-condensed table-hover">
+		<thead>
+			<tr>
+				<th style="width: 30%">Name</th>
+				<th style="width: 4%">Loc</th>
+				<th style="width: 15%">State</th>
+				<th style="text-align: right; width: 8%">Read</th>
+				<th style="text-align: right; width: 8%">Write</th>
+				<th style="text-align: right; width: 8%">Cksum</th>
+				<th style="width: 31%"></th>
+			</tr>
+		</thead>
+		<tbody>
+			
+			<tr>
+				<td style="padding-left: 1em">test</td>
+				<td>
+				
+				</td>
+				<td class="warning">DEGRADED</td>
+				<td style="text-align: right">0</td>
+				<td style="text-align: right">0</td>
+				<td style="text-align: right">0</td>
+				<td style=""></td>
+			</tr>
+			
+			<tr>
+				<td style="padding-left: 3em">raidz3-0</td>
+				<td>
+				
+				</td>
+				<td class="warning">DEGRADED</td>
+				<td style="text-align: right">0</td>
+				<td style="text-align: right">0</td>
+				<td style="text-align: right">0</td>
+				<td style=""></td>
+			</tr>
+			
+			<tr>
+				<td style="padding-left: 5em">B0</td>
+				<td>
+				
+				</td>
+				<td class="">UNAVAIL</td>
+				<td style="text-align: right">0</td>
+				<td style="text-align: right">0</td>
+				<td style="text-align: right">0</td>
+				<td style=""></td>
+			</tr>
+			
+			<tr>
+				<td style="padding-left: 5em">A1</td>
+				<td>
+				
+				</td>
+				<td class="success">ONLINE</td>
+				<td style="text-align: right">0</td>
+				<td style="text-align: right">0</td>
+				<td style="text-align: right">0</td>
+				<td style=""></td>
+			</tr>
+			
+			<tr>
+				<td style="padding-left: 5em">A2</td>
+				<td>
+				
+				</td>
+				<td class="success">ONLINE</td>
+				<td style="text-align: right">0</td>
+				<td style="text-align: right">0</td>
+				<td style="text-align: right">0</td>
+				<td style=""></td>
+			</tr>
+			
+			<tr>
+				<td style="padding-left: 5em">A3</td>
+				<td>
+				
+				</td>
+				<td class="success">ONLINE</td>
+				<td style="text-align: right">0</td>
+				<td style="text-align: right">0</td>
+				<td style="text-align: right">0</td>
+				<td style=""></td>
+			</tr>
+			
+			<tr>
+				<td style="padding-left: 5em">A4</td>
+				<td>
+				
+				</td>
+				<td class="success">ONLINE</td>
+				<td style="text-align: right">0</td>
+				<td style="text-align: right">0</td>
+				<td style="text-align: right">0</td>
+				<td style=""></td>
+			</tr>
+			
+			<tr>
+				<td style="padding-left: 5em">A5</td>
+				<td>
+				
+				</td>
+				<td class="success">ONLINE</td>
+				<td style="text-align: right">0</td>
+				<td style="text-align: right">0</td>
+				<td style="text-align: right">0</td>
+				<td style=""></td>
+			</tr>
+			
+			<tr>
+				<td style="padding-left: 5em">A6</td>
+				<td>
+				
+				</td>
+				<td class="success">ONLINE</td>
+				<td style="text-align: right">0</td>
+				<td style="text-align: right">0</td>
+				<td style="text-align: right">0</td>
+				<td style=""></td>
+			</tr>
+			
+			<tr>
+				<td style="padding-left: 1em">spares</td>
+				<td>
+				
+				</td>
+				<td class=""></td>
+				<td style="text-align: right">-</td>
+				<td style="text-align: right">-</td>
+				<td style="text-align: right">-</td>
+				<td style=""></td>
+			</tr>
+			
+			<tr>
+				<td style="padding-left: 3em">B1</td>
+				<td>
+				
+				</td>
+				<td class="">UNAVAIL</td>
+				<td style="text-align: right">-</td>
+				<td style="text-align: right">-</td>
+				<td style="text-align: right">-</td>
+				<td style=""></td>
+			</tr>
+			
+			<tr>
+				<td style="padding-left: 3em">B2</td>
+				<td>
+				
+				</td>
+				<td class="">UNAVAIL</td>
+				<td style="text-align: right">-</td>
+				<td style="text-align: right">-</td>
+				<td style="text-align: right">-</td>
+				<td style=""></td>
+			</tr>
+			
+		</tbody>
+	</table>
+
+	<dl class="dl-horizontal">
+		
+		<dt>errors:</dt><dd>No known data errors</dd>
+		
+	</dl>
+
+
+			</div> 
+		</div> 
+
+		<script src="/zw/resources/bootstrap/js/bootstrap.min.js"></script>
+
+	</body>
+</html>
+
+<!-- ===== zfsw_mirror ===== -->
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<title>zfswatcher</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<link href="/zw/resources/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+		<link href="/zw/resources/bootstrap/css/bootstrap-theme.min.css" rel="stylesheet">
+		<style type="text/css">
+			body {
+				padding-top: 60px;
+				padding-bottom: 60px;
+			}
+		</style>
+		<link href="/zw/resources/zfswatcher.css" rel="stylesheet">
+		<link href="/zw/resources/favicon.ico" rel="shortcut icon">
+		<script src="/zw/resources/bootstrap/js/jquery.min.js"></script>
+	</head>
+
+	<body>
+
+	<div class="navbar navbar-inverse navbar-fixed-top">
+		<div class="container-fluid">
+			<div class="navbar-header">
+				<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+	        <span class="sr-only">Toggle navigation</span>
+	        <span class="icon-bar"></span>
+	        <span class="icon-bar"></span>
+	        <span class="icon-bar"></span>
+	      </button>
+				<a class="navbar-brand" href="/zw/">zfswatcher</a>
+	    </div>
+				<div class="navbar-collapse collapse" id="bs-example-navbar-collapse-1">
+					<ul class="nav navbar-nav">
+						<li>
+							<a href="/zw/">Dashboard</a></li>
+						<li class="active">
+							<a href="/zw/status/">Pool Status</a></li>
+						<li>
+							<a href="/zw/enclosure/">Enclosure</a></li>
+						<li>
+							<a href="/zw/statistics/">Statistics</a></li>
+						<li>
+							<a href="/zw/logs/">Logs</a></li>
+					</ul>
+					<ul class="nav navbar-nav navbar-right">
+						<li>
+							<a href="/zw/about/" class="pull-right">About</a></li>
+					</ul>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="container-fluid">
+		
+		<div class="row-fluid">
+
+
+<ul class="nav nav-tabs">
+
+	<li>
+		<a href="zfsw_mix">zfsw_mix</a>
+	</li>
+
+	<li>
+		<a href="test">test</a>
+	</li>
+
+	<li class="active">
+		<a href="zfsw_mirror">zfsw_mirror</a>
+	</li>
+
+	<li>
+		<a href="datis">datis</a>
+	</li>
+
+	<li>
+		<a href="rpool">rpool</a>
+	</li>
+
+	<li>
+		<a href="secundus">secundus</a>
+	</li>
+
+	<li>
+		<a href="zfsw_draid">zfsw_draid</a>
+	</li>
+
+	<li>
+		<a href="zfsw_susp">zfsw_susp</a>
+	</li>
+
+	<li>
+		<a href="zfsw_rz2">zfsw_rz2</a>
+	</li>
+
+	<li>
+		<a href="zfsw_opt">zfsw_opt</a>
+	</li>
+
+</ul>
+
+	<dl class="dl-horizontal">
+		<dt>name:</dt><dd>zfsw_mirror</dd>
+		<dt>state:</dt><dd class="success">ONLINE</dd>
+		
+		<dt>status:</dt><dd>One or more devices is currently being resilvered.  The pool will
+continue to function, possibly in a degraded state.</dd>
+		
+		
+		<dt>action:</dt><dd>Wait for the resilver to complete.</dd>
+		
+		
+		
+		<dt>scan:</dt><dd>resilver in progress since Sat Nov 21 20:55:12 2026
+401M / 401M scanned, 23.9M / 401M issued at 23.9M/s
+7.97M resilvered, 5.97% done, 00:00:15 to go</dd>
+		
+	</dl>
+	<table class="table table-condensed table-hover">
+		<thead>
+			<tr>
+				<th style="width: 30%">Name</th>
+				<th style="width: 4%">Loc</th>
+				<th style="width: 15%">State</th>
+				<th style="text-align: right; width: 8%">Read</th>
+				<th style="text-align: right; width: 8%">Write</th>
+				<th style="text-align: right; width: 8%">Cksum</th>
+				<th style="width: 31%"></th>
+			</tr>
+		</thead>
+		<tbody>
+			
+			<tr>
+				<td style="padding-left: 1em">zfsw_mirror</td>
+				<td>
+				
+				</td>
+				<td class="success">ONLINE</td>
+				<td style="text-align: right">0</td>
+				<td style="text-align: right">0</td>
+				<td style="text-align: right">0</td>
+				<td style=""></td>
+			</tr>
+			
+			<tr>
+				<td style="padding-left: 3em">mirror-0</td>
+				<td>
+				
+				</td>
+				<td class="success">ONLINE</td>
+				<td style="text-align: right">0</td>
+				<td style="text-align: right">0</td>
+				<td style="text-align: right">0</td>
+				<td style=""></td>
+			</tr>
+			
+			<tr>
+				<td style="padding-left: 5em">/var/tmp/zfsw-collect/m1</td>
+				<td>
+				
+				</td>
+				<td class="success">ONLINE</td>
+				<td style="text-align: right">0</td>
+				<td style="text-align: right">0</td>
+				<td style="text-align: right">0</td>
+				<td style=""></td>
+			</tr>
+			
+			<tr>
+				<td style="padding-left: 5em">replacing-1</td>
+				<td>
+				
+				</td>
+				<td class="success">ONLINE</td>
+				<td style="text-align: right">0</td>
+				<td style="text-align: right">0</td>
+				<td style="text-align: right">0</td>
+				<td style=""></td>
+			</tr>
+			
+			<tr>
+				<td style="padding-left: 7em">/var/tmp/zfsw-collect/m2</td>
+				<td>
+				
+				</td>
+				<td class="success">ONLINE</td>
+				<td style="text-align: right">0</td>
+				<td style="text-align: right">0</td>
+				<td style="text-align: right">0</td>
+				<td style=""></td>
+			</tr>
+			
+			<tr>
+				<td style="padding-left: 7em">/var/tmp/zfsw-collect/m3</td>
+				<td>
+				
+				</td>
+				<td class="success">ONLINE</td>
+				<td style="text-align: right">0</td>
+				<td style="text-align: right">0</td>
+				<td style="text-align: right">0</td>
+				<td style="">(resilvering)</td>
+			</tr>
+			
+		</tbody>
+	</table>
+
+	<dl class="dl-horizontal">
+		
+		<dt>errors:</dt><dd>No known data errors</dd>
+		
+	</dl>
+
+
+			</div> 
+		</div> 
+
+		<script src="/zw/resources/bootstrap/js/bootstrap.min.js"></script>
+
+	</body>
+</html>
+
+<!-- ===== datis ===== -->
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<title>zfswatcher</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<link href="/zw/resources/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+		<link href="/zw/resources/bootstrap/css/bootstrap-theme.min.css" rel="stylesheet">
+		<style type="text/css">
+			body {
+				padding-top: 60px;
+				padding-bottom: 60px;
+			}
+		</style>
+		<link href="/zw/resources/zfswatcher.css" rel="stylesheet">
+		<link href="/zw/resources/favicon.ico" rel="shortcut icon">
+		<script src="/zw/resources/bootstrap/js/jquery.min.js"></script>
+	</head>
+
+	<body>
+
+	<div class="navbar navbar-inverse navbar-fixed-top">
+		<div class="container-fluid">
+			<div class="navbar-header">
+				<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+	        <span class="sr-only">Toggle navigation</span>
+	        <span class="icon-bar"></span>
+	        <span class="icon-bar"></span>
+	        <span class="icon-bar"></span>
+	      </button>
+				<a class="navbar-brand" href="/zw/">zfswatcher</a>
+	    </div>
+				<div class="navbar-collapse collapse" id="bs-example-navbar-collapse-1">
+					<ul class="nav navbar-nav">
+						<li>
+							<a href="/zw/">Dashboard</a></li>
+						<li class="active">
+							<a href="/zw/status/">Pool Status</a></li>
+						<li>
+							<a href="/zw/enclosure/">Enclosure</a></li>
+						<li>
+							<a href="/zw/statistics/">Statistics</a></li>
+						<li>
+							<a href="/zw/logs/">Logs</a></li>
+					</ul>
+					<ul class="nav navbar-nav navbar-right">
+						<li>
+							<a href="/zw/about/" class="pull-right">About</a></li>
+					</ul>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="container-fluid">
+		
+		<div class="row-fluid">
+
+
+<ul class="nav nav-tabs">
+
+	<li>
+		<a href="zfsw_mix">zfsw_mix</a>
+	</li>
+
+	<li>
+		<a href="test">test</a>
+	</li>
+
+	<li>
+		<a href="zfsw_mirror">zfsw_mirror</a>
+	</li>
+
+	<li class="active">
+		<a href="datis">datis</a>
+	</li>
+
+	<li>
+		<a href="rpool">rpool</a>
+	</li>
+
+	<li>
+		<a href="secundus">secundus</a>
+	</li>
+
+	<li>
+		<a href="zfsw_draid">zfsw_draid</a>
+	</li>
+
+	<li>
+		<a href="zfsw_susp">zfsw_susp</a>
+	</li>
+
+	<li>
+		<a href="zfsw_rz2">zfsw_rz2</a>
+	</li>
+
+	<li>
+		<a href="zfsw_opt">zfsw_opt</a>
+	</li>
+
+</ul>
+
+	<dl class="dl-horizontal">
+		<dt>name:</dt><dd>datis</dd>
+		<dt>state:</dt><dd class="success">ONLINE</dd>
+		
+		<dt>status:</dt><dd>Some supported and requested features are not enabled on the pool.
+The pool can still be used, but some features are unavailable.</dd>
+		
+		
+		<dt>action:</dt><dd>Enable all features using &#39;zpool upgrade&#39;. Once this is done,
+the pool may no longer be accessible by software that does not support
+the features. See zpool-features(7) for details.</dd>
+		
+		
+		
+		<dt>scan:</dt><dd>scrub repaired 0B in 09:27:59 with 0 errors on Sun Nov  8 09:52:00 2026</dd>
+		
+	</dl>
+	<table class="table table-condensed table-hover">
+		<thead>
+			<tr>
+				<th style="width: 30%">Name</th>
+				<th style="width: 4%">Loc</th>
+				<th style="width: 15%">State</th>
+				<th style="text-align: right; width: 8%">Read</th>
+				<th style="text-align: right; width: 8%">Write</th>
+				<th style="text-align: right; width: 8%">Cksum</th>
+				<th style="width: 31%"></th>
+			</tr>
+		</thead>
+		<tbody>
+			
+			<tr>
+				<td style="padding-left: 1em">datis</td>
+				<td>
+				
+				</td>
+				<td class="success">ONLINE</td>
+				<td style="text-align: right">0</td>
+				<td style="text-align: right">0</td>
+				<td style="text-align: right">0</td>
+				<td style=""></td>
+			</tr>
+			
+			<tr>
+				<td style="padding-left: 3em">raidz1-0</td>
+				<td>
+				
+				</td>
+				<td class="success">ONLINE</td>
+				<td style="text-align: right">0</td>
+				<td style="text-align: right">0</td>
+				<td style="text-align: right">0</td>
+				<td style=""></td>
+			</tr>
+			
+			<tr>
+				<td style="padding-left: 5em">ata-WDC_WD80EMZZ-11B4FB0_WD-CA0AAAAA</td>
+				<td>
+				
+				</td>
+				<td class="success">ONLINE</td>
+				<td style="text-align: right">0</td>
+				<td style="text-align: right">0</td>
+				<td style="text-align: right">0</td>
+				<td style=""></td>
+			</tr>
+			
+			<tr>
+				<td style="padding-left: 5em">ata-WDC_WD80EMZZ-11B4FB0_WD-CA0BBBBB</td>
+				<td>
+				
+				</td>
+				<td class="success">ONLINE</td>
+				<td style="text-align: right">0</td>
+				<td style="text-align: right">0</td>
+				<td style="text-align: right">0</td>
+				<td style=""></td>
+			</tr>
+			
+			<tr>
+				<td style="padding-left: 5em">ata-WDC_WD80EMZZ-11B4FB0_WD-CA0CCCCC</td>
+				<td>
+				
+				</td>
+				<td class="success">ONLINE</td>
+				<td style="text-align: right">0</td>
+				<td style="text-align: right">0</td>
+				<td style="text-align: right">0</td>
+				<td style=""></td>
+			</tr>
+			
+		</tbody>
+	</table>
+
+	<dl class="dl-horizontal">
+		
+		<dt>errors:</dt><dd>No known data errors</dd>
+		
+	</dl>
+
+
+			</div> 
+		</div> 
+
+		<script src="/zw/resources/bootstrap/js/bootstrap.min.js"></script>
+
+	</body>
+</html>
+
+<!-- ===== rpool ===== -->
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<title>zfswatcher</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<link href="/zw/resources/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+		<link href="/zw/resources/bootstrap/css/bootstrap-theme.min.css" rel="stylesheet">
+		<style type="text/css">
+			body {
+				padding-top: 60px;
+				padding-bottom: 60px;
+			}
+		</style>
+		<link href="/zw/resources/zfswatcher.css" rel="stylesheet">
+		<link href="/zw/resources/favicon.ico" rel="shortcut icon">
+		<script src="/zw/resources/bootstrap/js/jquery.min.js"></script>
+	</head>
+
+	<body>
+
+	<div class="navbar navbar-inverse navbar-fixed-top">
+		<div class="container-fluid">
+			<div class="navbar-header">
+				<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+	        <span class="sr-only">Toggle navigation</span>
+	        <span class="icon-bar"></span>
+	        <span class="icon-bar"></span>
+	        <span class="icon-bar"></span>
+	      </button>
+				<a class="navbar-brand" href="/zw/">zfswatcher</a>
+	    </div>
+				<div class="navbar-collapse collapse" id="bs-example-navbar-collapse-1">
+					<ul class="nav navbar-nav">
+						<li>
+							<a href="/zw/">Dashboard</a></li>
+						<li class="active">
+							<a href="/zw/status/">Pool Status</a></li>
+						<li>
+							<a href="/zw/enclosure/">Enclosure</a></li>
+						<li>
+							<a href="/zw/statistics/">Statistics</a></li>
+						<li>
+							<a href="/zw/logs/">Logs</a></li>
+					</ul>
+					<ul class="nav navbar-nav navbar-right">
+						<li>
+							<a href="/zw/about/" class="pull-right">About</a></li>
+					</ul>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="container-fluid">
+		
+		<div class="row-fluid">
+
+
+<ul class="nav nav-tabs">
+
+	<li>
+		<a href="zfsw_mix">zfsw_mix</a>
+	</li>
+
+	<li>
+		<a href="test">test</a>
+	</li>
+
+	<li>
+		<a href="zfsw_mirror">zfsw_mirror</a>
+	</li>
+
+	<li>
+		<a href="datis">datis</a>
+	</li>
+
+	<li class="active">
+		<a href="rpool">rpool</a>
+	</li>
+
+	<li>
+		<a href="secundus">secundus</a>
+	</li>
+
+	<li>
+		<a href="zfsw_draid">zfsw_draid</a>
+	</li>
+
+	<li>
+		<a href="zfsw_susp">zfsw_susp</a>
+	</li>
+
+	<li>
+		<a href="zfsw_rz2">zfsw_rz2</a>
+	</li>
+
+	<li>
+		<a href="zfsw_opt">zfsw_opt</a>
+	</li>
+
+</ul>
+
+	<dl class="dl-horizontal">
+		<dt>name:</dt><dd>rpool</dd>
+		<dt>state:</dt><dd class="success">ONLINE</dd>
+		
+		
+		
+		
+		<dt>scan:</dt><dd>scrub repaired 0B in 00:04:19 with 0 errors on Sun Nov  8 00:28:22 2026</dd>
+		
+	</dl>
+	<table class="table table-condensed table-hover">
+		<thead>
+			<tr>
+				<th style="width: 30%">Name</th>
+				<th style="width: 4%">Loc</th>
+				<th style="width: 15%">State</th>
+				<th style="text-align: right; width: 8%">Read</th>
+				<th style="text-align: right; width: 8%">Write</th>
+				<th style="text-align: right; width: 8%">Cksum</th>
+				<th style="width: 31%"></th>
+			</tr>
+		</thead>
+		<tbody>
+			
+			<tr>
+				<td style="padding-left: 1em">rpool</td>
+				<td>
+				
+				</td>
+				<td class="success">ONLINE</td>
+				<td style="text-align: right">0</td>
+				<td style="text-align: right">0</td>
+				<td style="text-align: right">0</td>
+				<td style=""></td>
+			</tr>
+			
+			<tr>
+				<td style="padding-left: 3em">mirror-0</td>
+				<td>
+				
+				</td>
+				<td class="success">ONLINE</td>
+				<td style="text-align: right">0</td>
+				<td style="text-align: right">0</td>
+				<td style="text-align: right">0</td>
+				<td style=""></td>
+			</tr>
+			
+			<tr>
+				<td style="padding-left: 5em">ata-SanDisk_SSD_PLUS_120GB_201911A0000A-part3</td>
+				<td>
+				
+				</td>
+				<td class="success">ONLINE</td>
+				<td style="text-align: right">0</td>
+				<td style="text-align: right">0</td>
+				<td style="text-align: right">0</td>
+				<td style=""></td>
+			</tr>
+			
+			<tr>
+				<td style="padding-left: 5em">sdi3</td>
+				<td>
+				
+				</td>
+				<td class="success">ONLINE</td>
+				<td style="text-align: right">0</td>
+				<td style="text-align: right">0</td>
+				<td style="text-align: right">0</td>
+				<td style=""></td>
+			</tr>
+			
+		</tbody>
+	</table>
+
+	<dl class="dl-horizontal">
+		
+		<dt>errors:</dt><dd>No known data errors</dd>
+		
+	</dl>
+
+
+			</div> 
+		</div> 
+
+		<script src="/zw/resources/bootstrap/js/bootstrap.min.js"></script>
+
+	</body>
+</html>
+
+<!-- ===== secundus ===== -->
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<title>zfswatcher</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<link href="/zw/resources/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+		<link href="/zw/resources/bootstrap/css/bootstrap-theme.min.css" rel="stylesheet">
+		<style type="text/css">
+			body {
+				padding-top: 60px;
+				padding-bottom: 60px;
+			}
+		</style>
+		<link href="/zw/resources/zfswatcher.css" rel="stylesheet">
+		<link href="/zw/resources/favicon.ico" rel="shortcut icon">
+		<script src="/zw/resources/bootstrap/js/jquery.min.js"></script>
+	</head>
+
+	<body>
+
+	<div class="navbar navbar-inverse navbar-fixed-top">
+		<div class="container-fluid">
+			<div class="navbar-header">
+				<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+	        <span class="sr-only">Toggle navigation</span>
+	        <span class="icon-bar"></span>
+	        <span class="icon-bar"></span>
+	        <span class="icon-bar"></span>
+	      </button>
+				<a class="navbar-brand" href="/zw/">zfswatcher</a>
+	    </div>
+				<div class="navbar-collapse collapse" id="bs-example-navbar-collapse-1">
+					<ul class="nav navbar-nav">
+						<li>
+							<a href="/zw/">Dashboard</a></li>
+						<li class="active">
+							<a href="/zw/status/">Pool Status</a></li>
+						<li>
+							<a href="/zw/enclosure/">Enclosure</a></li>
+						<li>
+							<a href="/zw/statistics/">Statistics</a></li>
+						<li>
+							<a href="/zw/logs/">Logs</a></li>
+					</ul>
+					<ul class="nav navbar-nav navbar-right">
+						<li>
+							<a href="/zw/about/" class="pull-right">About</a></li>
+					</ul>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="container-fluid">
+		
+		<div class="row-fluid">
+
+
+<ul class="nav nav-tabs">
+
+	<li>
+		<a href="zfsw_mix">zfsw_mix</a>
+	</li>
+
+	<li>
+		<a href="test">test</a>
+	</li>
+
+	<li>
+		<a href="zfsw_mirror">zfsw_mirror</a>
+	</li>
+
+	<li>
+		<a href="datis">datis</a>
+	</li>
+
+	<li>
+		<a href="rpool">rpool</a>
+	</li>
+
+	<li class="active">
+		<a href="secundus">secundus</a>
+	</li>
+
+	<li>
+		<a href="zfsw_draid">zfsw_draid</a>
+	</li>
+
+	<li>
+		<a href="zfsw_susp">zfsw_susp</a>
+	</li>
+
+	<li>
+		<a href="zfsw_rz2">zfsw_rz2</a>
+	</li>
+
+	<li>
+		<a href="zfsw_opt">zfsw_opt</a>
+	</li>
+
+</ul>
+
+	<dl class="dl-horizontal">
+		<dt>name:</dt><dd>secundus</dd>
+		<dt>state:</dt><dd class="success">ONLINE</dd>
+		
+		
+		
+		
+		<dt>scan:</dt><dd>scrub repaired 0B in 00:05:45 with 0 errors on Sun Nov  8 00:29:49 2026</dd>
+		
+	</dl>
+	<table class="table table-condensed table-hover">
+		<thead>
+			<tr>
+				<th style="width: 30%">Name</th>
+				<th style="width: 4%">Loc</th>
+				<th style="width: 15%">State</th>
+				<th style="text-align: right; width: 8%">Read</th>
+				<th style="text-align: right; width: 8%">Write</th>
+				<th style="text-align: right; width: 8%">Cksum</th>
+				<th style="width: 31%"></th>
+			</tr>
+		</thead>
+		<tbody>
+			
+			<tr>
+				<td style="padding-left: 1em">secundus</td>
+				<td>
+				
+				</td>
+				<td class="success">ONLINE</td>
+				<td style="text-align: right">0</td>
+				<td style="text-align: right">0</td>
+				<td style="text-align: right">0</td>
+				<td style=""></td>
+			</tr>
+			
+			<tr>
+				<td style="padding-left: 3em">raidz1-0</td>
+				<td>
+				
+				</td>
+				<td class="success">ONLINE</td>
+				<td style="text-align: right">0</td>
+				<td style="text-align: right">0</td>
+				<td style="text-align: right">0</td>
+				<td style=""></td>
+			</tr>
+			
+			<tr>
+				<td style="padding-left: 5em">WD4TB01</td>
+				<td>
+				
+				</td>
+				<td class="success">ONLINE</td>
+				<td style="text-align: right">0</td>
+				<td style="text-align: right">0</td>
+				<td style="text-align: right">0</td>
+				<td style=""></td>
+			</tr>
+			
+			<tr>
+				<td style="padding-left: 5em">WD4TB02</td>
+				<td>
+				
+				</td>
+				<td class="success">ONLINE</td>
+				<td style="text-align: right">0</td>
+				<td style="text-align: right">0</td>
+				<td style="text-align: right">0</td>
+				<td style=""></td>
+			</tr>
+			
+			<tr>
+				<td style="padding-left: 5em">IW4TB01</td>
+				<td>
+				
+				</td>
+				<td class="success">ONLINE</td>
+				<td style="text-align: right">0</td>
+				<td style="text-align: right">0</td>
+				<td style="text-align: right">0</td>
+				<td style=""></td>
+			</tr>
+			
+			<tr>
+				<td style="padding-left: 5em">IW4TB02</td>
+				<td>
+				
+				</td>
+				<td class="success">ONLINE</td>
+				<td style="text-align: right">0</td>
+				<td style="text-align: right">0</td>
+				<td style="text-align: right">0</td>
+				<td style=""></td>
+			</tr>
+			
+		</tbody>
+	</table>
+
+	<dl class="dl-horizontal">
+		
+		<dt>errors:</dt><dd>No known data errors</dd>
+		
+	</dl>
+
+
+			</div> 
+		</div> 
+
+		<script src="/zw/resources/bootstrap/js/bootstrap.min.js"></script>
+
+	</body>
+</html>
+
+<!-- ===== zfsw_draid ===== -->
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<title>zfswatcher</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<link href="/zw/resources/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+		<link href="/zw/resources/bootstrap/css/bootstrap-theme.min.css" rel="stylesheet">
+		<style type="text/css">
+			body {
+				padding-top: 60px;
+				padding-bottom: 60px;
+			}
+		</style>
+		<link href="/zw/resources/zfswatcher.css" rel="stylesheet">
+		<link href="/zw/resources/favicon.ico" rel="shortcut icon">
+		<script src="/zw/resources/bootstrap/js/jquery.min.js"></script>
+	</head>
+
+	<body>
+
+	<div class="navbar navbar-inverse navbar-fixed-top">
+		<div class="container-fluid">
+			<div class="navbar-header">
+				<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+	        <span class="sr-only">Toggle navigation</span>
+	        <span class="icon-bar"></span>
+	        <span class="icon-bar"></span>
+	        <span class="icon-bar"></span>
+	      </button>
+				<a class="navbar-brand" href="/zw/">zfswatcher</a>
+	    </div>
+				<div class="navbar-collapse collapse" id="bs-example-navbar-collapse-1">
+					<ul class="nav navbar-nav">
+						<li>
+							<a href="/zw/">Dashboard</a></li>
+						<li class="active">
+							<a href="/zw/status/">Pool Status</a></li>
+						<li>
+							<a href="/zw/enclosure/">Enclosure</a></li>
+						<li>
+							<a href="/zw/statistics/">Statistics</a></li>
+						<li>
+							<a href="/zw/logs/">Logs</a></li>
+					</ul>
+					<ul class="nav navbar-nav navbar-right">
+						<li>
+							<a href="/zw/about/" class="pull-right">About</a></li>
+					</ul>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="container-fluid">
+		
+		<div class="row-fluid">
+
+
+<ul class="nav nav-tabs">
+
+	<li>
+		<a href="zfsw_mix">zfsw_mix</a>
+	</li>
+
+	<li>
+		<a href="test">test</a>
+	</li>
+
+	<li>
+		<a href="zfsw_mirror">zfsw_mirror</a>
+	</li>
+
+	<li>
+		<a href="datis">datis</a>
+	</li>
+
+	<li>
+		<a href="rpool">rpool</a>
+	</li>
+
+	<li>
+		<a href="secundus">secundus</a>
+	</li>
+
+	<li class="active">
+		<a href="zfsw_draid">zfsw_draid</a>
+	</li>
+
+	<li>
+		<a href="zfsw_susp">zfsw_susp</a>
+	</li>
+
+	<li>
+		<a href="zfsw_rz2">zfsw_rz2</a>
+	</li>
+
+	<li>
+		<a href="zfsw_opt">zfsw_opt</a>
+	</li>
+
+</ul>
+
+	<dl class="dl-horizontal">
+		<dt>name:</dt><dd>zfsw_draid</dd>
+		<dt>state:</dt><dd class="warning">DEGRADED</dd>
+		
+		<dt>status:</dt><dd>One or more devices are faulted in response to persistent errors.
+Sufficient replicas exist for the pool to continue functioning in a
+degraded state.</dd>
+		
+		
+		<dt>action:</dt><dd>Replace the faulted device, or use &#39;zpool clear&#39; to mark the device
+repaired.</dd>
+		
+		
+		
+		<dt>scan:</dt><dd>scrub in progress since Sat Nov 21 22:14:30 2026
+75.3M / 75.5M scanned, 75.2M / 75.4M issued at 6.83M/s
+0B repaired, 99.77% done, no estimated completion time
+resilvered (draid1:2d:5c:1s-0) 16.0M in 00:00:15 with 0 errors on Sat Nov 21 22:14:30 2026</dd>
+		
+	</dl>
+	<table class="table table-condensed table-hover">
+		<thead>
+			<tr>
+				<th style="width: 30%">Name</th>
+				<th style="width: 4%">Loc</th>
+				<th style="width: 15%">State</th>
+				<th style="text-align: right; width: 8%">Read</th>
+				<th style="text-align: right; width: 8%">Write</th>
+				<th style="text-align: right; width: 8%">Cksum</th>
+				<th style="width: 31%"></th>
+			</tr>
+		</thead>
+		<tbody>
+			
+			<tr>
+				<td style="padding-left: 1em">zfsw_draid</td>
+				<td>
+				
+				</td>
+				<td class="warning">DEGRADED</td>
+				<td style="text-align: right">0</td>
+				<td style="text-align: right">0</td>
+				<td style="text-align: right">0</td>
+				<td style=""></td>
+			</tr>
+			
+			<tr>
+				<td style="padding-left: 3em">draid1:2d:5c:1s-0</td>
+				<td>
+				
+				</td>
+				<td class="warning">DEGRADED</td>
+				<td style="text-align: right">0</td>
+				<td style="text-align: right">0</td>
+				<td style="text-align: right">0</td>
+				<td style=""></td>
+			</tr>
+			
+			<tr>
+				<td style="padding-left: 5em">/var/tmp/zfsw-collect2/d1</td>
+				<td>
+				
+				</td>
+				<td class="success">ONLINE</td>
+				<td style="text-align: right">0</td>
+				<td style="text-align: right">0</td>
+				<td style="text-align: right">0</td>
+				<td style=""></td>
+			</tr>
+			
+			<tr>
+				<td style="padding-left: 5em">spare-1</td>
+				<td>
+				
+				</td>
+				<td class="warning">DEGRADED</td>
+				<td style="text-align: right">0</td>
+				<td style="text-align: right">0</td>
+				<td style="text-align: right">0</td>
+				<td style=""></td>
+			</tr>
+			
+			<tr>
+				<td style="padding-left: 7em">/var/tmp/zfsw-collect2/d2</td>
+				<td>
+				
+				</td>
+				<td class="danger">FAULTED</td>
+				<td style="text-align: right">0</td>
+				<td style="text-align: right">0</td>
+				<td style="text-align: right">0</td>
+				<td style="">external device fault</td>
+			</tr>
+			
+			<tr>
+				<td style="padding-left: 7em">draid1-0-0</td>
+				<td>
+				
+				</td>
+				<td class="success">ONLINE</td>
+				<td style="text-align: right">0</td>
+				<td style="text-align: right">0</td>
+				<td style="text-align: right">0</td>
+				<td style=""></td>
+			</tr>
+			
+			<tr>
+				<td style="padding-left: 5em">/var/tmp/zfsw-collect2/d3</td>
+				<td>
+				
+				</td>
+				<td class="success">ONLINE</td>
+				<td style="text-align: right">0</td>
+				<td style="text-align: right">0</td>
+				<td style="text-align: right">0</td>
+				<td style=""></td>
+			</tr>
+			
+			<tr>
+				<td style="padding-left: 5em">/var/tmp/zfsw-collect2/d4</td>
+				<td>
+				
+				</td>
+				<td class="success">ONLINE</td>
+				<td style="text-align: right">0</td>
+				<td style="text-align: right">0</td>
+				<td style="text-align: right">0</td>
+				<td style=""></td>
+			</tr>
+			
+			<tr>
+				<td style="padding-left: 5em">/var/tmp/zfsw-collect2/d5</td>
+				<td>
+				
+				</td>
+				<td class="success">ONLINE</td>
+				<td style="text-align: right">0</td>
+				<td style="text-align: right">0</td>
+				<td style="text-align: right">0</td>
+				<td style=""></td>
+			</tr>
+			
+			<tr>
+				<td style="padding-left: 1em">spares</td>
+				<td>
+				
+				</td>
+				<td class=""></td>
+				<td style="text-align: right">-</td>
+				<td style="text-align: right">-</td>
+				<td style="text-align: right">-</td>
+				<td style=""></td>
+			</tr>
+			
+			<tr>
+				<td style="padding-left: 3em">draid1-0-0</td>
+				<td>
+				
+				</td>
+				<td class="">INUSE</td>
+				<td style="text-align: right">-</td>
+				<td style="text-align: right">-</td>
+				<td style="text-align: right">-</td>
+				<td style=""></td>
+			</tr>
+			
+		</tbody>
+	</table>
+
+	<dl class="dl-horizontal">
+		
+		<dt>errors:</dt><dd>No known data errors</dd>
+		
+	</dl>
+
+
+			</div> 
+		</div> 
+
+		<script src="/zw/resources/bootstrap/js/bootstrap.min.js"></script>
+
+	</body>
+</html>
+
+<!-- ===== zfsw_susp ===== -->
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<title>zfswatcher</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<link href="/zw/resources/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+		<link href="/zw/resources/bootstrap/css/bootstrap-theme.min.css" rel="stylesheet">
+		<style type="text/css">
+			body {
+				padding-top: 60px;
+				padding-bottom: 60px;
+			}
+		</style>
+		<link href="/zw/resources/zfswatcher.css" rel="stylesheet">
+		<link href="/zw/resources/favicon.ico" rel="shortcut icon">
+		<script src="/zw/resources/bootstrap/js/jquery.min.js"></script>
+	</head>
+
+	<body>
+
+	<div class="navbar navbar-inverse navbar-fixed-top">
+		<div class="container-fluid">
+			<div class="navbar-header">
+				<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+	        <span class="sr-only">Toggle navigation</span>
+	        <span class="icon-bar"></span>
+	        <span class="icon-bar"></span>
+	        <span class="icon-bar"></span>
+	      </button>
+				<a class="navbar-brand" href="/zw/">zfswatcher</a>
+	    </div>
+				<div class="navbar-collapse collapse" id="bs-example-navbar-collapse-1">
+					<ul class="nav navbar-nav">
+						<li>
+							<a href="/zw/">Dashboard</a></li>
+						<li class="active">
+							<a href="/zw/status/">Pool Status</a></li>
+						<li>
+							<a href="/zw/enclosure/">Enclosure</a></li>
+						<li>
+							<a href="/zw/statistics/">Statistics</a></li>
+						<li>
+							<a href="/zw/logs/">Logs</a></li>
+					</ul>
+					<ul class="nav navbar-nav navbar-right">
+						<li>
+							<a href="/zw/about/" class="pull-right">About</a></li>
+					</ul>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="container-fluid">
+		
+		<div class="row-fluid">
+
+
+<ul class="nav nav-tabs">
+
+	<li>
+		<a href="zfsw_mix">zfsw_mix</a>
+	</li>
+
+	<li>
+		<a href="test">test</a>
+	</li>
+
+	<li>
+		<a href="zfsw_mirror">zfsw_mirror</a>
+	</li>
+
+	<li>
+		<a href="datis">datis</a>
+	</li>
+
+	<li>
+		<a href="rpool">rpool</a>
+	</li>
+
+	<li>
+		<a href="secundus">secundus</a>
+	</li>
+
+	<li>
+		<a href="zfsw_draid">zfsw_draid</a>
+	</li>
+
+	<li class="active">
+		<a href="zfsw_susp">zfsw_susp</a>
+	</li>
+
+	<li>
+		<a href="zfsw_rz2">zfsw_rz2</a>
+	</li>
+
+	<li>
+		<a href="zfsw_opt">zfsw_opt</a>
+	</li>
+
+</ul>
+
+	<dl class="dl-horizontal">
+		<dt>name:</dt><dd>zfsw_susp</dd>
+		<dt>state:</dt><dd class="success">ONLINE</dd>
+		
+		<dt>status:</dt><dd>One or more devices has experienced an error resulting in data
+corruption.  Applications may be affected.</dd>
+		
+		
+		<dt>action:</dt><dd>Restore the file in question if possible.  Otherwise restore the
+entire pool from backup.</dd>
+		
+		
+		<dt>see:</dt><dd><a href="https://openzfs.github.io/openzfs-docs/msg/ZFS-8000-8A" target="_blank">https://openzfs.github.io/openzfs-docs/msg/ZFS-8000-8A</a></dd>
+		
+		
+	</dl>
+	<table class="table table-condensed table-hover">
+		<thead>
+			<tr>
+				<th style="width: 30%">Name</th>
+				<th style="width: 4%">Loc</th>
+				<th style="width: 15%">State</th>
+				<th style="text-align: right; width: 8%">Read</th>
+				<th style="text-align: right; width: 8%">Write</th>
+				<th style="text-align: right; width: 8%">Cksum</th>
+				<th style="width: 31%"></th>
+			</tr>
+		</thead>
+		<tbody>
+			
+			<tr>
+				<td style="padding-left: 1em">zfsw_susp</td>
+				<td>
+				
+				</td>
+				<td class="success">ONLINE</td>
+				<td style="text-align: right">0</td>
+				<td style="text-align: right">0</td>
+				<td style="text-align: right">0</td>
+				<td style=""></td>
+			</tr>
+			
+			<tr>
+				<td style="padding-left: 3em">/var/tmp/zfsw-collect/i3</td>
+				<td>
+				
+				</td>
+				<td class="success">ONLINE</td>
+				<td style="text-align: right">0</td>
+				<td style="text-align: right">1.34K</td>
+				<td style="text-align: right">0</td>
+				<td style=""></td>
+			</tr>
+			
+		</tbody>
+	</table>
+
+	<dl class="dl-horizontal">
+		
+		<dt>errors:</dt><dd>121 data errors, use &#39;-v&#39; for a list</dd>
+		
+	</dl>
+
+
+			</div> 
+		</div> 
+
+		<script src="/zw/resources/bootstrap/js/bootstrap.min.js"></script>
+
+	</body>
+</html>
+
+<!-- ===== zfsw_rz2 ===== -->
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<title>zfswatcher</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<link href="/zw/resources/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+		<link href="/zw/resources/bootstrap/css/bootstrap-theme.min.css" rel="stylesheet">
+		<style type="text/css">
+			body {
+				padding-top: 60px;
+				padding-bottom: 60px;
+			}
+		</style>
+		<link href="/zw/resources/zfswatcher.css" rel="stylesheet">
+		<link href="/zw/resources/favicon.ico" rel="shortcut icon">
+		<script src="/zw/resources/bootstrap/js/jquery.min.js"></script>
+	</head>
+
+	<body>
+
+	<div class="navbar navbar-inverse navbar-fixed-top">
+		<div class="container-fluid">
+			<div class="navbar-header">
+				<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+	        <span class="sr-only">Toggle navigation</span>
+	        <span class="icon-bar"></span>
+	        <span class="icon-bar"></span>
+	        <span class="icon-bar"></span>
+	      </button>
+				<a class="navbar-brand" href="/zw/">zfswatcher</a>
+	    </div>
+				<div class="navbar-collapse collapse" id="bs-example-navbar-collapse-1">
+					<ul class="nav navbar-nav">
+						<li>
+							<a href="/zw/">Dashboard</a></li>
+						<li class="active">
+							<a href="/zw/status/">Pool Status</a></li>
+						<li>
+							<a href="/zw/enclosure/">Enclosure</a></li>
+						<li>
+							<a href="/zw/statistics/">Statistics</a></li>
+						<li>
+							<a href="/zw/logs/">Logs</a></li>
+					</ul>
+					<ul class="nav navbar-nav navbar-right">
+						<li>
+							<a href="/zw/about/" class="pull-right">About</a></li>
+					</ul>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="container-fluid">
+		
+		<div class="row-fluid">
+
+
+<ul class="nav nav-tabs">
+
+	<li>
+		<a href="zfsw_mix">zfsw_mix</a>
+	</li>
+
+	<li>
+		<a href="test">test</a>
+	</li>
+
+	<li>
+		<a href="zfsw_mirror">zfsw_mirror</a>
+	</li>
+
+	<li>
+		<a href="datis">datis</a>
+	</li>
+
+	<li>
+		<a href="rpool">rpool</a>
+	</li>
+
+	<li>
+		<a href="secundus">secundus</a>
+	</li>
+
+	<li>
+		<a href="zfsw_draid">zfsw_draid</a>
+	</li>
+
+	<li>
+		<a href="zfsw_susp">zfsw_susp</a>
+	</li>
+
+	<li class="active">
+		<a href="zfsw_rz2">zfsw_rz2</a>
+	</li>
+
+	<li>
+		<a href="zfsw_opt">zfsw_opt</a>
+	</li>
+
+</ul>
+
+	<dl class="dl-horizontal">
+		<dt>name:</dt><dd>zfsw_rz2</dd>
+		<dt>state:</dt><dd class="warning">DEGRADED</dd>
+		
+		<dt>status:</dt><dd>One or more devices are faulted in response to persistent errors.
+Sufficient replicas exist for the pool to continue functioning in a
+degraded state.</dd>
+		
+		
+		<dt>action:</dt><dd>Replace the faulted device, or use &#39;zpool clear&#39; to mark the device
+repaired.</dd>
+		
+		
+		
+	</dl>
+	<table class="table table-condensed table-hover">
+		<thead>
+			<tr>
+				<th style="width: 30%">Name</th>
+				<th style="width: 4%">Loc</th>
+				<th style="width: 15%">State</th>
+				<th style="text-align: right; width: 8%">Read</th>
+				<th style="text-align: right; width: 8%">Write</th>
+				<th style="text-align: right; width: 8%">Cksum</th>
+				<th style="width: 31%"></th>
+			</tr>
+		</thead>
+		<tbody>
+			
+			<tr>
+				<td style="padding-left: 1em">zfsw_rz2</td>
+				<td>
+				
+				</td>
+				<td class="warning">DEGRADED</td>
+				<td style="text-align: right">0</td>
+				<td style="text-align: right">0</td>
+				<td style="text-align: right">0</td>
+				<td style=""></td>
+			</tr>
+			
+			<tr>
+				<td style="padding-left: 3em">raidz2-0</td>
+				<td>
+				
+				</td>
+				<td class="warning">DEGRADED</td>
+				<td style="text-align: right">0</td>
+				<td style="text-align: right">0</td>
+				<td style="text-align: right">0</td>
+				<td style=""></td>
+			</tr>
+			
+			<tr>
+				<td style="padding-left: 5em">/var/tmp/zfsw-collect2/z1</td>
+				<td>
+				
+				</td>
+				<td class="danger">FAULTED</td>
+				<td style="text-align: right">0</td>
+				<td style="text-align: right">0</td>
+				<td style="text-align: right">0</td>
+				<td style="">external device fault</td>
+			</tr>
+			
+			<tr>
+				<td style="padding-left: 5em">/var/tmp/zfsw-collect2/z2</td>
+				<td>
+				
+				</td>
+				<td class="danger">FAULTED</td>
+				<td style="text-align: right">0</td>
+				<td style="text-align: right">0</td>
+				<td style="text-align: right">0</td>
+				<td style="">external device fault</td>
+			</tr>
+			
+			<tr>
+				<td style="padding-left: 5em">/var/tmp/zfsw-collect2/z3</td>
+				<td>
+				
+				</td>
+				<td class="success">ONLINE</td>
+				<td style="text-align: right">0</td>
+				<td style="text-align: right">0</td>
+				<td style="text-align: right">0</td>
+				<td style=""></td>
+			</tr>
+			
+			<tr>
+				<td style="padding-left: 5em">/var/tmp/zfsw-collect2/z4</td>
+				<td>
+				
+				</td>
+				<td class="success">ONLINE</td>
+				<td style="text-align: right">0</td>
+				<td style="text-align: right">0</td>
+				<td style="text-align: right">0</td>
+				<td style=""></td>
+			</tr>
+			
+		</tbody>
+	</table>
+
+	<dl class="dl-horizontal">
+		
+		<dt>errors:</dt><dd>No known data errors</dd>
+		
+	</dl>
+
+
+			</div> 
+		</div> 
+
+		<script src="/zw/resources/bootstrap/js/bootstrap.min.js"></script>
+
+	</body>
+</html>
+
+<!-- ===== zfsw_opt ===== -->
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<title>zfswatcher</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<link href="/zw/resources/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+		<link href="/zw/resources/bootstrap/css/bootstrap-theme.min.css" rel="stylesheet">
+		<style type="text/css">
+			body {
+				padding-top: 60px;
+				padding-bottom: 60px;
+			}
+		</style>
+		<link href="/zw/resources/zfswatcher.css" rel="stylesheet">
+		<link href="/zw/resources/favicon.ico" rel="shortcut icon">
+		<script src="/zw/resources/bootstrap/js/jquery.min.js"></script>
+	</head>
+
+	<body>
+
+	<div class="navbar navbar-inverse navbar-fixed-top">
+		<div class="container-fluid">
+			<div class="navbar-header">
+				<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+	        <span class="sr-only">Toggle navigation</span>
+	        <span class="icon-bar"></span>
+	        <span class="icon-bar"></span>
+	        <span class="icon-bar"></span>
+	      </button>
+				<a class="navbar-brand" href="/zw/">zfswatcher</a>
+	    </div>
+				<div class="navbar-collapse collapse" id="bs-example-navbar-collapse-1">
+					<ul class="nav navbar-nav">
+						<li>
+							<a href="/zw/">Dashboard</a></li>
+						<li class="active">
+							<a href="/zw/status/">Pool Status</a></li>
+						<li>
+							<a href="/zw/enclosure/">Enclosure</a></li>
+						<li>
+							<a href="/zw/statistics/">Statistics</a></li>
+						<li>
+							<a href="/zw/logs/">Logs</a></li>
+					</ul>
+					<ul class="nav navbar-nav navbar-right">
+						<li>
+							<a href="/zw/about/" class="pull-right">About</a></li>
+					</ul>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="container-fluid">
+		
+		<div class="row-fluid">
+
+
+<ul class="nav nav-tabs">
+
+	<li>
+		<a href="zfsw_mix">zfsw_mix</a>
+	</li>
+
+	<li>
+		<a href="test">test</a>
+	</li>
+
+	<li>
+		<a href="zfsw_mirror">zfsw_mirror</a>
+	</li>
+
+	<li>
+		<a href="datis">datis</a>
+	</li>
+
+	<li>
+		<a href="rpool">rpool</a>
+	</li>
+
+	<li>
+		<a href="secundus">secundus</a>
+	</li>
+
+	<li>
+		<a href="zfsw_draid">zfsw_draid</a>
+	</li>
+
+	<li>
+		<a href="zfsw_susp">zfsw_susp</a>
+	</li>
+
+	<li>
+		<a href="zfsw_rz2">zfsw_rz2</a>
+	</li>
+
+	<li class="active">
+		<a href="zfsw_opt">zfsw_opt</a>
+	</li>
+
+</ul>
+
+	<dl class="dl-horizontal">
+		<dt>name:</dt><dd>zfsw_opt</dd>
+		<dt>state:</dt><dd class="success">ONLINE</dd>
+		
+		
+		
+		
+	</dl>
+	<table class="table table-condensed table-hover">
+		<thead>
+			<tr>
+				<th style="width: 30%">Name</th>
+				<th style="width: 4%">Loc</th>
+				<th style="width: 15%">State</th>
+				<th style="text-align: right; width: 8%">Read</th>
+				<th style="text-align: right; width: 8%">Write</th>
+				<th style="text-align: right; width: 8%">Cksum</th>
+				<th style="width: 31%"></th>
+			</tr>
+		</thead>
+		<tbody>
+			
+			<tr>
+				<td style="padding-left: 1em">zfsw_opt</td>
+				<td>
+				
+				</td>
+				<td class="success">ONLINE</td>
+				<td style="text-align: right">0</td>
+				<td style="text-align: right">0</td>
+				<td style="text-align: right">0</td>
+				<td style=""></td>
+			</tr>
+			
+			<tr>
+				<td style="padding-left: 3em">13093892248541598013</td>
+				<td>
+				
+				</td>
+				<td class="success">ONLINE</td>
+				<td style="text-align: right">0</td>
+				<td style="text-align: right">0</td>
+				<td style="text-align: right">0</td>
+				<td style=""></td>
+			</tr>
+			
+			<tr>
+				<td style="padding-left: 5em">14472808773214427843</td>
+				<td>
+				
+				</td>
+				<td class="success">ONLINE</td>
+				<td style="text-align: right">0</td>
+				<td style="text-align: right">0</td>
+				<td style="text-align: right">0</td>
+				<td style=""></td>
+			</tr>
+			
+			<tr>
+				<td style="padding-left: 5em">5026051920062145897</td>
+				<td>
+				
+				</td>
+				<td class="success">ONLINE</td>
+				<td style="text-align: right">0</td>
+				<td style="text-align: right">0</td>
+				<td style="text-align: right">0</td>
+				<td style=""></td>
+			</tr>
+			
+		</tbody>
+	</table>
+
+	<dl class="dl-horizontal">
+		
+		<dt>errors:</dt><dd>No known data errors</dd>
+		
+	</dl>
+
+
+			</div> 
+		</div> 
+
+		<script src="/zw/resources/bootstrap/js/bootstrap.min.js"></script>
+
+	</body>
+</html>
+

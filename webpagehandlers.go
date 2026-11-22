@@ -144,14 +144,6 @@ type dashboardWeb struct {
 	Pools            []*poolStatusWeb
 }
 
-type logMsgWeb struct {
-	Time       string
-	Severity   string
-	Class      string
-	Text       string
-	Attachment string
-}
-
 type enclosureWeb struct {
 	ChassisEnable      bool
 	Chassis45drives15  bool
@@ -164,117 +156,122 @@ type enclosureWeb struct {
 	EnclosureData      map[string][]*devChassisStatusWeb
 }
 
+// wwwLogBuffer keeps the most recent log messages for the logs page and the
+// API; wwwLogMutex protects it.
 var (
-	wwwLogBuffer []*logMsgWeb
+	wwwLogBuffer []Event
 	wwwLogMutex  sync.RWMutex
 )
 
 func wwwLogReceiver(m *notifier.Msg) {
 	wwwLogMutex.Lock()
 	if wwwLogBuffer == nil {
-		wwwLogBuffer = make([]*logMsgWeb, 0, cfg.Www.Logbuffer+1)
+		wwwLogBuffer = make([]Event, 0, cfg.Www.Logbuffer+1)
 	}
-	switch m.MsgType {
-	case notifier.MSGTYPE_MESSAGE:
-		nm := &logMsgWeb{}
-		nm.Time, nm.Severity, nm.Text = m.Strings()
-		nm.Class = cfg.Www.Severitycssclassmap[m.Severity]
-		wwwLogBuffer = append(wwwLogBuffer, nm)
-	case notifier.MSGTYPE_ATTACHMENT:
-		prev := len(wwwLogBuffer) - 1
-		if len(wwwLogBuffer) > 0 && wwwLogBuffer[prev].Attachment == "" {
-			// add the attachment to the previous message
-			wwwLogBuffer[prev].Attachment = m.Text
-		} else {
-			// make a new entry only with the attachment
-			nm := &logMsgWeb{}
-			nm.Time, nm.Severity, nm.Attachment = m.Strings()
-			nm.Class = cfg.Www.Severitycssclassmap[m.Severity]
-			wwwLogBuffer = append(wwwLogBuffer, nm)
-		}
-	}
-	if len(wwwLogBuffer) > cfg.Www.Logbuffer {
-		wwwLogBuffer = wwwLogBuffer[len(wwwLogBuffer)-cfg.Www.Logbuffer:]
-	}
+	wwwLogBuffer = eventsAppend(wwwLogBuffer, m, cfg.Www.Logbuffer)
 	wwwLogMutex.Unlock()
 }
 
-func makePoolStatusWeb(pool *PoolType, usage map[string]*PoolUsageType) *poolStatusWeb {
+// logTimeFormat is the format of the time column of the logs page (the same
+// as in the log files).
+const logTimeFormat = "2006-01-02 15:04:05"
+
+// logMsgWeb is a row of the logs page.
+type logMsgWeb struct {
+	Time       string
+	Severity   string
+	Class      string
+	Text       string
+	Attachment string
+}
+
+func makeLogMsgWeb(e Event) logMsgWeb {
+	w := logMsgWeb{
+		Time:       e.Time.Format(logTimeFormat),
+		Severity:   e.Severity,
+		Text:       e.Text,
+		Attachment: e.Attachment,
+	}
+	if sev, ok := severityFromName(e.Severity); ok {
+		w.Class = cfg.Www.Severitycssclassmap[sev]
+	}
+	return w
+}
+
+// The functions below form the presentation layer: they turn the data of the
+// model (Pool, Device, Usage, Event) into the structures used by the
+// templates (CSS classes, indentation, URLs).
+
+// devIndent is the left padding in em of a device at the given tree depth.
+func devIndent(depth int) int {
+	return 1 + 2*depth
+}
+
+func makePoolStatusWeb(pool Pool, usage map[string]Usage) *poolStatusWeb {
 	statusWeb := &poolStatusWeb{
-		Name:       pool.name,
-		State:      pool.state,
-		StateClass: cfg.Www.Poolstatecssclassmap[pool.state],
-		Status:     pool.status,
-		Action:     pool.action,
-		See:        pool.see,
-		Scan:       pool.scan,
-		Errors:     pool.errors,
+		Name:       pool.Name,
+		State:      pool.State,
+		StateClass: cfg.Www.Poolstatecssclassmap[pool.State],
+		Status:     pool.Status,
+		Action:     pool.Action,
+		See:        pool.See,
+		Scan:       pool.Scan,
+		Errors:     pool.Errors,
 		Root:       cfg.Www.Rootdir,
 	}
 	statusWeb.Avail = -1
 	statusWeb.Used = -1
 	statusWeb.Total = -1
 	statusWeb.Logicalused = -1
-	if u, ok := usage[pool.name]; ok {
+	if u, ok := usage[pool.Name]; ok {
 		statusWeb.Avail = u.Avail
-		statusWeb.AvailPercent = u.GetAvailPercent()
+		statusWeb.AvailPercent = u.AvailPercent
 		statusWeb.Used = u.Used
 		statusWeb.Logicalused = u.Logicalused
 		statusWeb.Compressratio = u.Compressratio
-		usedPercent := u.GetUsedPercent()
-		statusWeb.UsedPercent = usedPercent
+		statusWeb.UsedPercent = u.UsedPercent
 		statusWeb.Total = u.Avail + u.Used
-		usedSeverity, _ := cfg.Severity.Usedspace.GetByPercentage(usedPercent)
+		usedSeverity, _ := cfg.Severity.Usedspace.GetByPercentage(u.UsedPercent)
 		statusWeb.UsedClass = cfg.Www.Usedstatecssclassmap[usedSeverity]
 	}
 
-	for n, dev := range pool.devs {
+	pool.Walk(func(dev Device, depth int) {
 		devw := devStatusWeb{
-			Name:       dev.name,
-			State:      dev.state,
-			StateClass: cfg.Www.Devstatecssclassmap[dev.state],
-			Read:       dev.read,
-			Write:      dev.write,
-			Cksum:      dev.cksum,
-			Rest:       dev.rest,
+			Indent:     devIndent(depth),
+			Name:       dev.Name,
+			State:      dev.State,
+			StateClass: cfg.Www.Devstatecssclassmap[dev.State],
+			Read:       dev.Read,
+			Write:      dev.Write,
+			Cksum:      dev.Cksum,
+			Rest:       dev.Info,
 			Root:       cfg.Www.Rootdir,
-			Return:     cfg.Www.Rootdir + "/status/" + url.PathEscape(pool.name),
+			Return:     cfg.Www.Rootdir + "/status/" + url.PathEscape(pool.Name),
 		}
-		devw.Indent = 1
-		for d := n; pool.devs[d].parentDev != -1; d = pool.devs[d].parentDev {
-			devw.Indent += 2
-		}
-
-		if cfg.Leds.Enable && len(dev.subDevs) == 0 {
-			loc, err := locateQuery(dev.name)
+		if cfg.Leds.Enable && len(dev.Children) == 0 {
+			loc, err := locateQuery(dev.Name)
 			if err == nil {
-				slog.Debug("locate query succeeded", "device", dev.name)
+				slog.Debug("locate query succeeded", "device", dev.Name)
 				devw.EnableLed = true
 				devw.Locate = loc
 			}
 		}
 		statusWeb.Devs = append(statusWeb.Devs, devw)
-	}
+	})
 	return statusWeb
 }
 
-func makeChassisStatusWeb(pool *PoolType) *chassisStatusWeb {
+func makeChassisStatusWeb(pool Pool) *chassisStatusWeb {
 	statusWeb := &chassisStatusWeb{
 		Root: cfg.Www.Rootdir,
 	}
-
-	for n, dev := range pool.devs {
-		devw := devChassisStatusWeb{
-			Name:  dev.name,
-			State: dev.state,
-		}
-		devw.Indent = 1
-		for d := n; pool.devs[d].parentDev != -1; d = pool.devs[d].parentDev {
-			devw.Indent += 2
-		}
-
-		statusWeb.Devs = append(statusWeb.Devs, devw)
-	}
+	pool.Walk(func(dev Device, depth int) {
+		statusWeb.Devs = append(statusWeb.Devs, devChassisStatusWeb{
+			Indent: devIndent(depth),
+			Name:   dev.Name,
+			State:  dev.State,
+		})
+	})
 	return statusWeb
 }
 
@@ -288,10 +285,7 @@ func statusHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	currentState.mutex.RLock()
-	state := currentState.state
-	usage := currentState.usage
-	currentState.mutex.RUnlock()
+	state, usage := snapshotState()
 
 	if len(state) == 0 {
 		err := templates.ExecuteTemplate(w, "status-none.html", &webData{Nav: wn})
@@ -306,8 +300,8 @@ func statusHandler(w http.ResponseWriter, r *http.Request) {
 	match := -1
 
 	for n, s := range state {
-		active := s.name == pool
-		subnav = append(subnav, webSubNav{Name: s.name, Active: active})
+		active := s.Name == pool
+		subnav = append(subnav, webSubNav{Name: s.Name, Active: active})
 		if active {
 			match = n
 		}
@@ -355,12 +349,7 @@ func usageHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}
-	usage := parseZfsList(zfsListOutput)
-	if err != nil {
-		notify.Print(notifier.ERR, "parsing ZFS disk usage failed")
-		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-		return
-	}
+	usage := usageList(usageMapFromParsed(parseZfsList(zfsListOutput)))
 	err = templates.ExecuteTemplate(w, "usage.html", &webData{Nav: wn, Data: usage})
 	if err != nil {
 		notify.Printf(notifier.ERR, "error executing template: %s", err)
@@ -371,19 +360,8 @@ func usageHandler(w http.ResponseWriter, r *http.Request) {
 func dashboardHandler(w http.ResponseWriter, r *http.Request) {
 	wn := webNav{Dashboard: true, Root: cfg.Www.Rootdir}
 
-	uptime, err := getSystemUptime()
-	if err != nil {
-		notify.Printf(notifier.ERR, "can not get system uptime: %s", err)
-	}
-	loadavg, err := getSystemLoadaverage()
-	if err != nil {
-		notify.Printf(notifier.ERR, "can not get system load average: %s", err)
-	}
-
-	currentState.mutex.RLock()
-	state := currentState.state
-	usage := currentState.usage
-	currentState.mutex.RUnlock()
+	host := hostInfo()
+	state, usage := snapshotState()
 
 	var ws []*poolStatusWeb
 
@@ -393,13 +371,13 @@ func dashboardHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	d := &dashboardWeb{
-		SysUptime:        myDurationString(uptime),
-		ZfswatcherUptime: myDurationString(time.Since(startTime)),
-		SysLoadaverage:   loadavg,
+		SysUptime:        myDurationString(time.Duration(host.SystemUptimeSeconds) * time.Second),
+		ZfswatcherUptime: myDurationString(time.Duration(host.ZfswatcherUptimeSeconds) * time.Second),
+		SysLoadaverage:   host.LoadAverage,
 		Pools:            ws,
 	}
 
-	err = templates.ExecuteTemplate(w, "dashboard.html", &webData{Nav: wn, Data: d})
+	err := templates.ExecuteTemplate(w, "dashboard.html", &webData{Nav: wn, Data: d})
 	if err != nil {
 		notify.Printf(notifier.ERR, "error executing template: %s", err)
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
@@ -417,9 +395,12 @@ func statisticsHandler(w http.ResponseWriter, r *http.Request) {
 
 func logsHandler(w http.ResponseWriter, r *http.Request) {
 	wn := webNav{Logs: true, Root: cfg.Www.Rootdir}
-	wwwLogMutex.RLock()
-	err := templates.ExecuteTemplate(w, "logs.html", &webData{Nav: wn, Data: wwwLogBuffer})
-	wwwLogMutex.RUnlock()
+	events := snapshotEvents()
+	rows := make([]logMsgWeb, 0, len(events))
+	for _, e := range events {
+		rows = append(rows, makeLogMsgWeb(e))
+	}
+	err := templates.ExecuteTemplate(w, "logs.html", &webData{Nav: wn, Data: rows})
 	if err != nil {
 		notify.Printf(notifier.ERR, "error executing template: %s", err)
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
@@ -492,9 +473,7 @@ func locateRedirectTarget(ret string) string {
 func enclosureHandler(w http.ResponseWriter, r *http.Request) {
 	wn := webNav{Enclosure: true, Root: cfg.Www.Rootdir}
 
-	currentState.mutex.RLock()
-	state := currentState.state
-	currentState.mutex.RUnlock()
+	state := snapshotPools()
 
 	var ws []*chassisStatusWeb
 	var wsx []*devChassisStatusWeb

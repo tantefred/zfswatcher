@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<title>zfswatcher</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<link href="/zw/resources/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+		<link href="/zw/resources/bootstrap/css/bootstrap-theme.min.css" rel="stylesheet">
+		<style type="text/css">
+			body {
+				padding-top: 60px;
+				padding-bottom: 60px;
+			}
+		</style>
+		<link href="/zw/resources/zfswatcher.css" rel="stylesheet">
+		<link href="/zw/resources/favicon.ico" rel="shortcut icon">
+		<script src="/zw/resources/bootstrap/js/jquery.min.js"></script>
+	</head>
+
+	<body>
+
+	<div class="navbar navbar-inverse navbar-fixed-top">
+		<div class="container-fluid">
+			<div class="navbar-header">
+				<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+	        <span class="sr-only">Toggle navigation</span>
+	        <span class="icon-bar"></span>
+	        <span class="icon-bar"></span>
+	        <span class="icon-bar"></span>
+	      </button>
+				<a class="navbar-brand" href="/zw/">zfswatcher</a>
+	    </div>
+				<div class="navbar-collapse collapse" id="bs-example-navbar-collapse-1">
+					<ul class="nav navbar-nav">
+						<li>
+							<a href="/zw/">Dashboard</a></li>
+						<li>
+							<a href="/zw/status/">Pool Status</a></li>
+						<li class="active">
+							<a href="/zw/enclosure/">Enclosure</a></li>
+						<li>
+							<a href="/zw/statistics/">Statistics</a></li>
+						<li>
+							<a href="/zw/logs/">Logs</a></li>
+					</ul>
+					<ul class="nav navbar-nav navbar-right">
+						<li>
+							<a href="/zw/about/" class="pull-right">About</a></li>
+					</ul>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="container-fluid">
+		
+		<div class="row-fluid">
+
+
+  
+  <div class="page-header" style="margin: 0px;">
+    
+    
+    
+    
+      <h1 align="center">45Drives S45 Enclosure
+      </h1>
+      <h2 align="center"><small>Front of unit</small></h2>
+      <table class="enclosure45table" align="center">
+        <tbody>
+          <tr>
+            <td id="drive1-1" class="enclosuretabletd"></td>
+            <td id="drive1-2" class="enclosuretabletd"></td>
+            <td id="drive1-3" class="enclosuretabletd"></td>
+            <td id="drive1-4" class="enclosuretabletd"></td>
+            <td id="drive1-5" class="enclosuretabletd"></td>
+            <td id="drive1-6" class="enclosuretabletd"></td>
+            <td id="drive1-7" class="enclosuretabletd"></td>
+            <td id="drive1-8" class="enclosuretabletd"></td>
+            <td id="drive1-9" class="enclosuretabletd"></td>
+            <td id="drive1-10" class="enclosuretabletd"></td>
+            <td id="drive1-11" class="enclosuretabletd"></td>
+            <td id="drive1-12" class="enclosuretabletd"></td>
+            <td id="drive1-13" class="enclosuretabletd"></td>
+            <td id="drive1-14" class="enclosuretabletd"></td>
+            <td id="drive1-15" class="enclosuretabletd"></td>
+        </tr>
+          <tr>
+            <td id="drive2-6" class="enclosuretabletd"></td>
+            <td id="drive2-5" class="enclosuretabletd"></td>
+            <td id="drive2-4" class="enclosuretabletd"></td>
+            <td id="drive2-3" class="enclosuretabletd"></td>
+            <td id="drive2-2" class="enclosuretabletd"></td>
+            <td id="drive2-1" class="enclosuretabletd"></td>
+            <td id="drive1-24" class="enclosuretabletd"></td>
+            <td id="drive1-23" class="enclosuretabletd"></td>
+            <td id="drive1-22" class="enclosuretabletd"></td>
+            <td id="drive1-21" class="enclosuretabletd"></td>
+            <td id="drive1-20" class="enclosuretabletd"></td>
+            <td id="drive1-19" class="enclosuretabletd"></td>
+            <td id="drive1-18" class="enclosuretabletd"></td>
+            <td id="drive1-17" class="enclosuretabletd"></td>
+            <td id="drive1-16" class="enclosuretabletd"></td>
+        </tr>
+          <tr>
+            <td id="drive2-7" class="enclosuretabletd"></td>
+            <td id="drive2-8" class="enclosuretabletd"></td>
+            <td id="drive2-9" class="enclosuretabletd"></td>
+            <td id="drive2-10" class="enclosuretabletd"></td>
+            <td id="drive2-11" class="enclosuretabletd"></td>
+            <td id="drive2-12" class="enclosuretabletd"></td>
+            <td id="drive2-13" class="enclosuretabletd"></td>
+            <td id="drive2-14" class="enclosuretabletd"></td>
+            <td id="drive2-15" class="enclosuretabletd"></td>
+            <td id="drive2-16" class="enclosuretabletd"></td>
+            <td id="drive2-17" class="enclosuretabletd"></td>
+            <td id="drive2-18" class="enclosuretabletd"></td>
+            <td id="drive2-19" class="enclosuretabletd"></td>
+            <td id="drive2-20" class="enclosuretabletd"></td>
+            <td id="drive2-21" class="enclosuretabletd"></td>
+        </tr>
+        </tbody>
+      </table>
+
+      <script type="application/json" id="enclosure-drives">{"drives1":[{"Indent":0,"Name":"1-3","State":"ONLINE","StateClass":""},{"Indent":0,"Name":"1-1","State":"ONLINE","StateClass":""},{"Indent":0,"Name":"1-10","State":"ONLINE","StateClass":""},{"Indent":0,"Name":"1-2","State":"FAULTED","StateClass":""}],"drives2":[{"Indent":0,"Name":"2-2","State":"ONLINE","StateClass":""},{"Indent":0,"Name":"2-1","State":"DEGRADED","StateClass":""}]}</script>
+      <script src="/zw/resources/enclosure.js"></script>
+    
+    
+    </div>
+    
+
+
+			</div> 
+		</div> 
+
+		<script src="/zw/resources/bootstrap/js/bootstrap.min.js"></script>
+
+	</body>
+</html>
+

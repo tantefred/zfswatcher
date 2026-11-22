@@ -292,9 +292,8 @@ func healthzHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "405 Method Not Allowed", http.StatusMethodNotAllowed)
 		return
 	}
-	zpoolHealth.mutex.Lock()
-	seen, ok, at := zpoolHealth.seen, zpoolHealth.ok, zpoolHealth.at
-	zpoolHealth.mutex.Unlock()
+	q := snapshotZpoolQuery()
+	seen, ok, at := q.Seen, q.OK, q.Time
 
 	code, text := http.StatusOK, "ok"
 	switch {
