@@ -91,6 +91,16 @@ is 10,
 switches the refresh off. The pages work without JavaScript, they just do
 not update. Any other value is a configuration error.
 .TP
+.B metrics
+In section
+.BR [www] :
+a boolean, default
+.BR false .
+If true, the Prometheus endpoint
+.I <rootdir>/metrics
+is served (text exposition format 0.0.4, GET and HEAD only, role viewer,
+HTTP Basic or API token). See the section "Prometheus" in README.md.
+.TP
 .BR severitycssclassmap ", " poolstatecssclassmap ", " devstatecssclassmap ", " usedstatecssclassmap
 In section
 .BR [www] :
@@ -137,7 +147,10 @@ A client sends the token as
 .B Authorization: Bearer
 .IR token .
 Tokens are accepted only for paths below
-.IR <rootdir>/api/ ;
+.I <rootdir>/api/
+and for
+.I <rootdir>/metrics
+(if enabled);
 for all other pages only HTTP Basic authentication of a
 .B wwwuser
 works. Basic authentication is accepted for the API as well.

@@ -215,7 +215,7 @@ Some notes:
 - API tokens: an `[apitoken "name"]` section (`enable`, `hash`, `role`) lets
   scripts and monitoring tools call the API below `<rootdir>/api/` with
   `Authorization: Bearer <token>`. Tokens work **only** for paths under
-  `/api/`; the web pages accept the password login only, and the password
+  `/api/` and for `/metrics` (if enabled, see "Prometheus"); the web pages accept the password login only, and the password
   login also works for the API. `zfswatcher -T` (`--generate-token`) creates
   a token and prints it once together with the line `hash = sha256:...` for
   the configuration; only the hash is stored, so save the token right away.
@@ -257,6 +257,45 @@ curl -H "Authorization: Bearer zfsw_..." "https://host:8990/api/v1/events?limit=
 ```
 
 The API is new and may still change incompatibly until version 1.0.
+
+## Prometheus
+
+With `metrics = true` in section `[www]` (default `false`) zfswatcher serves
+`<rootdir>/metrics` in the Prometheus text format. It needs the role
+`viewer`, accepts HTTP Basic and API tokens, and answers only `GET` and
+`HEAD`. Without the option the path serves no metrics.
+
+| Metric | Labels | Meaning |
+|--------|--------|---------|
+| `zfswatcher_build_info` | `version` | always 1 |
+| `zfswatcher_pool_state` | `pool`, `state` | 1 for the current state, 0 for the other known ones (ONLINE, DEGRADED, FAULTED, OFFLINE, UNAVAIL, REMOVED, SUSPENDED) |
+| `zfswatcher_device_state` | `pool`, `device`, `state` | the same for every vdev and disk |
+| `zfswatcher_device_read_errors`, `_write_errors`, `_cksum_errors` | `pool`, `device` | error counters of `zpool status` (gauges: `zpool clear` resets them) |
+| `zfswatcher_pool_size_bytes`, `_allocated_bytes`, `_free_bytes`, `_used_ratio` | `pool` | space of the pool's root dataset as in `zfs list` (used + available) |
+| `zfswatcher_last_check_timestamp_seconds`, `zfswatcher_last_check_success` | | time and result of the last `zpool status` query |
+
+Example alert: `zfswatcher_pool_state{state="ONLINE"} == 0`.
+
+Create a token with `zfswatcher -T`, put the `[apitoken]` section with
+`role = viewer` into the configuration, and store the token in a file only
+Prometheus can read (`/etc/prometheus/zfswatcher.token`):
+
+```
+scrape_configs:
+  - job_name: zfswatcher
+    scheme: https
+    metrics_path: /metrics        # <rootdir>/metrics
+    authorization:
+      type: Bearer                # the default
+      credentials_file: /etc/prometheus/zfswatcher.token
+    static_configs:
+      - targets: ["host:8990"]
+```
+
+Older Prometheus versions use `bearer_token_file:` instead of
+`authorization:`. HTTP Basic works with `basic_auth:` (`username`,
+`password_file`).
+
 
 ## Reverse proxy
 
