@@ -180,6 +180,20 @@ Some notes:
   on the proxy; the proxy passes the login of the built-in HTTP
   authentication on. See "Reverse proxy" below.
 
+- The web interface is rendered on the server (Go templates) and uses
+  Bootstrap 5; both Bootstrap and htmx are bundled (`www/resources`), no
+  external requests are made. The dashboard and the pool status reload their
+  content with htmx every `refresh` seconds (`[www]`, default 10, `0` = off,
+  otherwise 2 to 3600). Without JavaScript or with `refresh = 0` the pages
+  work as before, they just do not update. The pages use no inline scripts or
+  styles, so the Content-Security-Policy sent with them allows only
+  resources of the same origin. A custom template must follow this (no
+  `style` attributes, no inline `<script>`), otherwise the browser blocks it.
+  The CSS class maps of the configuration (`severitycssclassmap`,
+  `poolstatecssclassmap`, `devstatecssclassmap`, `usedstatecssclassmap`) take
+  Bootstrap 5 class names; the old Bootstrap 3 names of existing
+  configurations are translated automatically (see NEWS).
+
 - Health check: `GET <rootdir>/healthz` (for example `/healthz`, or
   `/zfswatcher/healthz` with the nginx example above) needs no login, so
   monitoring tools such as Uptime Kuma can poll it. It only reports the state
