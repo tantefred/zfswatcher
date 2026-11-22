@@ -24,7 +24,7 @@ package notifier
 import (
 	"errors"
 	"fmt"
-	"os"
+	"log/slog"
 	"strings"
 	"sync"
 	"time"
@@ -43,17 +43,14 @@ const (
 // private
 
 func internalError(str string) {
-	// This is an internal error in the notifier library.
-	// What should be done with these errors?
-	// Right now we just write the errors to STDERR.
-	// This is not a good solution.
-	fmt.Fprintf(os.Stderr, "%s [NOTIFIER] %s\n",
-		time.Now().Format(date_time_FORMAT), str)
+	// An internal error of the notifier library cannot be reported through
+	// the notifier itself, so it goes to the slog diagnostics (stderr).
+	slog.Error(str, "component", "notifier")
 }
 
 func checkInternalError(str string, err error) {
 	if err != nil {
-		internalError(fmt.Sprintf("%s: %s", str, err))
+		slog.Error(str, "component", "notifier", "err", err)
 	}
 }
 

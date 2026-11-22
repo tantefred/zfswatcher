@@ -13,6 +13,15 @@ Upgrade notes
    logs a warning at startup and on reload if it is set. Remove it from
    your configuration.
 
+Changes
+
+ - Internal diagnostics (debug output such as runtime statistics on
+   SIGUSR1, and internal errors of the notifier library) are now written
+   with log/slog to stderr, which is the journal under systemd
+   ("journalctl -u zfswatcher"). The debug level is enabled with -d.
+   Messages a human has to act on still go to the configured log files,
+   syslog and mail.
+
 Fixes
 
  - zfswatcher no longer starts a background "zpool iostat" process that

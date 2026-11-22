@@ -24,6 +24,7 @@ package main
 import (
 	"errors"
 	"fmt"
+	"log/slog"
 	"os"
 	"os/exec"
 	"strings"
@@ -151,7 +152,7 @@ func setDevLeds(devandled map[string]ibpiID) {
 		// skip devices which are currently missing
 		st, err := os.Stat(devled.path)
 		if err != nil || st.Mode()&os.ModeDevice == 0 {
-			notify.Print(notifier.DEBUG, "skipping missing device LED: ", dev)
+			slog.Debug("skipping missing device LED", "device", dev)
 			continue
 		}
 		// reset unknown status to normal

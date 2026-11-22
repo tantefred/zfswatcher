@@ -117,6 +117,11 @@ be useful.
 See the installed `zfswatcher(8)` manual page for information on invoking
 the zfswatcher process.
 
+Internal diagnostic messages (not the pool events, which go to the
+configured log files, syslog and mail) are written to stderr. Under systemd
+they end up in the journal: `journalctl -u zfswatcher`. With `-d` the debug
+level is included.
+
 
 ## Configuration
 

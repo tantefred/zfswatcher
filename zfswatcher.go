@@ -30,6 +30,7 @@ package main
 
 import (
 	"fmt"
+	"log/slog"
 	"net/http"
 	"os"
 	"os/signal"
@@ -419,14 +420,17 @@ MAINLOOP:
 		case <-sigCexit:
 			break MAINLOOP
 		case <-sigChup:
-			notify.Print(notifier.DEBUG, "reconfiguring, reopening logs")
+			slog.Debug("reconfiguring, reopening logs")
 			reconfigure()
 		case <-sigCusr1:
 			var memstats runtime.MemStats
 			runtime.ReadMemStats(&memstats)
-			notify.Printf(notifier.DEBUG, "running with %d goroutines",
-				runtime.NumGoroutine())
-			notify.Printf(notifier.DEBUG, "memory statistics: %+v", memstats)
+			slog.Debug("runtime stats",
+				"goroutines", runtime.NumGoroutine(),
+				"alloc", memstats.Alloc,
+				"heap_inuse", memstats.HeapInuse,
+				"sys", memstats.Sys,
+				"num_gc", memstats.NumGC)
 		}
 	}
 	// exiting, stop tickers, close everything, etc:
@@ -450,17 +454,11 @@ EXIT:
 	// wait a moment for logger goroutines to quit so that we get the last log messages:
 	select {
 	case <-notifyCloseC:
-		if optDebug {
-			fmt.Println("exiting now: logger finished")
-		}
+		slog.Debug("exiting now", "reason", "logger finished")
 	case <-sigCexit:
-		if optDebug {
-			fmt.Println("exiting now: got another signal")
-		}
+		slog.Debug("exiting now", "reason", "got another signal")
 	case <-time.After(time.Second * 10):
-		if optDebug {
-			fmt.Println("exiting now: timer elapsed")
-		}
+		slog.Debug("exiting now", "reason", "timer elapsed")
 	}
 }
 

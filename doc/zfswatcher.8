@@ -45,6 +45,10 @@ instead of the default
 .TP
 .BR \-d ", " \-\-debug
 Enable debug mode which outputs all messages to STDOUT.
+Internal diagnostic messages (written to STDERR, under systemd to the
+journal, see
+.BR journalctl (1))
+then include the debug level.
 .TP
 .BR \-P ", " \-\-passwordhash
 Read a password and print its bcrypt hash (cost 10) for the

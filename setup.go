@@ -371,7 +371,7 @@ func setup() {
 
 	// command line flags:
 	pflag.StringVarP(&cfgFile, "conf", "c", CFGFILE, "configuration file path")
-	pflag.BoolVarP(&optDebug, "debug", "d", false, "print debug information to stdout")
+	pflag.BoolVarP(&optDebug, "debug", "d", false, "debug mode: messages also to stdout, diagnostics at debug level to stderr")
 	optHashPassword := pflag.BoolP("passwordhash", "P", false, "read a password and print its bcrypt hash")
 	optTest := pflag.BoolP("test", "t", false, "test configuration and exit")
 	optVersion := pflag.BoolP("version", "v", false, "print version information and exit")
@@ -395,6 +395,8 @@ func setup() {
 	if *optTest {
 		optDebug = true
 	}
+
+	setupSlog(optDebug)
 
 	cfg = getCfg()
 	if cfg == nil {
