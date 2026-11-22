@@ -67,6 +67,9 @@ Changes
    ("journalctl -u zfswatcher"). The debug level is enabled with -d.
    Messages a human has to act on still go to the configured log files,
    syslog and mail.
+ - A successful reload (SIGHUP, also sent by logrotate after rotating the
+   log files) is logged as "configuration reloaded" at level info. Before,
+   only a debug message "reconfiguring, reopening logs" was written.
 
 Fixes
 
