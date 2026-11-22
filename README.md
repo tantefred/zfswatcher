@@ -321,7 +321,9 @@ Failed logins are counted per client address. After `loginfailures` failures
 (default 5) within `loginwindow` seconds (default 60) the address gets
 `429 Too Many Requests` with a `Retry-After` header for `loginlockout` seconds
 (default 60), without any password or token check, and one message with the
-severity `[severity] loginlockout` (default warning) is sent. `loginfailures = 0`
+severity `[severity] loginlockout` (default warning) is sent. A successful
+login does not reset the counter, failures only expire with the window. IPv6
+clients are counted per /64 prefix. `loginfailures = 0`
 switches this off. **Behind a reverse proxy `trustedproxies` must be set**:
 otherwise every request comes from the address of the proxy, and one attacker
 locks out all users.

@@ -21,6 +21,7 @@ package main
 
 import (
 	"fmt"
+	"net/netip"
 	"sync"
 	"time"
 )
@@ -56,18 +57,33 @@ func checkLoginBackoff(failures, window, lockout int) error {
 }
 
 type loginEntry struct {
-	count       int
+	count       int       // failures in the current window
+	pending     int       // attempts in flight
 	start       time.Time // first failure of the current window
 	lockedUntil time.Time // zero if not locked
 }
 
-// loginGuard counts failed logins per client address and locks a client
-// out for a while after too many of them. It is safe for concurrent use.
+func (e *loginEntry) locked() bool { return !e.lockedUntil.IsZero() }
+
+// expired reports whether the entry no longer has any effect.
+func (e *loginEntry) expired(now time.Time, window time.Duration) bool {
+	if e.locked() {
+		return !now.Before(e.lockedUntil)
+	}
+	return !now.Before(e.start.Add(window))
+}
+
+// loginGuard counts failed logins per client and locks a client out for a
+// while after too many of them. Successful logins do not reset the counter
+// (otherwise a user with a valid password could guess other passwords
+// without limit); the counters only expire with the window. It is safe for
+// concurrent use.
 type loginGuard struct {
 	mu         sync.Mutex
 	now        func() time.Time
 	maxEntries int
 	entries    map[string]*loginEntry
+	overflow   bool // the table is full of locked clients, reported once
 }
 
 func newLoginGuard() *loginGuard {
@@ -78,67 +94,127 @@ func newLoginGuard() *loginGuard {
 	}
 }
 
-// expired reports whether the entry no longer has any effect.
-func (e *loginEntry) expired(now time.Time, window time.Duration) bool {
-	if !e.lockedUntil.IsZero() {
-		return !now.Before(e.lockedUntil)
+// loginKey maps a client address to the key of its counter: IPv4 addresses
+// individually, IPv6 addresses by their /64 prefix (a client usually owns
+// a whole /64, so it could otherwise use endless addresses). Text which is
+// not an address (with or without port) is used as is.
+func loginKey(ip string) string {
+	a, err := netip.ParseAddr(ip)
+	if err != nil {
+		ap, err2 := netip.ParseAddrPort(ip)
+		if err2 != nil {
+			return ip
+		}
+		a = ap.Addr()
 	}
-	return !now.Before(e.start.Add(window))
+	a = a.Unmap().WithZone("")
+	if a.Is6() {
+		if p, err := a.Prefix(64); err == nil {
+			return p.String()
+		}
+	}
+	return a.String()
 }
 
-// blocked reports whether the client is locked out and for how many more
-// seconds (rounded up).
-func (g *loginGuard) blocked(ip string) (int, bool) {
-	g.mu.Lock()
-	defer g.mu.Unlock()
-	e, ok := g.entries[ip]
-	if !ok || e.lockedUntil.IsZero() {
-		return 0, false
-	}
-	now := g.now()
-	if !now.Before(e.lockedUntil) {
-		delete(g.entries, ip)
-		return 0, false
-	}
-	d := e.lockedUntil.Sub(now)
-	return int((d + time.Second - 1) / time.Second), true
-}
+// loginVerdict is the result of begin.
+type loginVerdict int
 
-// fail records a failed login and reports whether this one locked the
-// client out.
-func (g *loginGuard) fail(ip string, failures int, window, lockout time.Duration) bool {
+const (
+	loginAllow     loginVerdict = iota
+	loginDeny                   // locked out or no attempts left
+	loginOverflow               // table full of locked clients, unknown client refused
+	loginOverflow1              // like loginOverflow, first time (to be reported)
+)
+
+// begin reserves an attempt slot for the client. With loginAllow the caller
+// must call end exactly once. Otherwise it returns the seconds to wait.
+func (g *loginGuard) begin(ip string, failures int, window time.Duration) (key string, v loginVerdict, retry int) {
+	key = loginKey(ip)
 	g.mu.Lock()
 	defer g.mu.Unlock()
 	now := g.now()
-	e, ok := g.entries[ip]
+	e, ok := g.entries[key]
 	if ok && e.expired(now, window) {
-		delete(g.entries, ip)
-		ok = false
+		if e.pending == 0 {
+			delete(g.entries, key)
+			ok = false
+		} else {
+			*e = loginEntry{pending: e.pending, start: now}
+		}
 	}
 	if !ok {
-		g.makeRoom(now, window)
+		if !g.makeRoom(now, window) {
+			if g.overflow {
+				return key, loginOverflow, ceilSeconds(window)
+			}
+			g.overflow = true
+			return key, loginOverflow1, ceilSeconds(window)
+		}
 		e = &loginEntry{start: now}
-		g.entries[ip] = e
+		g.entries[key] = e
 	}
-	if !e.lockedUntil.IsZero() {
-		return false // already locked, no new message
+	if e.locked() {
+		return key, loginDeny, ceilSeconds(e.lockedUntil.Sub(now))
 	}
-	e.count++
-	if e.count >= failures {
-		e.lockedUntil = now.Add(lockout)
-		return true
+	if e.count+e.pending >= failures {
+		return key, loginDeny, ceilSeconds(e.start.Add(window).Sub(now))
 	}
-	return false
+	e.pending++
+	return key, loginAllow, 0
+}
+
+func ceilSeconds(d time.Duration) int {
+	s := int((d + time.Second - 1) / time.Second)
+	if s < 1 {
+		s = 1
+	}
+	return s
+}
+
+// end releases the slot taken by begin. Only a failed login (failed) is
+// counted; it returns true if that locked the client out.
+func (g *loginGuard) end(key string, failed bool, failures int, window, lockout time.Duration) bool {
+	g.mu.Lock()
+	defer g.mu.Unlock()
+	now := g.now()
+	e, ok := g.entries[key]
+	if !ok {
+		// evicted while in flight
+		if !failed || !g.makeRoom(now, window) {
+			return false
+		}
+		e = &loginEntry{start: now}
+		g.entries[key] = e
+	} else if e.pending > 0 {
+		e.pending--
+	}
+	locked := false
+	if failed && !e.locked() {
+		if e.expired(now, window) {
+			e.count, e.start = 0, now
+		}
+		e.count++
+		if e.count >= failures {
+			e.lockedUntil = now.Add(lockout)
+			locked = true
+		}
+	}
+	if e.count == 0 && e.pending == 0 && !e.locked() {
+		delete(g.entries, key)
+	}
+	return locked
 }
 
 // makeRoom ensures that one more entry fits: expired entries go first, then
-// the oldest ones.
-func (g *loginGuard) makeRoom(now time.Time, window time.Duration) {
+// the oldest unlocked ones. Locked entries are never evicted; it returns
+// false if only those are left.
+func (g *loginGuard) makeRoom(now time.Time, window time.Duration) bool {
 	if len(g.entries) < g.maxEntries {
-		return
+		g.overflow = false
+		return true
 	}
 	for k, e := range g.entries {
-		if e.expired(now, window) {
+		if e.pending == 0 && e.expired(now, window) {
 			delete(g.entries, k)
 		}
 	}
@@ -146,19 +222,17 @@ func (g *loginGuard) makeRoom(now time.Time, window time.Duration) {
 		var oldest string
 		var ot time.Time
 		for k, e := range g.entries {
-			if oldest == "" || e.start.Before(ot) {
+			if !e.locked() && (oldest == "" || e.start.Before(ot)) {
 				oldest, ot = k, e.start
 			}
 		}
+		if oldest == "" {
+			return false
+		}
 		delete(g.entries, oldest)
 	}
-}
-
-// success forgets the failures of the client.
-func (g *loginGuard) success(ip string) {
-	g.mu.Lock()
-	delete(g.entries, ip)
-	g.mu.Unlock()
+	g.overflow = false
+	return true
 }
 
 // size returns the number of tracked clients.

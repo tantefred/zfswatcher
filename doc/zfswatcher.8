@@ -106,7 +106,8 @@ and a
 header for
 .B loginlockout
 seconds (default 60), without checking any credentials. A successful login
-resets the counter,
+does not reset the counter (failures only expire with the window), IPv6
+clients are counted per /64 prefix, and
 .B /healthz
 is not affected. One message per lockout is sent with the severity
 .B loginlockout

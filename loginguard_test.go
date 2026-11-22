@@ -9,6 +9,7 @@ import (
 	"strconv"
 	"strings"
 	"sync"
+	"sync/atomic"
 	"testing"
 	"time"
 
@@ -123,14 +124,16 @@ func TestLoginBackoffLockout(t *testing.T) {
 	}
 }
 
-func TestLoginBackoffSuccessResets(t *testing.T) {
+func TestLoginBackoffSuccessDoesNotReset(t *testing.T) {
 	_, _, h := backoffSetup(t)
-	for i := 0; i < 5; i++ {
-		loginReq(h, "192.0.2.1", "bad")
-		loginReq(h, "192.0.2.1", "bad")
-		if w := loginReq(h, "192.0.2.1", "good"); w.Code != 200 {
-			t.Fatalf("round %d: %d", i, w.Code)
-		}
+	// a valid login in between must not reset the counter: 3rd failure locks
+	loginReq(h, "192.0.2.1", "bad")
+	loginReq(h, "192.0.2.1", "good")
+	loginReq(h, "192.0.2.1", "bad")
+	loginReq(h, "192.0.2.1", "good")
+	loginReq(h, "192.0.2.1", "bad")
+	if w := loginReq(h, "192.0.2.1", "good"); w.Code != 429 {
+		t.Errorf("got %d, want 429", w.Code)
 	}
 }
 
@@ -171,44 +174,140 @@ func TestLoginBackoffDisabled(t *testing.T) {
 	}
 }
 
-func TestLoginGuardMaxEntries(t *testing.T) {
+func guardWithClock(max int) (*loginGuard, *fakeClock) {
 	g := newLoginGuard()
 	clk := &fakeClock{t: time.Unix(1_000_000, 0)}
 	g.now = clk.now
-	g.maxEntries = 50
+	g.maxEntries = max
+	return g, clk
+}
+
+// attempt runs one failed login through the guard.
+func attempt(g *loginGuard, ip string, failed bool) (loginVerdict, bool) {
+	key, v, _ := g.begin(ip, 5, time.Minute)
+	if v != loginAllow {
+		return v, false
+	}
+	return v, g.end(key, failed, 5, time.Minute, time.Minute)
+}
+
+func TestLoginGuardMaxEntries(t *testing.T) {
+	g, clk := guardWithClock(50)
 	for i := 0; i < 500; i++ {
-		g.fail("10.0."+strconv.Itoa(i/250)+"."+strconv.Itoa(i%250), 5, time.Minute, time.Minute)
+		attempt(g, "10.0."+strconv.Itoa(i/250)+"."+strconv.Itoa(i%250), true)
 		clk.advance(time.Millisecond)
 		if g.size() > 50 {
 			t.Fatalf("%d entries", g.size())
 		}
 	}
-	// expired entries are dropped first
-	clk.advance(time.Hour)
-	g.fail("203.0.113.1", 5, time.Minute, time.Minute)
+	clk.advance(time.Hour) // expired entries are dropped first
+	attempt(g, "203.0.113.1", true)
 	if g.size() != 1 {
 		t.Errorf("%d entries after expiry, want 1", g.size())
 	}
 }
 
+func TestLoginGuardLockedEntriesSurvive(t *testing.T) {
+	g, clk := guardWithClock(10)
+	for i := 0; i < 5; i++ { // lock out one client
+		attempt(g, "192.0.2.1", true)
+	}
+	if _, _, secs := g.begin("192.0.2.1", 5, time.Minute); secs != 60 {
+		t.Fatalf("not locked: %d", secs)
+	}
+	for i := 0; i < 100; i++ { // flood with single failures from other clients
+		attempt(g, "10.0.0."+strconv.Itoa(i), true)
+		clk.advance(time.Millisecond)
+	}
+	if _, v, _ := g.begin("192.0.2.1", 5, time.Minute); v != loginDeny {
+		t.Errorf("locked client was evicted: %v", v)
+	}
+}
+
+func TestLoginGuardOverflowEmergency(t *testing.T) {
+	g, clk := guardWithClock(3)
+	for i := 0; i < 3; i++ {
+		for j := 0; j < 5; j++ {
+			attempt(g, "10.0.0."+strconv.Itoa(i), true)
+		}
+	}
+	if v, _ := attempt(g, "10.9.9.9", false); v != loginOverflow1 {
+		t.Errorf("first refusal: %v", v)
+	}
+	if v, _ := attempt(g, "10.9.9.8", false); v != loginOverflow {
+		t.Errorf("second refusal: %v", v)
+	}
+	// known locked client is still reported as locked
+	if _, v, _ := g.begin("10.0.0.0", 5, time.Minute); v != loginDeny {
+		t.Errorf("known client: %v", v)
+	}
+	clk.advance(2 * time.Minute) // lockouts expired: normal again
+	if v, _ := attempt(g, "10.9.9.9", false); v != loginAllow {
+		t.Errorf("after expiry: %v", v)
+	}
+}
+
+func TestLoginKeyIPv6Prefix(t *testing.T) {
+	cases := map[string]string{
+		"192.0.2.1":                  "192.0.2.1",
+		"192.0.2.1:99":               "192.0.2.1",
+		"::ffff:192.0.2.1":           "192.0.2.1",
+		"2001:db8:1:2:aaaa::1":       "2001:db8:1:2::/64",
+		"2001:db8:1:2:bbbb::2":       "2001:db8:1:2::/64",
+		"[2001:db8:1:2:cccc::3]:443": "2001:db8:1:2::/64",
+		"2001:db8:1:3::1":            "2001:db8:1:3::/64",
+		"not an address":             "not an address",
+	}
+	for in, want := range cases {
+		if got := loginKey(in); got != want {
+			t.Errorf("loginKey(%q) = %q, want %q", in, got, want)
+		}
+	}
+}
+
+func TestLoginOverflowNotifiesOnce(t *testing.T) {
+	_, _, h := backoffSetup(t)
+	webLoginGuard.maxEntries = 2
+	cfg.Www.Loginfailures = 1
+	msgs := captureNotify(t)
+	loginReq(h, "192.0.2.1", "bad")
+	loginReq(h, "192.0.2.2", "bad")
+	for i := 0; i < 3; i++ {
+		if w := loginReq(h, "192.0.2.3", "good"); w.Code != 429 {
+			t.Fatalf("got %d", w.Code)
+		}
+	}
+	n := 0
+	for _, m := range msgs() {
+		if strings.Contains(m, "too many clients") {
+			n++
+		}
+	}
+	if n != 1 {
+		t.Errorf("%d overflow messages, want 1", n)
+	}
+}
+
 func TestLoginGuardConcurrent(t *testing.T) {
-	g := newLoginGuard()
+	g, _ := guardWithClock(100)
 	var wg sync.WaitGroup
-	for i := 0; i < 8; i++ {
+	var checks atomic.Int32
+	for i := 0; i < 200; i++ {
 		wg.Add(1)
-		go func(i int) {
+		go func() {
 			defer wg.Done()
-			ip := "192.0.2." + strconv.Itoa(i%3)
-			for j := 0; j < 200; j++ {
-				g.blocked(ip)
-				g.fail(ip, 5, time.Minute, time.Millisecond)
-				if j%50 == 0 {
-					g.success(ip)
-				}
+			key, v, _ := g.begin("192.0.2.1", 5, time.Minute)
+			if v != loginAllow {
+				return
 			}
-		}(i)
+			checks.Add(1) // the expensive password check
+			g.end(key, true, 5, time.Minute, time.Minute)
+		}()
 	}
 	wg.Wait()
+	if n := checks.Load(); n > 5 {
+		t.Errorf("%d password checks, at most 5 allowed", n)
+	}
 }
 
 func TestLoginBackoffAPIJSONAndBearer(t *testing.T) {

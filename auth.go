@@ -327,12 +327,13 @@ func plainError(w http.ResponseWriter, _ *http.Request, code int, msg string) {
 	http.Error(w, msg, code)
 }
 
-// recordLoginFailure counts a failed login of the client and reports the
-// lockout, once per lockout.
-func recordLoginFailure(ip string) {
-	window := time.Duration(cfg.Www.Loginwindow) * time.Second
+func loginWindow() time.Duration { return time.Duration(cfg.Www.Loginwindow) * time.Second }
+
+// recordLoginResult releases the attempt slot and counts a failed login. It
+// reports the lockout, once per lockout.
+func recordLoginResult(key, ip string, failed bool) {
 	lockout := time.Duration(cfg.Www.Loginlockout) * time.Second
-	if webLoginGuard.fail(ip, cfg.Www.Loginfailures, window, lockout) && notify != nil {
+	if webLoginGuard.end(key, failed, cfg.Www.Loginfailures, loginWindow(), lockout) && notify != nil {
 		notify.Printf(cfg.Severity.Loginlockout,
 			"web login: client %s locked out for %ds after %d failed attempts",
 			ip, cfg.Www.Loginlockout, cfg.Www.Loginfailures)
@@ -351,31 +352,36 @@ func requireRoleWith(a Authenticator, render errorRenderer, min Role, h http.Han
 	return func(w http.ResponseWriter, r *http.Request) {
 		ip := clientIP(r)
 		failures := cfg.Www.Loginfailures
+		var key string
 		if failures > 0 {
 			// Locked out clients are rejected before any (expensive)
-			// credential check.
-			if secs, locked := webLoginGuard.blocked(ip); locked {
+			// credential check; the slot is reserved atomically so that
+			// parallel requests cannot exceed the limit.
+			var v loginVerdict
+			var secs int
+			key, v, secs = webLoginGuard.begin(ip, failures, loginWindow())
+			if v != loginAllow {
+				if v == loginOverflow1 && notify != nil {
+					notify.Printf(cfg.Severity.Loginlockout,
+						"web login: too many clients are locked out, refusing all unknown clients until some lockouts expire")
+				}
 				w.Header().Set("Retry-After", strconv.Itoa(secs))
 				render(w, r, http.StatusTooManyRequests, "429 Too Many Requests")
 				return
 			}
 		}
 		p, err := a.Authenticate(r)
+		failed := p == nil && err != nil
+		if failed && notify != nil {
+			notify.Printf(notifier.WARNING, "web login failed for %s from %s", err, ip)
+		}
+		if failures > 0 {
+			recordLoginResult(key, ip, failed)
+		}
 		if p == nil {
-			if err != nil {
-				if notify != nil {
-					notify.Printf(notifier.WARNING, "web login failed for %s from %s", err, ip)
-				}
-				if failures > 0 {
-					recordLoginFailure(ip)
-				}
-			}
 			w.Header().Set("WWW-Authenticate", `Basic realm="`+authRealm+`", charset="UTF-8"`)
 			render(w, r, http.StatusUnauthorized, "401 Unauthorized")
 			return
-		}
-		if failures > 0 {
-			webLoginGuard.success(ip)
 		}
 		if p.Role < min {
 			render(w, r, http.StatusForbidden, "403 Forbidden")
