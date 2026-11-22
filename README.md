@@ -187,8 +187,10 @@ Some notes:
   the URL. Commented examples are in the configuration file.
 
 - `zfswatcher --test-notify` sends one test message to all enabled outputs
-  and exits without starting the daemon. The message has the severity
-  `emerg`, so it passes every `level`. The exit code is 1 if a webhook
+  and exits without starting the daemon. The message has the most urgent
+  `level` of the enabled outputs (for example `warning` if levels `warning`
+  and `info` are configured), so it reaches every channel without being more
+  urgent than needed. Without enabled outputs it exits with code 1. The exit code is 1 if a webhook
   delivery fails (other channels are best effort), which also makes it
   usable in scripts.
 

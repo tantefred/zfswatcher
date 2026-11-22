@@ -15,8 +15,8 @@ New features
    times out after 10 s and is retried once after a network error or HTTP
    5xx; failures are logged with log/slog (without token and query string).
    Attachments are not sent. Examples are in the configuration files.
- - "zfswatcher --test-notify" sends a test message (severity emerg, so it
-   passes every level) to all enabled outputs and exits without starting
+ - "zfswatcher --test-notify" sends a test message (with the most urgent
+   configured level, so it reaches every channel) to all enabled outputs and exits without starting
    the daemon. The exit code is 1 if a webhook delivery fails.
 
 

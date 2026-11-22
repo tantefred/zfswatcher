@@ -75,11 +75,10 @@ below.
 .TP
 .B \-\-test\-notify
 Send one test message to all enabled outputs (log files, syslog, e-mail,
-webhooks) and exit; the daemon is not started. The message has the severity
-.BR emerg ,
-so it passes every
+webhooks) and exit; the daemon is not started. The message has the most urgent
 .B level
-setting. The exit status is 1 if a webhook delivery fails (the other outputs
+of the enabled outputs, so it reaches every one of them without being more
+urgent than necessary. Without an enabled output the exit status is 1. The exit status is 1 if a webhook delivery fails (the other outputs
 are best effort) or an output cannot be set up.
 .TP
 .BR \-t ", " \-\-test

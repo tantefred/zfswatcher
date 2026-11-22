@@ -171,7 +171,8 @@ func TestRunTestNotify(t *testing.T) {
 	hostname = "testhost"
 	defer func() { hostname = oldHost }()
 
-	text := "[webhook \"a\"]\nenable = true\nlevel = emerg\nurl = " + srv.URL + "/h\n"
+	text := "[webhook \"a\"]\nenable = true\nlevel = warning\nurl = " + srv.URL + "/h\n"
+	text += "[logfile \"l\"]\nenable = true\nlevel = info\nfile = " + filepath.Join(t.TempDir(), "l.log") + "\n"
 	c := cfgFromText(t, text)
 	if c == nil {
 		t.Fatal("config rejected")
@@ -181,7 +182,7 @@ func TestRunTestNotify(t *testing.T) {
 		t.Fatalf("exit code %d: %s", code, out.String())
 	}
 	mu.Lock()
-	if len(bodies) != 1 || !strings.Contains(bodies[0], "test notification") || !strings.Contains(bodies[0], "emerg") {
+	if len(bodies) != 1 || !strings.Contains(bodies[0], "test notification") || !strings.Contains(bodies[0], "[warning]") {
 		t.Errorf("bodies %q", bodies)
 	}
 	status = 400
@@ -192,9 +193,21 @@ func TestRunTestNotify(t *testing.T) {
 		t.Errorf("failing webhook: exit code %d, output %q", code, out.String())
 	}
 
-	// no outputs configured: nothing to fail
 	out.Reset()
-	if code := runTestNotify(&cfgType{}, &out); code != 0 {
-		t.Errorf("empty config: exit code %d", code)
+	if code := runTestNotify(&cfgType{}, &out); code != 1 || !strings.Contains(out.String(), "no enabled outputs") {
+		t.Errorf("empty config: exit code %d, output %q", code, out.String())
+	}
+}
+
+func TestTestNotifySeverity(t *testing.T) {
+	c := cfgFromText(t, "[webhook \"a\"]\nenable = true\nlevel = info\nurl = http://h/x\n"+
+		"[webhook \"b\"]\nenable = true\nlevel = err\nurl = http://h/x\n"+
+		"[webhook \"c\"]\nenable = false\nlevel = emerg\nurl = http://h/x\n"+
+		"[email \"m\"]\nenable = true\nlevel = warning\n")
+	if sev, ok := testNotifySeverity(c); !ok || sev != notifier.ERR {
+		t.Errorf("got %v %v, want err", sev, ok)
+	}
+	if _, ok := testNotifySeverity(&cfgType{}); ok {
+		t.Error("severity for empty config")
 	}
 }

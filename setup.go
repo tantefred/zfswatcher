@@ -460,15 +460,52 @@ func setupOutputs(c *cfgType) (*notifier.Notifier, []*notifier.WebhookOutput, bo
 // testNotifyWait is how long --test-notify waits for the deliveries.
 var testNotifyWait = 60 * time.Second
 
+// testNotifySeverity returns the most urgent "level" of all enabled outputs
+// (log file, syslog, e-mail, webhook; the web log buffer is ignored). A
+// message with this severity passes the filter of every one of them (lower
+// numbers are more urgent and a message passes if its severity is not less
+// urgent than the level) without being more urgent than necessary.
+func testNotifySeverity(c *cfgType) (notifier.Severity, bool) {
+	sev, found := notifier.DEBUG, false
+	add := func(enable bool, level notifier.Severity) {
+		if enable {
+			found = true
+			if level < sev {
+				sev = level
+			}
+		}
+	}
+	for _, s := range c.Logfile {
+		add(s.Enable, s.Level)
+	}
+	for _, s := range c.Syslog {
+		add(s.Enable, s.Level)
+	}
+	for _, s := range c.Email {
+		add(s.Enable, s.Level)
+	}
+	for _, s := range c.Webhook {
+		add(s.Enable, s.Level)
+	}
+	return sev, found
+}
+
 // runTestNotify sends one test message to all enabled outputs (the normal
 // daemon does not start) and returns the exit code: 0 if all webhooks
-// accepted the message, 1 if a webhook delivery or output setup failed.
-// The message has severity "emerg", which passes every level filter, so
-// each configured channel is really tested. Other channels (mail, syslog,
-// log file) are best effort: failures only show in the diagnostics on stderr.
+// accepted the message, 1 if a webhook delivery or output setup failed or
+// no output is enabled. The message has the most urgent configured level
+// (see testNotifySeverity), so it reaches every channel without a needlessly
+// high severity (emerg would be broadcast to all terminals by rsyslog).
+// Other channels (mail, syslog, log file) are best effort: failures only
+// show in the diagnostics on stderr.
 func runTestNotify(c *cfgType, out io.Writer) int {
+	sev, found := testNotifySeverity(c)
+	if !found {
+		_, _ = fmt.Fprintln(out, "no enabled outputs")
+		return 1
+	}
 	n, hooks, failed := setupOutputs(c)
-	n.Printf(notifier.EMERG, "zfswatcher test notification from %s (sent by --test-notify)", hostname)
+	n.Printf(sev, "zfswatcher test notification from %s (sent by --test-notify)", hostname)
 	n.Flush()
 	select {
 	case <-n.Close():
