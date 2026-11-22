@@ -21,21 +21,28 @@
 
 package notifier
 
-func (n Notifier) loggerCallback(ch chan *Msg, f func(*Msg)) {
-	defer n.wg.Done()
+// CallbackOutput calls a function for every message and attachment.
+type CallbackOutput struct {
+	acceptTypes
+	f func(*Msg)
+}
+
+// NewCallbackOutput returns an Output which calls f for each message. f
+// runs in the output's goroutine.
+func NewCallbackOutput(f func(*Msg)) *CallbackOutput {
+	return &CallbackOutput{acceptTypes: acceptTypes{attachment: true}, f: f}
+}
+
+// Run implements Output.
+func (o *CallbackOutput) Run(ch <-chan *Msg) {
 	for m := range ch {
-		f(m)
+		o.f(m)
 	}
 }
 
-// AddLoggerCallback adds a log output which just calls back the given function
-// whenever there is a message to be logged.
+// AddLoggerCallback adds an output which calls f for each message.
 func (n *Notifier) AddLoggerCallback(s Severity, f func(*Msg)) error {
-	ch := make(chan *Msg, chan_SIZE)
-	n.wg.Add(1)
-	go n.loggerCallback(ch, f)
-	n.out = append(n.out, notifyOutput{severity: s, ch: ch, attachment: true})
-	return nil
+	return n.AddOutput(s, NewCallbackOutput(f))
 }
 
 // eof

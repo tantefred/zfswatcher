@@ -19,7 +19,6 @@
 // along with zfswatcher. If not, see <http://www.gnu.org/licenses/>.
 //
 
-// Notifier - Go logging package (syslog, file and e-mail)
 package notifier
 
 import (
@@ -62,9 +61,7 @@ func (n *Notifier) dispatcher() {
 		// forward the message to relevant loggers
 		for _, out := range n.out {
 			switch {
-			case m.MsgType == MSGTYPE_ATTACHMENT && !out.attachment:
-				continue
-			case m.MsgType == MSGTYPE_FLUSH && !out.flush:
+			case !out.accepts(m.MsgType):
 				continue
 			case m.Severity <= out.severity:
 				// the zero value of Severity is EMERG, thus
@@ -89,10 +86,14 @@ func (n *Notifier) dispatcher() {
 // public API
 
 type notifyOutput struct {
-	severity   Severity
-	ch         chan *Msg
-	attachment bool
-	flush      bool
+	severity Severity
+	ch       chan *Msg
+	filter   MsgFilter // nil: accept all message types
+}
+
+// accepts reports whether the output wants messages of type t.
+func (o *notifyOutput) accepts(t MsgType) bool {
+	return o.filter == nil || o.filter.Accepts(t)
 }
 
 // Notifier is a logging subsystem instance which is running as a goroutine

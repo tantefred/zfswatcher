@@ -30,9 +30,21 @@ import (
 // logFileMode is used when a log file is created (before the umask).
 const logFileMode = 0o640
 
-func (n *Notifier) loggerFile(ch chan *Msg, filename string) {
-	defer n.wg.Done()
+// FileOutput appends messages and attachments to a log file. It reopens the
+// file on MSGTYPE_REOPEN (log rotation).
+type FileOutput struct {
+	acceptTypes
+	filename string
+}
 
+// NewFileOutput returns an Output which appends to the file filename.
+func NewFileOutput(filename string) *FileOutput {
+	return &FileOutput{acceptTypes: acceptTypes{attachment: true}, filename: filename}
+}
+
+// Run implements Output.
+func (o *FileOutput) Run(ch <-chan *Msg) {
+	filename := o.filename
 	var fileopen bool
 
 	f, err := os.OpenFile(filename, os.O_WRONLY|os.O_APPEND|os.O_CREATE, logFileMode) //nolint:gosec // path from admin config
@@ -81,6 +93,7 @@ func (n *Notifier) loggerFile(ch chan *Msg, filename string) {
 }
 
 // AddLoggerFile adds a file based logging output.
+// AddLoggerFile adds a file logging output.
 func (n *Notifier) AddLoggerFile(s Severity, file string) error {
 	switch {
 	case s < severity_MIN || s > severity_MAX:
@@ -88,11 +101,5 @@ func (n *Notifier) AddLoggerFile(s Severity, file string) error {
 	case file == "":
 		return errors.New(`"file" not defined`)
 	}
-	ch := make(chan *Msg, chan_SIZE)
-	n.wg.Add(1)
-	go n.loggerFile(ch, file)
-	n.out = append(n.out, notifyOutput{severity: s, ch: ch, attachment: true})
-	return nil
+	return n.AddOutput(s, NewFileOutput(file))
 }
-
-// eof

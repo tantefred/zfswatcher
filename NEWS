@@ -5,6 +5,14 @@
 
 version 0.8.0 (unreleased)
 
+Upgrade notes
+
+ - The unfinished iostat stream was removed. The option "zpooliostatcmd" in
+   section [main] is obsolete: it is still accepted so that existing
+   configuration files keep working, but it has no effect and zfswatcher
+   logs a warning at startup and on reload if it is set. Remove it from
+   your configuration.
+
 Changes
 
  - Internal diagnostics (debug output such as runtime statistics on
@@ -13,6 +21,19 @@ Changes
    ("journalctl -u zfswatcher"). The debug level is enabled with -d.
    Messages a human has to act on still go to the configured log files,
    syslog and mail.
+
+Fixes
+
+ - zfswatcher no longer starts a background "zpool iostat" process that
+   only printed its output to stdout.
+
+Internal changes
+
+ - The notifier package has a plug-in interface for output channels
+   (notifier.Output and Notifier.AddOutput, documented in
+   notifier/doc.go). Log file, syslog, e-mail, standard output and
+   callback outputs are now implemented with it. The configuration and
+   the behaviour are unchanged.
 
 
 version 0.7.0 released 2026-11-22
