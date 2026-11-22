@@ -2,12 +2,14 @@ package main
 
 import (
 	"errors"
+	"fmt"
 	"io/fs"
 	"os"
 	"path/filepath"
 	"strings"
 	"sync"
 	"testing"
+	"time"
 
 	"github.com/tantefred/zfswatcher/notifier"
 )
@@ -335,5 +337,119 @@ func TestStaleTempFilesRemoved(t *testing.T) {
 	}
 	if _, err := os.Stat(other); err != nil {
 		t.Errorf("unrelated file removed: %v", err)
+	}
+}
+
+func testEvents(n int) []Event {
+	ts := time.Date(2026, 11, 1, 10, 0, 0, 0, time.UTC)
+	var ev []Event
+	for i := 0; i < n; i++ {
+		ev = append(ev, Event{Time: ts.Add(time.Duration(i) * time.Minute),
+			Severity: "warning", Text: fmt.Sprintf("event %d", i)})
+	}
+	ev[n-1].Attachment = "attachment"
+	return ev
+}
+
+func TestStateFileEventsRoundtrip(t *testing.T) {
+	path := filepath.Join(t.TempDir(), "state.json")
+	sf := newStateFile(parseFixture(t, "zpool-status-degraded.txt"), nil)
+	sf.Events = testEvents(3)
+	if err := writeStateFile(path, sf); err != nil {
+		t.Fatal(err)
+	}
+	raw, _ := os.ReadFile(path)
+	if !strings.Contains(string(raw), `"time": "2026-11-01T10:00:00Z"`) {
+		t.Errorf("time is not RFC3339: %s", raw)
+	}
+	got, err := loadStateFile(path)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !eventsEqual(got.Events, sf.Events) || !got.sameAs(sf) {
+		t.Errorf("events changed by the roundtrip: %+v", got.Events)
+	}
+	other := *sf
+	other.Events = testEvents(4)
+	if got.sameAs(&other) {
+		t.Error("different events must not be the same state")
+	}
+}
+
+func TestStateFileWithoutEvents(t *testing.T) {
+	path := filepath.Join(t.TempDir(), "old.json")
+	old := `{"version":1,"pools":[{"name":"tank","state":"ONLINE"}],"future":true}`
+	if err := os.WriteFile(path, []byte(old), 0o600); err != nil {
+		t.Fatal(err)
+	}
+	sf, err := loadStateFile(path)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(sf.Events) != 0 || len(sf.Pools) != 1 {
+		t.Errorf("unexpected content: %+v", sf)
+	}
+}
+
+func TestPersisterWritesEvents(t *testing.T) {
+	goldenSetup(t)
+	cfg.Www.Logbuffer = 3
+	path := filepath.Join(t.TempDir(), "state.json")
+	pools := parseFixture(t, "zpool-status-degraded.txt")
+	sp := newStatePersister(path)
+	sp.update(pools, nil)
+	if sf, _ := loadStateFile(path); len(sf.Events) != 0 {
+		t.Fatalf("unexpected events %+v", sf.Events)
+	}
+	ts := time.Date(2026, 11, 1, 10, 0, 0, 0, time.Local)
+	for i := 0; i < 5; i++ {
+		wwwLogReceiver(&notifier.Msg{Time: ts.Add(time.Duration(i) * time.Second),
+			MsgType: notifier.MSGTYPE_MESSAGE, Severity: notifier.INFO, Text: fmt.Sprintf("m%d", i)})
+	}
+	sp.update(pools, nil)
+	sf, err := loadStateFile(path)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(sf.Events) != 3 || sf.Events[0].Text != "m2" || sf.Events[2].Text != "m4" {
+		t.Fatalf("events in file: %+v", sf.Events)
+	}
+	// unchanged: no new write
+	if err := os.Remove(path); err != nil {
+		t.Fatal(err)
+	}
+	sp.update(pools, nil)
+	if _, err := os.Stat(path); err == nil {
+		t.Error("written again although nothing changed")
+	}
+}
+
+func TestRestoreEvents(t *testing.T) {
+	goldenSetup(t)
+	cfg.Www.Logbuffer = 4
+	wwwLogReceiver(&notifier.Msg{Time: time.Now(), MsgType: notifier.MSGTYPE_MESSAGE, Severity: notifier.INFO, Text: "starting"})
+	restoreEvents(testEvents(5), 4)
+	ev := snapshotEvents()
+	if len(ev) != 4 || ev[0].Text != "event 2" || ev[3].Text != "starting" {
+		t.Fatalf("got %+v", ev)
+	}
+	restoreEvents(nil, 4)
+	restoreEvents(testEvents(2), 0)
+	if len(snapshotEvents()) != 4 {
+		t.Error("empty input or limit 0 changed the buffer")
+	}
+}
+
+func TestRestoredEventsNotNotified(t *testing.T) {
+	goldenSetup(t)
+	cfg.Www.Logbuffer = 10
+	done := captureState(t)
+	cfg.Www.Logbuffer = 10
+	restoreEvents(testEvents(3), 10)
+	if msgs := done(); len(msgs) != 0 {
+		t.Errorf("restoring sent notifications: %q", msgs)
+	}
+	if len(snapshotEvents()) != 3 {
+		t.Error("events not in the buffer")
 	}
 }
